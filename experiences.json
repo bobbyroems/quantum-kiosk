@@ -3,7 +3,7 @@
   "experiences": [
     {
       "id": "magne",
-      "label": "MAGNE",
+      "label": "QuNorth",
       "directory": "experiences\\magne",
       "defaultSource": "..\\magne-kiosk",
       "importProfile": "magne",
@@ -12,7 +12,7 @@
     },
     {
       "id": "iqm",
-      "label": "IQM",
+      "label": "Explore Quantum",
       "directory": "experiences\\iqm",
       "defaultSource": "..\\makeshift-iqm-kiosk",
       "importProfile": "iqm",

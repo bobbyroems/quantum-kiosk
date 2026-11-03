@@ -1,6 +1,6 @@
 # Quantum experience launcher
 
-An offline launcher for independently built, editable web experiences, using one shared fullscreen Electron window. The registered **MAGNE** and **IQM** experiences appear as large touch targets on a light welcome screen.
+An offline launcher for independently built, editable web experiences, using one shared fullscreen Electron window. The welcome screen presents **QuNorth** (MAGNE) and **Explore Quantum** (IQM) as large white and navy touch targets with descriptive subtitles and circular chevrons, over a soft pastel background. Partner branding sits below the cards; portrait screens stack the cards and landscape screens place them side by side. Fonts, texture, and partner images are bundled in `launcher\assets` for offline use. Their internal IDs remain `magne` and `iqm`.
 
 ## Setup and run (Windows)
 
@@ -159,7 +159,7 @@ The narrow immutable `window.launcher` bridge provides `bridgeVersion: 1`, capab
 - `returnToLauncher()` → `{ ok, state }`; available to trusted experience main frames. `capabilities.returnToLauncher` is true in experience documents and false on the launcher.
 - `onStateChanged(callback)` → an unsubscribe function.
 
-Each experience's welcome screen includes a secondary **Back to experiences** touch target. It returns directly to the launcher without confirmation; it never closes the shared window or quits Electron. Existing MAGNE Home and IQM Exit controls still return to their own welcome screens, where visitors can then leave the experience. The new control is hidden, disabled, and removed from keyboard focus during interaction. It disables immediately on activation; failed navigation shows accessible feedback and permits a retry.
+Each experience's welcome screen includes an **Exit to main menu** button in the top-right corner. Both use the same compact white button with an orange outline, orange label, and decorative close icon. At the 768px-wide portrait reference size, the button is 26px tall with 12px top and 36px right insets; MAGNE scales responsively and IQM uses equivalent dimensions within its scaled 2160px stage. It returns directly to the launcher without confirmation; it never closes the shared window or quits Electron. Existing MAGNE Home and IQM Exit controls still return to their own welcome screens, where visitors can then leave the experience. The control is hidden, disabled, and removed from keyboard focus during interaction. It disables immediately on activation; failed navigation shows accessible feedback and permits a retry.
 
 The controls are launcher-owned: `experiences.json` selects the `magne`/`iqm` adapters in `electron\runtime-adapters.cjs`; the sandboxed preload mounts the control in MAGNE's `#attract-screen` or IQM's `[data-screen="attract"]`. `electron\return-control-styles.cjs` supplies scoped Electron-injected CSS compatible with IQM's inline-style restrictions and scaled stage. Observers/listeners are disposed when the document unloads. No return-control HTML/JS/CSS is added to the imported renderers or originals, so imports preserve these adapters and stand-alone/browser runs have no launcher-specific button. An upstream welcome-selector change requires a reviewed adapter update.
 

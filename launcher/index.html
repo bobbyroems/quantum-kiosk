@@ -12,19 +12,31 @@
 <body>
   <main class="welcome" aria-labelledby="welcome-title">
     <header>
-      <p class="eyebrow">Quantum experiences</p>
-      <h1 id="welcome-title">Explore quantum.</h1>
-      <p class="introduction">Choose an experience to begin.</p>
+      <h1 id="welcome-title" class="eyebrow">Quantum experiences</h1>
+      <p class="introduction">Choose an experience to begin</p>
     </header>
     <div class="experiences" aria-label="Choose an experience">
-      <button class="experience experience--magne" type="button" data-experience="magne">
-        <span class="experience__label">MAGNE</span><span class="experience__action" aria-hidden="true">Begin <span>→</span></span>
+      <button class="experience" type="button" data-experience="magne">
+        <span class="experience__copy">
+          <span class="experience__label">QuNorth</span>
+          <span class="experience__description">Explore the Nordic quantum initiative</span>
+        </span>
+        <span class="experience__action" aria-hidden="true"></span>
       </button>
-      <button class="experience experience--iqm" type="button" data-experience="iqm">
-        <span class="experience__label">IQM</span><span class="experience__action" aria-hidden="true">Begin <span>→</span></span>
+      <button class="experience" type="button" data-experience="iqm">
+        <span class="experience__copy">
+          <span class="experience__label">Explore Quantum</span>
+          <span class="experience__description">Explore the building blocks of quantum computing</span>
+        </span>
+        <span class="experience__action" aria-hidden="true"></span>
       </button>
     </div>
     <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
+    <footer class="partners" aria-label="Experience partners">
+      <img class="partners__qunorth" src="assets/qunorth.png" alt="QuNorth" width="150" height="43">
+      <span class="partners__divider" aria-hidden="true"></span>
+      <img class="partners__microsoft" src="assets/microsoft.png" alt="Microsoft" width="1404" height="300">
+    </footer>
   </main>
 </body>
 </html>

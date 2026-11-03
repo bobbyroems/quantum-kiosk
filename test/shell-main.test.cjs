@@ -176,6 +176,25 @@ test('return CSS is inserted only after a trusted adapted document loads, never 
   await shell.ipc('quantum:launch-experience', 'magne')
   assert.equal(contents.styles.length, 2, 'Stale load callbacks must not insert CSS into a successor')
 })
+test('both return buttons share the reference outline, close icon, and stage-correct sizing', () => {
+  const { RETURN_CONTROL_CSS: css } = require('../electron/return-control-styles.cjs')
+  const rule = selector => css.slice(css.indexOf(`${selector} {`) + selector.length + 2).split('}')[0]
+  const control = rule('[data-quantum-return]')
+  assert.match(control, /--return-unit: clamp\(1px, 0\.1302083333vw, 2\.8125px\)/)
+  assert.match(control, /top: calc\(12 \* var\(--return-unit\)\)/)
+  assert.match(control, /right: calc\(36 \* var\(--return-unit\)\)/)
+  const button = rule('[data-quantum-return] button')
+  for (const declaration of ['min-height: calc(26 * var(--return-unit))',
+    'border: calc(1 * var(--return-unit)) solid #ff5a36', 'border-radius: calc(3 * var(--return-unit))',
+    'background: #fff', 'color: #ff5a36', 'font-weight: 400']) {
+    assert.ok(button.includes(declaration), declaration)
+  }
+  assert.match(rule('[data-quantum-return] button::after'), /linear-gradient\(45deg/)
+  assert.match(rule('[data-quantum-return] button::after'), /linear-gradient\(-45deg/)
+  assert.match(rule('[data-quantum-return] button:focus-visible'), /outline:.*solid #0055d4/)
+  assert.match(rule('[data-quantum-return="iqm"]'), /--return-unit: 2\.8125px/)
+  assert.doesNotMatch(css, /\[data-quantum-return="(?:magne|iqm)"\] button/)
+})
 test('return styling failures restore the launcher rather than leave an unstyled experience control', async () => {
   const shell = await harness()
   const contents = shell.windows[0].webContents

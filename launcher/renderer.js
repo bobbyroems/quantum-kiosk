@@ -5,6 +5,10 @@
   const group = document.querySelector('.experiences');
   const status = document.getElementById('status');
   const labels = new Map(buttons.map(button => [button.dataset.experience, button.dataset.experience.toUpperCase()]));
+  const descriptions = new Map([
+    ['magne', 'Explore the Nordic quantum initiative'],
+    ['iqm', 'Explore the building blocks of quantum computing']
+  ]);
   let busy = false;
   let launching = false;
   let connected = false;
@@ -54,17 +58,22 @@
       button.className = 'experience';
       button.type = 'button';
       button.dataset.experience = entry.id;
+      const copy = document.createElement('span');
+      copy.className = 'experience__copy';
       const label = document.createElement('span');
       label.className = 'experience__label';
       label.textContent = entry.label;
+      copy.append(label);
+      if (descriptions.has(entry.id)) {
+        const description = document.createElement('span');
+        description.className = 'experience__description';
+        description.textContent = descriptions.get(entry.id);
+        copy.append(description);
+      }
       const action = document.createElement('span');
       action.className = 'experience__action';
       action.setAttribute('aria-hidden', 'true');
-      action.textContent = 'Begin ';
-      const arrow = document.createElement('span');
-      arrow.textContent = '→';
-      action.append(arrow);
-      button.append(label, action);
+      button.append(copy, action);
       labels.set(entry.id, entry.label);
       bindButton(button);
       return button;

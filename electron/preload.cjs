@@ -104,7 +104,7 @@ if (process.isMainFrame && location.protocol === 'quantum-app:' && !location.use
       } catch {
         if (!ownsDocument()) return
         busy = false
-        button.textContent = 'Back to experiences'
+        button.textContent = 'Exit to main menu'
         button.removeAttribute('aria-busy')
         status.textContent = 'Could not return. Please try again.'
         status.hidden = false
@@ -120,7 +120,7 @@ if (process.isMainFrame && location.protocol === 'quantum-app:' && !location.use
       control.hidden = true
       button = owner.createElement('button')
       button.type = 'button'
-      button.textContent = 'Back to experiences'
+      button.textContent = 'Exit to main menu'
       button.disabled = true
       button.tabIndex = -1
       status = owner.createElement('p')

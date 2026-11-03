@@ -116,6 +116,49 @@ async function screenshot(name) {
   fs.writeFileSync(filename, (await window().webContents.capturePage()).toPNG());
   report.screenshots.push(filename);
 }
+async function checkLauncherDesign() {
+  const debuggerClient = window().webContents.debugger;
+  try {
+    for (const [width, height] of [[768, 1365], [1080, 1920], [2160, 3840], [1280, 720], [390, 844]]) {
+      await debuggerClient.sendCommand('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
+      await evaluate('document.fonts.ready');
+      const design = await evaluate(`(() => {
+        const bounds = node => { const r = node.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height,
+          visible: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight && r.right <= innerWidth }; };
+        const cards = [...document.querySelectorAll('.experience')];
+        return { cards: cards.map(bounds), colors: cards.map(node => getComputedStyle(node).backgroundColor),
+          descriptions: cards.map(node => node.querySelector('.experience__description').textContent),
+          descriptionLines: cards.map(node => { const text = node.querySelector('.experience__description');
+            return Math.round(text.getBoundingClientRect().height / parseFloat(getComputedStyle(text).lineHeight)); }),
+          branding: [...document.querySelectorAll('.partners img')].map(node => ({ ...bounds(node), loaded: node.complete && node.naturalWidth > 0 })),
+          header: bounds(document.querySelector('header')), footer: bounds(document.querySelector('.partners')),
+          overflow: document.documentElement.scrollWidth > innerWidth || document.documentElement.scrollHeight > innerHeight,
+          fontLoaded: document.fonts.check('22px "Segoe Sans"') };
+      })()`);
+      assert.ok(design.cards.every(card => card.visible && card.height >= 160), JSON.stringify(design));
+      assert.ok(design.header.visible && design.footer.visible && !design.overflow, JSON.stringify(design));
+      assert.ok(design.branding.every(logo => logo.loaded && logo.visible));
+      assert.equal(design.fontLoaded, true);
+      assert.deepEqual(design.colors, ['rgb(255, 255, 255)', 'rgb(7, 30, 42)']);
+      assert.deepEqual(design.descriptions, ['Explore the Nordic quantum initiative', 'Explore the building blocks of quantum computing']);
+      if (width === 768) {
+        assert.ok(Math.abs(design.cards[0].x - 71) < 3 && Math.abs(design.cards[0].y - 449) < 3, JSON.stringify(design.cards));
+        assert.ok(Math.abs(design.cards[0].width - 626) < 3 && Math.abs(design.cards[0].height - 283) < 3);
+        assert.deepEqual(design.descriptionLines, [1, 1]);
+        await screenshot('welcome-reference');
+      }
+      check(`Reference launcher design fits ${width}x${height}`, design);
+    }
+    await debuggerClient.sendCommand('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+    await debuggerClient.sendCommand('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Tab', code: 'Tab', windowsVirtualKeyCode: 9 });
+    const focus = await evaluate('({ visible: document.activeElement.matches(".experience:focus-visible"), outline: getComputedStyle(document.activeElement).outlineStyle })');
+    assert.equal(focus.visible, true);
+    assert.equal(focus.outline, 'solid');
+    check('Keyboard focus remains visible on launcher cards', focus);
+  } finally {
+    await debuggerClient.sendCommand('Emulation.clearDeviceMetricsOverride');
+  }
+}
 async function touch(selector) {
   const target = await evaluate(`(() => { const selector = ${JSON.stringify(selector)}; const button = document.querySelector(selector); const rect = button.getBoundingClientRect(); const point = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2, id: 1 }; const hit = document.elementFromPoint(point.x, point.y); return { point, width: innerWidth, height: innerHeight, hit: hit?.outerHTML.slice(0, 300), reachable: Boolean(hit?.closest(selector)), screen: document.querySelector('[data-screen].is-active')?.dataset.screen }; })()`);
   assert.ok(target.point.x >= 0 && target.point.x < target.width && target.point.y >= 0 && target.point.y < target.height, `Touch target is outside the viewport: ${JSON.stringify(target)}`);
@@ -146,16 +189,28 @@ async function checkReturnControl(name, visible) {
   const control = await evaluate(`(() => {
     const button = document.querySelector(${JSON.stringify(returnSelector)});
     const rect = button.getBoundingClientRect();
+    const style = getComputedStyle(button);
+    const stage = document.getElementById('kiosk-stage');
+    const unit = stage ? 2.8125 * Math.min(innerWidth / 2160, innerHeight / 3840) : Math.max(1, Math.min(innerWidth / 768, 2.8125));
     return { text: button.textContent, width: rect.width, height: rect.height,
       visible: rect.width > 0 && rect.height > 0 && rect.top >= 0 && rect.left >= 0 && rect.bottom <= innerHeight && rect.right <= innerWidth,
+      color: style.color, background: style.backgroundColor, border: style.borderTopStyle, borderColor: style.borderTopColor,
+      appearance: style.appearance,
+      icon: getComputedStyle(button, '::after').content, expectedHeight: 26 * unit,
       disabled: button.disabled, tabIndex: button.tabIndex };
   })()`);
   if (visible) {
-    assert.equal(control.text, 'Back to experiences');
+    assert.equal(control.text, 'Exit to main menu');
     assert.equal(control.visible, true);
-    assert.ok(control.height >= 40, `Return target is too small: ${JSON.stringify(control)}`);
+    assert.ok(Math.abs(control.height - control.expectedHeight) < 1, `Return target does not match reference sizing: ${JSON.stringify(control)}`);
+    assert.equal(control.color, 'rgb(255, 90, 54)');
+    assert.equal(control.background, 'rgb(255, 255, 255)');
+    assert.equal(control.border, 'solid');
+    assert.equal(control.borderColor, 'rgb(255, 90, 54)');
+    assert.equal(control.appearance, 'none');
+    assert.equal(control.icon, '""');
   } else assert.equal(control.visible, false);
-  check(`${name} return control is ${visible ? 'visible and touch-sized on welcome' : 'hidden and unfocusable during interaction'}`, control);
+  check(`${name} return control is ${visible ? 'visible at its configured size on welcome' : 'hidden and unfocusable during interaction'}`, control);
 }
 async function visitorReturn(name, input = 'touch') {
   await checkReturnControl(name, true);
@@ -165,6 +220,25 @@ async function visitorReturn(name, input = 'touch') {
   await until(() => !window().webContents.isCurrentlyAudible(), 'visitor return stops experience audio', 5000);
   assert.equal(await evaluate('document.querySelector("[data-quantum-return]") === null'), true);
   check(`${name} welcome ${input} returns directly to launcher in the same window`, true);
+}
+async function checkReturnReference(name) {
+  const debuggerClient = window().webContents.debugger;
+  try {
+    for (const [width, height] of [[768, 1365], [2160, 3840]]) {
+      await debuggerClient.sendCommand('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
+      await wait(100);
+      await checkReturnControl(name, true);
+      const rect = await evaluate(`(() => { const r = document.querySelector(${JSON.stringify(returnSelector)}).getBoundingClientRect();
+        return { top: r.top, right: innerWidth - r.right, width: r.width }; })()`);
+      const scale = width / 768;
+      assert.ok(Math.abs(rect.top - 12 * scale) < 2 && Math.abs(rect.right - 36 * scale) < 2, JSON.stringify(rect));
+      assert.ok(Math.abs(rect.width - 123 * scale) < 8 * scale, JSON.stringify(rect));
+      if (width === 768) await screenshot(`${name.toLowerCase()}-return-reference`);
+      check(`${name} exit button matches reference at ${width}x${height}`, rect);
+    }
+  } finally {
+    await debuggerClient.sendCommand('Emulation.clearDeviceMetricsOverride');
+  }
 }
 
 async function run() {
@@ -178,8 +252,9 @@ async function run() {
   assert.equal(welcome.secure, true);
   assert.equal(welcome.node, 'undefined');
   assert.equal(welcome.sandbox, 'undefined');
-  assert.deepEqual(welcome.labels, ['MAGNE', 'IQM']);
-  check('Secure sandboxed welcome and MAGNE/IQM targets', welcome);
+  assert.deepEqual(welcome.labels, ['QuNorth', 'Explore Quantum']);
+  check('Secure sandboxed welcome and QuNorth/Explore Quantum targets', welcome);
+  await checkLauncherDesign();
   await checkLayout();
   await screenshot('welcome');
 
@@ -215,6 +290,7 @@ async function run() {
   await evaluate('window.__smokeDocumentMarker = "magne"; true');
   check('MAGNE launches once with its original production idle timeout', shell.getNavigationState());
   await checkReturnControl('MAGNE', true);
+  await checkReturnReference('MAGNE');
   await screenshot('magne');
   const fonts = await evaluate('(async () => ({ outfit: (await document.fonts.load(\'16px "Outfit"\')).length, unica: (await document.fonts.load(\'16px "Unica One"\')).length }))()');
   assert.ok(fonts.outfit > 0 && fonts.unica > 0);
@@ -250,6 +326,7 @@ async function run() {
   assert.equal(runtime.idle, 120000);
   check('IQM receives its runtime configuration before startup', runtime);
   await checkReturnControl('IQM', true);
+  await checkReturnReference('IQM');
   await screenshot('iqm');
   await evaluate('window.__kioskApp.goHome(); true');
   await wait(700);

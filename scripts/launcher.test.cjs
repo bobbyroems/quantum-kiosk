@@ -5,6 +5,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(path.dirname(__dirname), 'launcher', 'renderer.js'), 'utf8');
+const html = fs.readFileSync(path.join(path.dirname(__dirname), 'launcher', 'index.html'), 'utf8');
+const registeredExperiences = JSON.parse(fs.readFileSync(path.join(path.dirname(__dirname), 'experiences.json'), 'utf8')).experiences;
 const idle = { document: 'launcher', isLoading: false, experienceId: null, error: null };
 const turn = () => new Promise(resolve => setImmediate(resolve));
 function setup(options = {}) {
@@ -19,7 +21,7 @@ function setup(options = {}) {
   const events = {};
   const calls = [];
   const bridge = { getState: options.getState || (() => Promise.resolve(idle)),
-    getExperiences: options.getExperiences || (() => Promise.resolve(options.experiences || [{ id: 'magne', label: 'MAGNE' }, { id: 'iqm', label: 'IQM' }])),
+    getExperiences: options.getExperiences || (() => Promise.resolve(options.experiences || registeredExperiences)),
     launchExperience: options.launch || (id => { calls.push(id); return new Promise(() => {}); }),
     onStateChanged(callback) { subscriber = callback; return () => { closed = true; }; } };
   const window = { launcher: options.noBridge ? undefined : bridge, addEventListener(name, listener) { events[name] = listener; } };
@@ -28,6 +30,29 @@ function setup(options = {}) {
   return { status, buttons, group, calls, emit: state => subscriber(state), pagehide: () => events.pagehide(), isClosed: () => closed };
 }
 
+test('static welcome copy matches registered display names and retains an accessible heading', () => {
+  assert.deepEqual(registeredExperiences.map(entry => [entry.id, entry.label]), [['magne', 'QuNorth'], ['iqm', 'Explore Quantum']]);
+  assert.deepEqual([...html.matchAll(/class="experience__label">([^<]+)</g)].map(match => match[1]), registeredExperiences.map(entry => entry.label));
+  assert.deepEqual([...html.matchAll(/data-experience="([^"]+)"/g)].map(match => match[1]), registeredExperiences.map(entry => entry.id));
+  assert.equal([...html.matchAll(/class="experience__action" aria-hidden="true"><\/span>/g)].length, 2);
+  assert.deepEqual([...html.matchAll(/class="experience__description">([^<]+)</g)].map(match => match[1]),
+    ['Explore the Nordic quantum initiative', 'Explore the building blocks of quantum computing']);
+  assert.match(html, /aria-labelledby="welcome-title"/);
+  assert.match(html, /<h1 id="welcome-title" class="eyebrow">Quantum experiences<\/h1>/);
+  assert.doesNotMatch(html, />Explore quantum\.<|>Begin /i);
+});
+test('redesigned targets retain descriptions, decorative chevrons, and original launch IDs', async () => {
+  const calls = [];
+  const page = setup({ launch: async id => { calls.push(id); return { ok: true, state: idle }; } });
+  await turn();
+  assert.deepEqual(page.buttons.map(button => button.children[0].children[0].textContent), ['QuNorth', 'Explore Quantum']);
+  assert.deepEqual(page.buttons.map(button => button.children[0].children[1].textContent),
+    ['Explore the Nordic quantum initiative', 'Explore the building blocks of quantum computing']);
+  assert.ok(page.buttons.every(button => button.children[1].attributes['aria-hidden'] === 'true'));
+  await page.buttons[0].click();
+  await page.buttons[1].click();
+  assert.deepEqual(calls, ['magne', 'iqm']);
+});
 test('standalone preview explains shell requirement and disables launches', () => {
   const page = setup({ noBridge: true });
   assert.ok(page.buttons.every(button => button.disabled));
@@ -40,7 +65,7 @@ test('only one launch is sent for rapid repeated taps', async () => {
   assert.deepEqual(page.calls, ['magne']);
   assert.ok(page.buttons.every(button => button.disabled));
   assert.equal(page.group.attributes['aria-busy'], 'true');
-  assert.match(page.status.textContent, /MAGNE/);
+  assert.equal(page.status.textContent, 'Opening QuNorth…');
 });
 test('failed navigation result restores touch targets and plain-text feedback', async () => {
   const page = setup({ launch: async () => ({ ok: false, state: { ...idle, error: '<b>Missing build</b>' } }) });
@@ -64,7 +89,7 @@ test('a late initial read cannot overwrite a newer state notification', async ()
 test('busy notifications disable both experiences and release afterward', async () => {
   const page = setup(); await turn();
   page.emit({ ...idle, isLoading: true, experienceId: 'iqm' });
-  assert.match(page.status.textContent, /IQM/);
+  assert.equal(page.status.textContent, 'Opening Explore Quantum…');
   assert.ok(page.buttons.every(button => button.disabled));
   page.emit(idle);
   assert.ok(page.buttons.every(button => !button.disabled));
@@ -83,8 +108,9 @@ test('read-only registry drives every welcome target, preserves plain-text label
   await turn();
   assert.equal(page.buttons.length, 3);
   assert.deepEqual(page.buttons.map(button => button.dataset.experience), ['first', 'second', 'third']);
-  assert.equal(page.buttons[2].children[0].textContent, '<b>Third & final</b>');
-  assert.equal(page.buttons[2].children[0].innerHTML, undefined);
+  assert.equal(page.buttons[2].children[0].children[0].textContent, '<b>Third & final</b>');
+  assert.equal(page.buttons[2].children[0].children[0].innerHTML, undefined);
+  assert.equal(page.buttons[2].children[0].children.length, 1);
   page.buttons[2].click();
   assert.deepEqual(page.calls, ['third']);
   assert.equal(page.status.textContent, 'Opening <b>Third & final</b>…');
