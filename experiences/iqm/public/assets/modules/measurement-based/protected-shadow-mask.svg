@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="454.667" height="317.796" viewBox="-48 -48 454.667 317.796">
+  <!-- Same inner/outer balance as the measurement glow. Both share one adaptive
+       backdrop tint; dots get a smaller inner halo and no extra outer bloom. -->
+  <defs>
+    <g id="leader">
+      <path d="M174.351 13.9861V148.986"/>
+      <path d="M13.3333 208.463L12.7866 148.894H344.787L345.333 208.463"/>
+    </g>
+    <filter id="inner-glow" x="-48" y="-48" width="454.667" height="317.796" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <filter id="outer-glow" x="-48" y="-48" width="454.667" height="317.796" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <g filter="url(#outer-glow)" opacity="0.28">
+    <use href="#leader" fill="none" stroke="white" stroke-width="19" stroke-linejoin="round"/>
+  </g>
+  <g filter="url(#inner-glow)" opacity="0.8">
+    <use href="#leader" fill="none" stroke="white" stroke-width="11" stroke-linejoin="round"/>
+    <g fill="white" opacity="0.5">
+      <circle cx="174.351" cy="13.9861" r="15.9861"/>
+      <circle cx="13.3333" cy="208.463" r="15.3333"/>
+      <circle cx="345.333" cy="208.463" r="15.3333"/>
+    </g>
+  </g>
+</svg>

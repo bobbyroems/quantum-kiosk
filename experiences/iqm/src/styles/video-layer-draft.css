@@ -1,0 +1,302 @@
+.video-draft-page {
+  background: var(--color-background-deep);
+}
+
+.video-draft {
+  font-family: var(--font-text);
+}
+
+.video-draft__surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+  color: var(--color-navy);
+  isolation: isolate;
+}
+
+.video-draft__app-light {
+  position: absolute;
+  z-index: 0;
+  inset: -8%;
+  background:
+    radial-gradient(48% 28% at 25% 30%, rgba(0, 120, 212, 0.09), transparent 72%),
+    radial-gradient(42% 30% at 78% 42%, rgba(122, 95, 212, 0.08), transparent 70%),
+    #fff;
+  pointer-events: none;
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__app-light {
+  background:
+    radial-gradient(52% 36% at 50% 42%, rgba(0, 120, 212, 0.22), transparent 72%),
+    #07111f;
+}
+
+/* The checkerboard is a diagnostic alpha-inspection surface, not decoration. */
+.video-draft__surface[data-draft-background='checker'] .video-draft__app-light {
+  background-color: #dce4ec;
+  background-image:
+    linear-gradient(45deg, #cbd5df 25%, transparent 25%),
+    linear-gradient(-45deg, #cbd5df 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #cbd5df 75%),
+    linear-gradient(-45deg, transparent 75%, #cbd5df 75%);
+  background-position: 0 0, 0 36px, 36px -36px, -36px 0;
+  background-size: 72px 72px;
+}
+
+.video-draft__surface[data-draft-background='dark'] .majorana-intro__light-sweep,
+.video-draft__surface[data-draft-background='checker'] .majorana-intro__light-sweep {
+  display: none;
+}
+
+.video-draft__brand {
+  position: absolute;
+  z-index: 5;
+  top: 92px;
+  left: 100px;
+  display: flex;
+  height: 76px;
+  align-items: center;
+  gap: 38px;
+}
+
+.video-draft__brand-logo {
+  position: relative;
+  display: block;
+  width: 223px;
+  height: 76px;
+  overflow: hidden;
+}
+
+.video-draft__brand-logo img {
+  position: absolute;
+  top: -16.89px;
+  left: -37px;
+  width: 260px;
+  height: 116.53px;
+  max-width: none;
+}
+
+.video-draft__brand-rule {
+  width: 2px;
+  height: 50px;
+  background: #737373;
+}
+
+.video-draft__brand-name {
+  color: #737373;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__brand-name {
+  color: #d8e3ef;
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__brand-logo img {
+  filter: brightness(0) invert(1);
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__brand-rule {
+  background: rgba(216, 227, 239, 0.55);
+}
+
+.video-draft__media {
+  position: absolute;
+  z-index: 2;
+  top: 350px;
+  left: 180px;
+  display: grid;
+  width: 1800px;
+  height: 1800px;
+  place-items: center;
+}
+
+.video-draft__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 260ms var(--ease-out);
+}
+
+.video-draft__media.is-ready .video-draft__video {
+  opacity: 1;
+}
+
+.video-draft__loading,
+.video-draft__error {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin: 0;
+  padding: 34px 48px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 14px 42px rgba(42, 68, 111, 0.2);
+  color: var(--color-navy);
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.video-draft__media.is-ready .video-draft__loading,
+.video-draft__loading[hidden],
+.video-draft__error[hidden] {
+  display: none;
+}
+
+.video-draft__error {
+  max-width: 1240px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.video-draft__spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #d9ecf8;
+  border-top-color: var(--color-blue);
+  border-radius: 50%;
+  animation: video-draft-spin 800ms linear infinite;
+}
+
+.video-draft__explainer-host {
+  position: absolute;
+  z-index: 6;
+  top: 2260px;
+  left: 220px;
+  width: 1720px;
+}
+
+.video-draft__explainer {
+  --kiosk-explainer-background: rgba(255, 255, 255, 0.72);
+  --kiosk-explainer-body-size: 44px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-border-radius: 16px;
+  --kiosk-explainer-content-gap: 26px;
+  --kiosk-explainer-padding: 54px 64px;
+  --kiosk-explainer-title-size: 68px;
+  width: 100%;
+  min-height: 330px;
+  justify-content: center;
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__explainer {
+  --kiosk-explainer-background: rgba(12, 27, 45, 0.78);
+  --kiosk-explainer-body-color: #c7d7e8;
+  --kiosk-explainer-ink: #f5f9fd;
+  --kiosk-explainer-strong-color: #fff;
+}
+
+.video-draft__controls {
+  position: absolute;
+  z-index: 7;
+  bottom: 210px;
+  left: 220px;
+  display: grid;
+  width: 1720px;
+  min-height: 700px;
+  align-content: center;
+  gap: 50px;
+  padding: 70px;
+  border-radius: 16px;
+  background: rgba(254, 254, 254, 0.94);
+  box-shadow: 0 20px 70px rgba(42, 68, 111, 0.2);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__controls {
+  background: rgba(12, 27, 45, 0.92);
+  color: #f5f9fd;
+}
+
+.video-draft__picker {
+  display: grid;
+  gap: 20px;
+}
+
+.video-draft__picker label {
+  color: var(--color-navy);
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__picker label {
+  color: #f5f9fd;
+}
+
+.video-draft__picker select {
+  width: 100%;
+  min-height: 112px;
+  padding: 0 34px;
+  border: 2px solid rgba(42, 68, 111, 0.42);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--color-navy);
+  font: 600 38px/1.2 var(--font-text);
+}
+
+.video-draft__picker select:focus-visible,
+.video-draft__actions button:focus-visible {
+  outline: 6px solid rgba(0, 120, 212, 0.34);
+  outline-offset: 6px;
+}
+
+.video-draft__actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.video-draft__actions button {
+  min-height: 112px;
+  padding: 18px 24px;
+  border: 2px solid var(--color-navy);
+  border-radius: 12px;
+  background: var(--color-panel);
+  color: var(--color-navy);
+  font: 600 31px/1.2 var(--font-text);
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.video-draft__actions button:hover {
+  background: var(--color-panel-hover);
+}
+
+.video-draft__actions button:active {
+  transform: scale(0.985);
+}
+
+.video-draft__status {
+  min-height: 42px;
+  margin: 0;
+  color: rgba(42, 68, 111, 0.82);
+  font-size: 30px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.video-draft__surface[data-draft-background='dark'] .video-draft__status {
+  color: #c7d7e8;
+}
+
+@keyframes video-draft-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-draft__video,
+  .video-draft__actions button {
+    transition: none;
+  }
+
+  .video-draft__spinner {
+    animation: none;
+  }
+}

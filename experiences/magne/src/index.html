@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantum Kiosk</title>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/attract.css">
+  <link rel="stylesheet" href="styles/compute.css">
+  <link rel="stylesheet" href="styles/connect.css">
+  <link rel="stylesheet" href="styles/control.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Attract Mode / First Screen -->
+    <div id="attract-screen" class="screen active">
+      <div class="gradient-bg"></div>
+
+      <!-- Touch to start button -->
+      <button class="start-button" id="startButton">Touch to start</button>
+
+      <!-- Branding content - cycles through 3 states -->
+      <div class="branding">
+        <!-- QuNorth slide with dot patterns -->
+        <div class="brand-slide qunorth-slide active" data-slide="0">
+          <div class="slide-content">
+            <div class="dot-pattern dot-pattern-upper" data-slide="0"></div>
+            <div class="brand-copy">
+              <h1 class="brand-title">QuNorth</h1>
+              <p class="brand-subtitle">A Nordic Quantum Initiative</p>
+            </div>
+            <div class="dot-pattern dot-pattern-lower" data-slide="0"></div>
+          </div>
+        </div>
+
+        <!-- MAGNE slide -->
+        <div class="brand-slide" data-slide="1">
+          <div class="slide-content">
+            <div class="dot-pattern dot-pattern-upper" data-slide="1"></div>
+            <div class="brand-copy">
+              <span class="brand-pretitle">discover</span>
+              <h1 class="brand-title">MAGNE</h1>
+              <p class="brand-subtitle">A Quantum Computing Event</p>
+            </div>
+            <div class="dot-pattern dot-pattern-lower" data-slide="1"></div>
+          </div>
+        </div>
+
+        <!-- Connect Compute Control slide -->
+        <div class="brand-slide" data-slide="2">
+          <div class="slide-content">
+            <div class="dot-pattern dot-pattern-upper" data-slide="2"></div>
+            <p class="nav-hint">Choose a topic to explore</p>
+            <div class="brand-nav-words">
+              <span class="nav-word">Connect</span>
+              <span class="nav-word">Compute</span>
+              <span class="nav-word">Control</span>
+            </div>
+            <div class="dot-pattern dot-pattern-lower" data-slide="2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Interactive screens (hidden initially) -->
+    <div id="interactive-screen" class="screen">
+      <div class="gradient-bg"></div>
+      <!-- Global map that shows above nav for Connect tab -->
+      <div class="global-map" id="globalMap">
+        <img src="assets/images/connect/connect-map.png" alt="" />
+      </div>
+      <!-- QuNorth content - at same level as map for proper z-index -->
+      <div class="global-qunorth" id="globalQuNorth">
+        <div class="qunorth-intro">
+          <h2 class="qunorth-title">QuNorth</h2>
+          <div class="qunorth-subtitle-wrap">
+            <p class="qunorth-subtitle"><strong>A Nordic Quantum Initiative</strong></p>
+            <div class="global-locator-dot" id="globalLocatorDot">
+              <span class="locator-pulse"></span>
+              <span class="locator-center"></span>
+            </div>
+          </div>
+          <p class="qunorth-body">
+            QuNorth's mission is to empower the Nordic innovation ecosystem by providing reliable and cost-effective access to critical technologies for Nordic researchers and companies.
+          </p>
+        </div>
+        <div class="qunorth-location location-hidden">
+          <div class="location-card">
+            <div class="location-image">
+              <img src="assets/images/connect/connect-ronnegade-6.png" alt="Copenhagen's Innovation District" />
+            </div>
+            <div class="location-info">
+              <h3 class="location-title">Copenhagen's Innovation District</h3>
+              <p class="location-desc">
+                The new quantum facility in Copenhagen's Innovation District will provide the Nordic region with access to Magne, one of the most powerful quantum computers. The high-performance, next-generation hardware at the center of Copenhagen's growing quantum ecosystem will advance both scientific breakthroughs and the Nordics' position in the global quantum landscape.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="top-nav">
+        <button class="nav-home" id="navHomeBtn" aria-label="Return to start">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="nav-tabs">
+          <button class="nav-tab active" data-tab="connect">Connect</button>
+          <button class="nav-tab" data-tab="compute">Compute</button>
+          <button class="nav-tab" data-tab="control">Control</button>
+          <div class="nav-indicator"></div>
+        </div>
+      </nav>
+      <div class="content-area" id="contentArea">
+        <!-- Tab content will be injected here -->
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+:root {
+  --design-width: 2160;
+  --design-height: 3840;
+  --stage-scale: 1;
+
+  /* Microsoft Quantum light palette (Figma "reimagine/day") */
+  --color-background: #ffffff;
+  --color-background-deep: #ececec;
+  --color-ink: #2a446f;
+  --color-muted: rgba(42, 68, 111, 0.88);
+  --color-subtle: rgba(42, 68, 111, 0.6);
+  --color-line: rgba(0, 0, 0, 0.12);
+  --color-panel: #fefefe;
+  --color-panel-hover: #f2f7fc;
+  --color-navy: #2a446f;
+  --color-blue: #0078d4;
+  --color-accent: #0078d4;
+  --color-headline: #2a446f;
+  --color-purple: #7a5fd4;
+  --color-teal: #1a9e8f;
+  --color-gray: #b1b3b3;
+
+  /* The CTA fill, from the Button component on the Figma "Copy Reference"
+     board (node 416:757). Flat, not the brand gradient: the button component
+     draws one colour behind both the label and the icon badge, and the badge
+     reads as a lightened disc of that colour rather than of a ramp. */
+  --color-cta: #0055d4;
+
+  /* Q Gradient Dark Blue (Figma "Grads") */
+  --gradient-brand: linear-gradient(
+    131deg,
+    #2a446f 18%,
+    #185998 50%,
+    #1163ab 64%,
+    #0078d4 92%
+  );
+
+  /* Header controls (Back / All modules / Restart / Exit).
+     Every screen and module keeps its own header classes — those carry the
+     per-module state and animation hooks — but they all draw the control
+     itself from these values, so the chrome reads as one control set. */
+  --header-action-min-height: 72px;
+  --header-action-padding: 12px 28px;
+  --header-action-gap: 16px;
+  --header-action-radius: 8px;
+  --header-action-border: 2px solid var(--color-navy);
+  --header-action-color: var(--color-navy);
+  --header-action-bg: var(--color-panel);
+  --header-action-bg-active: var(--color-panel-hover);
+  --header-action-font-size: 32px;
+  --header-action-font-weight: 600;
+  --header-action-tracking: -0.015em;
+  --header-action-icon-box: 36px;
+  --header-action-icon-size: 30px;
+  --header-actions-gap: 24px;
+
+  /* Navy, applied to monochrome control icons so they track --color-navy. */
+  --header-action-icon-filter: brightness(0) saturate(100%) invert(24%) sepia(21%)
+    saturate(1400%) hue-rotate(184deg) brightness(94%);
+
+  /* The band that runs directly under a module's header (direction bar,
+     sub-module 1-2-3, up-next popup). One gradient serves all four surfaces
+     because the design draws them as the same band at different heights — it
+     states where the visitor is, and later where they can go next.
+
+     The floor runs three of these, one per module — see the scheme blocks
+     below. What is set here is the purple, which is both the design system's
+     "Grads/Q Gradient Dark Purple" (17:2001, 17:2055) and the default: any
+     surface drawing a band outside a module gets it. The names stay
+     colour-neutral so a scheme is a value swap and nothing else. */
+  --band-gradient: var(--band-gradient-purple);
+  --band-deep: var(--band-deep-purple);
+  --band-bright: var(--band-bright-purple);
+  --band-pale: var(--band-bright-purple);
+  --band-ink: #091f2c;
+  --band-offwhite: #f4f3f5;
+
+  /* The three schemes the boards draw, each a light-to-dark ramp on the same
+     angle and stops so every band reads as the same shape in a different
+     colour. Purple is the design system's dark purple; blue is its dark blue,
+     the same ramp `--gradient-brand` carries; teal is measured from the
+     Module 01 and 08 boards, which have no token of their own. */
+  --band-gradient-purple: linear-gradient(
+    -24.636deg,
+    #8661c5 11.027%,
+    #815dbe 15.401%,
+    #61488f 46.016%,
+    #4d3a72 70.071%,
+    #463668 83.921%
+  );
+  --band-deep-purple: #463668;
+  --band-bright-purple: #c5b4e3;
+
+  --band-gradient-blue: linear-gradient(
+    -24.636deg,
+    #0078d4 11.027%,
+    #1163ab 46.016%,
+    #185998 70.071%,
+    #2a446f 83.921%
+  );
+  --band-deep-blue: #2a446f;
+  --band-bright-blue: #95c8e6;
+
+  --band-gradient-teal: linear-gradient(
+    -24.636deg,
+    #52a99c 11.027%,
+    #46908a 46.016%,
+    #3c7b7a 70.071%,
+    #2e5e63 83.921%
+  );
+  --band-deep-teal: #2e5e63;
+  --band-bright-teal: #60c5b2;
+
+  /* The band butts against the header a module draws for itself, which is
+     120px here — Figma's 160px is the shell header, which modules hide. */
+  --band-top: 120px;
+
+  /* The bar's own height. Modules that clear the bar rather than run under it
+     offset their content by exactly this. */
+  --band-height: 205px;
+
+  --font-display: "Segoe Sans Display", "Segoe Sans", "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-text: "Segoe Sans", "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --font-ui: var(--font-text);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}

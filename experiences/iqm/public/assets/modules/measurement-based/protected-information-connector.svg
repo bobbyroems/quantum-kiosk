@@ -1,0 +1,34 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="784" height="555" viewBox="0 0 784 555" fill="none" xmlns="http://www.w3.org/2000/svg">
+<style>
+@media (prefers-reduced-motion: reduce) { .connector-flow { display: none; } }
+</style>
+<!-- Strokes rather than the outlined fills this was exported as: the right
+     branch now runs the width of the device and drops to a second location, and
+     hand-maintaining that as an outline is a great deal of arithmetic for a
+     shape the browser will stroke identically. Geometry is unchanged above the
+     split, so the label, its stem and the left branch sit exactly where they
+     did. Both turns stay square, as the exported shape had them. -->
+<g id="connector-shape" fill="none" stroke="#2a446f" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M174.351 13.9861V148.986" stroke-width="5.244"/>
+  <path d="M174.351 148.894H12.7866L13.3333 208.463" stroke-width="5"/>
+  <path d="M174.351 148.894H770V541.333" stroke-width="5"/>
+  <circle cx="174.351" cy="13.9861" r="13.9861" fill="#2a446f" stroke="none"/>
+  <circle cx="13.3333" cy="208.463" r="13.3333" fill="#2a446f" stroke="none"/>
+  <circle cx="770" cy="541.333" r="13.3333" fill="#2a446f" stroke="none"/>
+</g>
+<defs>
+<linearGradient id="protected-flow-gradient" x1="0" y1="0" x2="0" y2="100%">
+<stop offset="0" stop-color="#C6AFF5" stop-opacity="0"/>
+<stop offset="0.3" stop-color="#C6AFF5" stop-opacity="0.12"/>
+<stop offset="0.5" stop-color="#C6AFF5" stop-opacity="0.55"/>
+<stop offset="0.7" stop-color="#C6AFF5" stop-opacity="0.12"/>
+<stop offset="1" stop-color="#C6AFF5" stop-opacity="0"/>
+</linearGradient>
+<mask id="protected-flow-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="784" height="555" style="mask-type: alpha;">
+<use href="#connector-shape"/>
+</mask>
+</defs>
+<rect class="connector-flow" x="0" y="-92" width="784" height="90" fill="url(#protected-flow-gradient)" mask="url(#protected-flow-mask)">
+<animate attributeName="y" values="-92;557;557" dur="4s" repeatCount="indefinite" calcMode="spline" keyTimes="0;0.7;1" keySplines="0.4 0 0.2 1;0 0 1 1"/>
+</rect>
+</svg>

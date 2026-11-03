@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Majorana 2 — test przezroczystych warstw wideo</title>
+  <link rel="stylesheet" href="/styles/tokens.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/app.css">
+  <link rel="stylesheet" href="/js/modules/build-majorana-2/majorana.css">
+  <link rel="stylesheet" href="/styles/video-layer-draft.css">
+</head>
+<body class="video-draft-page">
+  <div id="viewport-shell">
+    <main id="kiosk-stage" class="video-draft" aria-label="Majorana 2 black-background removal test">
+      <section class="video-draft__surface" data-draft-background="app">
+        <div class="video-draft__app-light" aria-hidden="true"></div>
+        <div class="majorana-intro__light-sweep" aria-hidden="true"></div>
+
+        <div class="video-draft__brand" aria-label="Microsoft Quantum">
+          <span class="video-draft__brand-logo">
+            <img src="/assets/ui/microsoft-logo.png" alt="Microsoft">
+          </span>
+          <span class="video-draft__brand-rule" aria-hidden="true"></span>
+          <span class="video-draft__brand-name">Quantum</span>
+        </div>
+
+        <div class="video-draft__media" data-draft-media>
+          <video
+            class="video-draft__video"
+            data-draft-video
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+          ></video>
+          <div class="video-draft__loading" data-draft-loading role="status">
+            <span class="video-draft__spinner" aria-hidden="true"></span>
+            <span>Preparing preview…</span>
+          </div>
+          <p class="video-draft__error" data-draft-error hidden></p>
+        </div>
+
+        <div class="video-draft__explainer-host" data-draft-explainer></div>
+
+        <section class="video-draft__controls" aria-label="Preview controls">
+          <div class="video-draft__picker">
+            <label for="draft-clip">Clip</label>
+            <select id="draft-clip" data-draft-select></select>
+          </div>
+
+          <div class="video-draft__actions">
+            <button type="button" data-draft-action="previous">Poprzedni</button>
+            <button type="button" data-draft-action="play" aria-pressed="false">Pause</button>
+            <button type="button" data-draft-action="next">Next</button>
+            <button type="button" data-draft-action="background">Background: app</button>
+          </div>
+
+          <p class="video-draft__status" data-draft-status aria-live="polite"></p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="/js/video-layer-draft.js"></script>
+</body>
+</html>

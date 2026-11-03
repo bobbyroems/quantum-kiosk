@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<base href="/" />
+<title>Alpha Video Benchmark — packed H.264 vs VP9 WebM alpha</title>
+<style>
+  html, body { margin:0; min-height:100%; background:#0b0d10; color:#e8ecf1;
+    font-family:"Segoe UI", system-ui, sans-serif; }
+  main { max-width:1040px; margin:0 auto; padding:28px 24px 60px; }
+  h1 { font-size:19px; margin:0 0 6px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.07em; color:#8a94a3; margin:30px 0 6px; }
+  p { color:#9aa4b2; font-size:13px; line-height:1.65; max-width:74ch; }
+  button { background:#1d5fd0; color:#fff; border:0; border-radius:6px;
+    padding:10px 18px; font-size:14px; cursor:pointer; margin:0 8px 8px 0; }
+  button:disabled { background:#2a3038; color:#6b7480; cursor:default; }
+  table { border-collapse:collapse; width:100%; margin-top:12px; font-size:13px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid #232830; }
+  th { color:#8a94a3; font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.07em; }
+  td.num { font-variant-numeric:tabular-nums; }
+  tr.bad td { color:#ff9a9a; }
+  tr.good td { color:#8ee6a8; }
+  #status { margin-top:14px; font-size:13px; color:#8a94a3; min-height:1.4em; }
+  code { background:#171b21; padding:1px 5px; border-radius:3px; font-size:12px; }
+  .banner { border-radius:7px; padding:14px 16px; margin:18px 0; font-size:13px; line-height:1.6; }
+  .banner.stop { background:#3a1618; border:1px solid #7d2b30; color:#ffc9c9; }
+  .banner.warn { background:#3a2e12; border:1px solid #7d6224; color:#ffe2a8; }
+  .banner b { color:#fff; }
+  #stage { position:fixed; right:10px; bottom:10px; width:230px; opacity:.3; pointer-events:none; }
+  #stage video { width:100%; display:block; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Packed H.264 alpha vs VP9 WebM alpha</h1>
+  <p>
+    Same master, same crop, same on-screen resolution, same keyframe interval —
+    only the encoding strategy differs. <code>processingDuration</code> from
+    <code>requestVideoFrameCallback</code> is the decoder's own per-frame cost,
+    which is where a GPU path and a software path separate.
+  </p>
+
+  <!-- The trap this page exists to avoid. A tab that is not being composited
+       stops firing rAF and rVFC entirely and stops presenting frames, so every
+       number comes back either null or catastrophically bad — for both codecs
+       equally, which reads like a real result and is not one. Refusing to run
+       is better than publishing a plausible lie. -->
+  <div id="visibility-banner" class="banner stop" hidden></div>
+  <div id="asset-banner" class="banner warn" hidden></div>
+
+  <h2>Decode path, as reported by the browser</h2>
+  <p>
+    <code>powerEfficient</code> means the browser expects a hardware decoder.
+    Note this API has no way to express an alpha channel, so a
+    <code>true</code> for VP9 describes plain VP9 — it does not promise that
+    VP9 <em>with alpha</em> takes the same path. That is what the playback
+    measurement below is for.
+  </p>
+  <table id="caps"><thead><tr>
+    <th>Configuration</th><th>Supported</th><th>Smooth</th><th>Power efficient</th>
+  </tr></thead><tbody></tbody></table>
+
+  <h2>Playback</h2>
+  <button id="run">Run playback benchmark</button>
+  <button id="run-stress">Run 3-up stress test</button>
+  <button id="run-seek">Run seek benchmark</button>
+  <div id="status">Idle.</div>
+  <table id="results" hidden><thead><tr>
+    <th>Codec</th><th>Frame</th><th>Decode ms median</th><th>Decode ms p95</th>
+    <th>Achieved fps</th><th>Dropped / total</th>
+  </tr></thead><tbody></tbody></table>
+
+  <table id="seek-results" hidden><thead><tr>
+    <th>Codec</th><th>Seeks</th><th>Mean ms</th><th>Median ms</th><th>p95 ms</th>
+  </tr></thead><tbody></tbody></table>
+</main>
+<div id="stage"></div>
+
+<script type="module">
+const stage = document.querySelector('#stage')
+const statusEl = document.querySelector('#status')
+
+const PACKED = 'assets/video-fx/bench/tpt-intro-reveal-short.mp4'
+const BASELINE = 'assets/video-fx/tpt-intro-reveal-short.webm'
+
+const CLIPS = [
+  { codec: 'H.264 packed alpha', src: PACKED },
+  { codec: 'VP9 WebM alpha', src: BASELINE }
+]
+
+/* ---------- guards ---------- */
+
+function checkVisibility() {
+  const banner = document.querySelector('#visibility-banner')
+  const visible = document.visibilityState === 'visible'
+  banner.hidden = visible
+  if (!visible) {
+    banner.innerHTML = '<b>This tab is not being composited.</b> Chrome stops '
+      + 'firing requestAnimationFrame and requestVideoFrameCallback and stops '
+      + 'presenting video frames when a window is minimised, occluded or in a '
+      + 'background tab. Any numbers collected now are meaningless — and they '
+      + 'look like a real result, because both codecs degrade together. '
+      + 'Bring this window to the front and keep it there for the whole run.'
+  }
+  return visible
+}
+document.addEventListener('visibilitychange', checkVisibility)
+
+async function checkAssets() {
+  const banner = document.querySelector('#asset-banner')
+  const missing = []
+  for (const { src } of CLIPS) {
+    const response = await fetch(src, { method: 'HEAD' }).catch(() => null)
+    if (!response || !response.ok) missing.push(src)
+  }
+  banner.hidden = !missing.length
+  if (missing.length) {
+    /* The WebM is the shipped clip, so this benchmarks the real asset. The
+       packed H.264 is a development comparison only and is gitignored. */
+    banner.innerHTML = `<b>Missing: ${missing.join(', ')}</b><br>`
+      + 'Rebuild the packed comparison clip with '
+      + '<code>npm run pack:alpha-video -- --source "G:/Github/videofiles" '
+      + '--codec h264-packed --only TPT_Intro-Reveal_SHORT --out public/assets/video-fx/bench</code>.'
+  }
+  return !missing.length
+}
+
+/* ---------- capability report ---------- */
+
+async function reportCapabilities() {
+  const body = document.querySelector('#caps tbody')
+  const configs = [
+    ['H.264, packed frame (1906x1772)', 'video/mp4; codecs="avc1.640028"', 1906, 1772, 2_600_000],
+    ['H.264, artwork only (1906x886)', 'video/mp4; codecs="avc1.640028"', 1906, 886, 1_300_000],
+    ['VP9, plain (1906x886)', 'video/webm; codecs="vp09.00.10.08"', 1906, 886, 1_800_000],
+    ['H.264 full stage (2160x3840)', 'video/mp4; codecs="avc1.640028"', 2160, 3840, 8_000_000]
+  ]
+  for (const [label, contentType, width, height, bitrate] of configs) {
+    let info = {}
+    try {
+      info = await navigator.mediaCapabilities.decodingInfo({
+        type: 'file', video: { contentType, width, height, bitrate, framerate: 30 }
+      })
+    } catch { info = {} }
+    const row = document.createElement('tr')
+    row.className = info.powerEfficient ? 'good' : 'bad'
+    for (const value of [label, info.supported ?? '?', info.smooth ?? '?', info.powerEfficient ?? '?']) {
+      const cell = document.createElement('td')
+      cell.textContent = String(value)
+      row.append(cell)
+    }
+    body.append(row)
+  }
+}
+
+/* ---------- measurement ---------- */
+
+function summarise(values) {
+  if (!values.length) return null
+  const sorted = [...values].sort((a, b) => a - b)
+  const mean = values.reduce((total, value) => total + value, 0) / values.length
+  return {
+    mean: +mean.toFixed(2),
+    median: +sorted[sorted.length >> 1].toFixed(2),
+    p95: +sorted[Math.floor(sorted.length * 0.95)].toFixed(2)
+  }
+}
+
+function load(src) {
+  const video = document.createElement('video')
+  video.muted = true
+  video.playsInline = true
+  video.preload = 'auto'
+  video.loop = true
+  stage.append(video)
+  video.src = src
+  return new Promise((resolve, reject) => {
+    video.addEventListener('loadeddata', () => resolve(video), { once: true })
+    video.addEventListener('error', () => reject(new Error(`could not load ${src}`)), { once: true })
+    setTimeout(() => reject(new Error(`timed out loading ${src}`)), 20000)
+  })
+}
+
+function release(video) {
+  video.pause()
+  video.removeAttribute('src')
+  video.load()
+  video.remove()
+}
+
+/* Playback-quality counters are cumulative for the element's lifetime, so they
+   are read as a delta across the window rather than once at the end — otherwise
+   startup frames are attributed to steady-state load. */
+async function measurePlayback(video, seconds) {
+  const decode = []
+  const gaps = []
+  let previous = null
+  let running = true
+  const before = video.getVideoPlaybackQuality?.() ?? { totalVideoFrames: 0, droppedVideoFrames: 0 }
+
+  const onFrame = (now, meta) => {
+    if (typeof meta.processingDuration === 'number') decode.push(meta.processingDuration * 1000)
+    if (previous !== null) gaps.push(now - previous)
+    previous = now
+    if (running) video.requestVideoFrameCallback(onFrame)
+  }
+  video.requestVideoFrameCallback(onFrame)
+  await new Promise(resolve => setTimeout(resolve, seconds * 1000))
+  running = false
+
+  const after = video.getVideoPlaybackQuality?.() ?? { totalVideoFrames: 0, droppedVideoFrames: 0 }
+  const meanGap = gaps.length ? gaps.reduce((total, value) => total + value, 0) / gaps.length : 0
+  return {
+    decode: summarise(decode),
+    achievedFps: meanGap ? +(1000 / meanGap).toFixed(1) : null,
+    total: after.totalVideoFrames - before.totalVideoFrames,
+    dropped: after.droppedVideoFrames - before.droppedVideoFrames
+  }
+}
+
+async function measureSeeks(video, jumps = 24) {
+  const durations = []
+  const span = video.duration - 1 / 30
+  for (let index = 0; index < jumps; index += 1) {
+    /* Deterministic spread rather than random, so two runs are comparable. */
+    const target = ((index * 7919) % 997) / 997 * span
+    const start = performance.now()
+    video.currentTime = target
+    await new Promise(resolve => video.addEventListener('seeked', resolve, { once: true }))
+    durations.push(performance.now() - start)
+  }
+  return summarise(durations)
+}
+
+function addRow(tableId, values, healthy) {
+  const table = document.querySelector(tableId)
+  table.hidden = false
+  const row = document.createElement('tr')
+  row.className = healthy ? 'good' : 'bad'
+  for (const [index, value] of values.entries()) {
+    const cell = document.createElement('td')
+    if (index >= 2) cell.className = 'num'
+    cell.textContent = String(value)
+    row.append(cell)
+  }
+  table.querySelector('tbody').append(row)
+}
+
+async function guard() {
+  if (!checkVisibility()) {
+    statusEl.textContent = 'Refusing to run: this window is not being composited.'
+    return false
+  }
+  if (!await checkAssets()) {
+    statusEl.textContent = 'Refusing to run: a clip is missing.'
+    return false
+  }
+  return true
+}
+
+async function runPlayback(copies, suffix) {
+  if (!await guard()) return
+  for (const clip of CLIPS) {
+    const videos = []
+    for (let index = 0; index < copies; index += 1) videos.push(await load(clip.src))
+    await Promise.all(videos.map(video => video.play()))
+    /* A second of playback before measuring: the first frames after a start are
+       decoded under different conditions than steady state. */
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    statusEl.textContent = `Measuring ${clip.codec}${suffix}…`
+    const result = await measurePlayback(videos[0], 5)
+    if (!checkVisibility()) {
+      statusEl.textContent = 'Discarded: the window stopped being composited mid-run.'
+      videos.forEach(release)
+      return
+    }
+    const healthy = result.total > 0 && result.dropped / result.total <= 0.05
+    addRow('#results', [
+      clip.codec + suffix,
+      `${videos[0].videoWidth}x${videos[0].videoHeight}`,
+      result.decode?.median ?? 'n/a',
+      result.decode?.p95 ?? 'n/a',
+      result.achievedFps ?? 'n/a',
+      `${result.dropped} / ${result.total}`
+    ], healthy)
+    videos.forEach(release)
+  }
+  statusEl.textContent = 'Done.'
+}
+
+async function runSeek() {
+  if (!await guard()) return
+  for (const clip of CLIPS) {
+    statusEl.textContent = `Seeking ${clip.codec}…`
+    const video = await load(clip.src)
+    const result = await measureSeeks(video)
+    addRow('#seek-results', [clip.codec, 24, result.mean, result.median, result.p95], true)
+    release(video)
+  }
+  statusEl.textContent = 'Done.'
+}
+
+document.querySelector('#run').addEventListener('click', async event => {
+  event.target.disabled = true
+  try { await runPlayback(1, '') } catch (error) { statusEl.textContent = error.message }
+  event.target.disabled = false
+})
+document.querySelector('#run-stress').addEventListener('click', async event => {
+  event.target.disabled = true
+  try { await runPlayback(3, ' (3 concurrent)') } catch (error) { statusEl.textContent = error.message }
+  event.target.disabled = false
+})
+document.querySelector('#run-seek').addEventListener('click', async event => {
+  event.target.disabled = true
+  try { await runSeek() } catch (error) { statusEl.textContent = error.message }
+  event.target.disabled = false
+})
+
+checkVisibility()
+checkAssets()
+reportCapabilities()
+</script>
+</body>
+</html>

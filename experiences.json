@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "experiences": [
+    {
+      "id": "magne",
+      "label": "MAGNE",
+      "directory": "experiences\\magne",
+      "defaultSource": "..\\magne-kiosk",
+      "importProfile": "magne",
+      "adapter": "magne",
+      "runtimeConfig": null
+    },
+    {
+      "id": "iqm",
+      "label": "IQM",
+      "directory": "experiences\\iqm",
+      "defaultSource": "..\\makeshift-iqm-kiosk",
+      "importProfile": "iqm",
+      "adapter": "iqm",
+      "runtimeConfig": "config\\kiosk.config.json"
+    }
+  ]
+}

@@ -1,0 +1,4082 @@
+.majorana-module,
+.majorana-module * {
+  box-sizing: border-box;
+}
+
+.majorana-module {
+  --majorana-blue: #0078d4;
+  --majorana-ink: #243c63;
+  --majorana-muted: #66778f;
+  --majorana-line: #d9e0e8;
+  --majorana-pale: #eef5fb;
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  color: var(--majorana-ink);
+  font-family: var(--font-text);
+  isolation: isolate;
+}
+
+.majorana-module button:not(
+  :where(
+    .microsoft-header__action,
+    .kiosk-module-band__offer,
+    [class^='kiosk-up-next-popup__']
+  )
+) {
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.majorana-module__header {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  min-height: 120px;
+  flex: 0 0 120px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 100px;
+  background: #fefefe;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.14);
+}
+
+.majorana-brand,
+.majorana-primary-action,
+.majorana-next-action {
+  display: flex;
+  align-items: center;
+}
+
+.majorana-brand {
+  width: 435px;
+  height: 76px;
+}
+
+.majorana-brand__microsoft {
+  position: relative;
+  display: block;
+  width: 223px;
+  height: 76px;
+  flex: 0 0 223px;
+  overflow: hidden;
+}
+
+.majorana-brand__microsoft img {
+  position: absolute;
+  top: -16.89px;
+  left: -37px;
+  width: 260px;
+  height: 116.53px;
+  max-width: none;
+}
+
+.majorana-brand__rule {
+  width: 2px;
+  height: 50px;
+  flex: 0 0 2px;
+  margin-right: 39px;
+  background: #737373;
+}
+
+.majorana-brand__quantum {
+  color: #737373;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.64px;
+  line-height: 18.35px;
+  white-space: nowrap;
+}
+
+.majorana-module.is-entering-components .majorana-module__header {
+  animation: majorana-nav-enter 820ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.majorana-pathways-guidance {
+  position: absolute;
+  z-index: 42;
+  inset: 0;
+  visibility: hidden;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  touch-action: none;
+  user-select: none;
+  transition:
+    opacity 500ms ease-in-out,
+    visibility 0s linear 500ms;
+}
+
+.majorana-pathways-guidance.is-visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition:
+    opacity 500ms ease-in-out,
+    visibility 0s linear 0s;
+}
+
+.majorana-pathways-guidance__shade {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.majorana-pathways-guidance__tooltip {
+  position: absolute;
+  z-index: 1;
+  top: 928px;
+  left: 1536px;
+  width: 539.051px;
+  height: 115.791px;
+  pointer-events: none;
+}
+
+.majorana-pathways-guidance__pointer-frame {
+  position: absolute;
+  top: 37px;
+  left: 0;
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+}
+
+.majorana-pathways-guidance__pointer-frame img {
+  display: block;
+  width: 29.392px;
+  height: 26.25px;
+  max-width: none;
+  transform: rotate(-90deg);
+}
+
+.majorana-pathways-guidance__bubble {
+  position: absolute;
+  top: 0;
+  left: 25px;
+  display: flex;
+  width: max-content;
+  min-width: 514.051px;
+  max-width: 599px;
+  height: 115.791px;
+  align-items: center;
+  justify-content: center;
+  padding: 28.518px 38.026px;
+  border-radius: 19.012px;
+  background: #f4fafd;
+  color: #0e1726;
+  font-family: var(--font-display);
+  font-size: 42.36px;
+  font-weight: 600;
+  letter-spacing: -0.8472px;
+  line-height: 62.13px;
+  white-space: nowrap;
+}
+
+/* The band overlays the top of the stage, so the views start below it rather
+   than underneath it: every authored offset in this module is measured from
+   the first row the visitor can actually see. */
+.majorana-module__views {
+  position: relative;
+  min-height: 0;
+  margin-top: var(--band-height);
+  flex: 1;
+}
+
+.majorana-view {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.majorana-section-transition {
+  position: absolute;
+  z-index: 12;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.majorana-section-transition:empty {
+  visibility: hidden;
+}
+
+.majorana-section-transition [data-section-transition-item] {
+  z-index: 1;
+  cursor: default;
+}
+
+.majorana-module.is-section-transitioning .majorana-module__header {
+  pointer-events: none;
+}
+
+.majorana-module[data-section-transition="components-pathways"]
+  .majorana-pathways {
+  animation: none;
+}
+
+.majorana-module.has-shared-pathways-entry .majorana-pathways {
+  animation: none;
+}
+
+.majorana-module.is-pathways-model-handoff
+  .majorana-pathways__component-holder {
+  opacity: 0.3 !important;
+  transition: none !important;
+}
+
+.majorana-module[data-section-transition="components-pathways"]
+  .majorana-pathways__component-holder {
+  opacity: 0;
+}
+
+.majorana-module[data-section-transition="pathways-build"]
+  .majorana-build__tray,
+.majorana-module[data-section-transition="pathways-build"]
+  .majorana-build-part {
+  opacity: 0;
+}
+
+.majorana-eyebrow {
+  margin: 0;
+  color: var(--majorana-blue);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.majorana-model-slot,
+.majorana-model-stage {
+  position: absolute;
+}
+
+.majorana-model-stage {
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.majorana-model-stage__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.majorana-model-stage__canvas {
+  z-index: 1;
+  opacity: 0;
+  touch-action: none;
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-model-stage.is-ready .majorana-model-stage__canvas {
+  opacity: 1;
+}
+
+.majorana-model-stage__canvas[data-majorana-shared-scene] {
+  opacity: 1;
+  transition: none;
+}
+
+.majorana-schematic {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.972);
+  transform-origin: 50% 50%;
+  transition:
+    opacity 640ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 760ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.majorana-schematic__reveal,
+.majorana-schematic__content {
+  position: absolute;
+  inset: 0;
+}
+
+.majorana-schematic__reveal {
+  overflow: visible;
+}
+
+.majorana-schematic__content {
+  background: #fff;
+}
+
+.majorana-model-stage.is-schematic .majorana-model-stage__canvas {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Keep the live model fully present underneath the opaque schematic while it
+   resolves. Once the overlay is complete the next phase may hide the canvas
+   without exposing a white frame between the two representations. */
+.majorana-module[data-components-phase="schematic"]
+  .majorana-model-stage.is-schematic
+  .majorana-model-stage__canvas {
+  opacity: 1;
+}
+
+.majorana-model-stage.is-schematic .majorana-model-stage__loading {
+  display: none;
+}
+
+.majorana-model-stage.is-schematic .majorana-schematic {
+  opacity: 1;
+  transform: scale(0.982);
+}
+
+.majorana-schematic img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+.majorana-schematic__backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+
+.majorana-schematic__backdrop img {
+  top: -2.9%;
+  left: -5.86%;
+  width: 111.73%;
+  height: 105.81%;
+}
+
+.majorana-schematic__composite {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  mix-blend-mode: color-burn;
+}
+
+.majorana-schematic__composite--qpu {
+  top: 674.44px;
+  left: 321.08px;
+  width: 630.752px;
+  height: 657.35px;
+}
+
+.majorana-schematic__composite--qpu img {
+  top: -111.51%;
+  left: -68.28%;
+  width: 336.57%;
+  height: 323.03%;
+}
+
+.majorana-schematic__composite--cmos {
+  top: 674.5px;
+  left: 965.2px;
+  width: 658.956px;
+  height: 657.4px;
+}
+
+.majorana-schematic__composite--cmos img {
+  top: -111.51%;
+  left: -163.31%;
+  width: 322.27%;
+  height: 323.03%;
+}
+
+.majorana-schematic__groove,
+.majorana-schematic__component {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+}
+
+.majorana-schematic__groove-outer,
+.majorana-schematic__groove-inner {
+  position: absolute;
+  box-sizing: border-box;
+  border: 7.818px solid #dfdfe4;
+  background: linear-gradient(180deg, #e5e3e8, #c1c0c5);
+  box-shadow:
+    inset 7.818px 7.818px 7.818px rgba(56, 56, 56, 0.35),
+    inset 7.818px 7.818px 31.274px #7e7474;
+  opacity: 0.64;
+}
+
+.majorana-schematic__groove--qpu .majorana-schematic__groove-outer {
+  top: 674.5px;
+  left: 321.1px;
+  width: 630.8px;
+  height: 657.4px;
+  border-radius: 48.64px;
+}
+
+.majorana-schematic__groove--qpu .majorana-schematic__groove-inner {
+  top: 959.5px;
+  left: 589px;
+  width: 89.3px;
+  height: 87.4px;
+  border-radius: 4.054px;
+}
+
+.majorana-schematic__groove--cmos .majorana-schematic__groove-outer {
+  top: 674.5px;
+  left: 965.2px;
+  width: 659.3px;
+  height: 657.4px;
+  border-radius: 4.054px;
+}
+
+.majorana-schematic__groove--cmos .majorana-schematic__groove-inner {
+  top: 912px;
+  left: 1242.6px;
+  width: 102.6px;
+  height: 182.4px;
+  border-radius: 20.266px;
+}
+
+.majorana-schematic__component {
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-schematic__component-model {
+  position: absolute;
+  z-index: 4;
+  display: block;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.majorana-schematic__component-model--qpu {
+  top: 676.4px;
+  left: 321.1px;
+  width: 628.976px;
+  height: 655.5px;
+}
+
+.majorana-schematic__component-model--cmos {
+  top: 676.4px;
+  left: 967.08px;
+  width: 657.394px;
+  height: 655.5px;
+}
+
+.majorana-module.has-component-models .majorana-schematic__component-model {
+  opacity: 1;
+}
+
+.majorana-module.has-component-models
+  .majorana-schematic__component
+  > :not(.majorana-schematic__component-model) {
+  opacity: 0;
+}
+
+.majorana-model-stage.is-schematic .majorana-schematic__component--qpu {
+  opacity: 1;
+  transition-delay: 260ms;
+}
+
+.majorana-model-stage.is-schematic .majorana-schematic__component--cmos {
+  opacity: 1;
+  transition-delay: 340ms;
+}
+
+.majorana-module[data-components-phase="schematic"]
+  .majorana-model-stage.is-schematic
+  .majorana-schematic__component {
+  transition-delay: 0ms;
+}
+
+.majorana-schematic__qpu-shell {
+  position: absolute;
+  top: 676.4px;
+  left: 321.1px;
+  width: 628.976px;
+  height: 655.5px;
+  box-sizing: border-box;
+  border: 3.808px solid #666;
+  border-radius: 48.64px;
+  background: linear-gradient(180deg, #c5c0c9, #8f8a92);
+  box-shadow:
+    inset -38.076px 0 19.038px rgba(255, 255, 255, 0.4),
+    inset -76.152px 0 57.114px rgba(0, 0, 0, 0.08),
+    inset 38.076px 0 19.038px rgba(255, 255, 255, 0.4),
+    inset 76.152px 0 57.114px rgba(0, 0, 0, 0.08),
+    inset 0 38.076px 19.038px rgba(255, 255, 255, 0.4),
+    inset 0 76.152px 57.114px rgba(0, 0, 0, 0.08),
+    inset 0 -38.076px 19.038px rgba(255, 255, 255, 0.4),
+    inset 0 -76.152px 57.114px rgba(0, 0, 0, 0.08);
+}
+
+.majorana-schematic__qpu-crop {
+  position: absolute;
+  top: 731.24px;
+  left: 376.5px;
+  width: 516.006px;
+  height: 539.824px;
+  overflow: hidden;
+}
+
+.majorana-schematic__qpu-crop img {
+  top: -156.53%;
+  left: -79.29%;
+  width: 388.76%;
+  height: 413.06%;
+}
+
+.majorana-schematic__pcb-cover {
+  position: absolute;
+  top: 676.4px;
+  left: 967.08px;
+  width: 657.394px;
+  height: 655.5px;
+  overflow: hidden;
+}
+
+.majorana-schematic__pcb-cover img {
+  top: -152.55%;
+  left: -194.19%;
+  width: 380%;
+  height: 406.27%;
+}
+
+.majorana-schematic__green-mask {
+  position: absolute;
+  top: 856.88px;
+  left: 1197.28px;
+  width: 217.972px;
+  height: 286.366px;
+  background: #4f653e;
+}
+
+.majorana-schematic__cryo-chip {
+  position: absolute;
+  top: 904.36px;
+  left: 1245.01px;
+  width: 102.342px;
+  height: 192.54px;
+  overflow: hidden;
+  border-radius: 22.236px;
+  box-shadow: -2.142px 2.142px 2.142px rgba(0, 0, 0, 0.95);
+}
+
+.majorana-schematic__cryo-chip img {
+  top: -528.29%;
+  left: -1306.06%;
+  width: 1990.91%;
+  height: 1156.57%;
+}
+
+.majorana-model-stage__loading {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  min-width: 500px;
+  align-items: center;
+  flex-direction: column;
+  gap: 22px;
+  padding: 46px 54px;
+  border: 2px solid rgba(0, 120, 212, 0.15);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 26px 100px rgba(37, 77, 112, 0.13);
+  color: var(--majorana-muted);
+  font-size: 26px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  transition: opacity 260ms ease, visibility 0s linear 260ms;
+}
+
+.majorana-model-stage__loading strong {
+  color: var(--majorana-ink);
+  font-size: 34px;
+  font-weight: 620;
+}
+
+.majorana-model-stage__loading.is-complete {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.majorana-model-stage__loading.has-error {
+  min-width: 680px;
+}
+
+.majorana-model-stage__spinner {
+  width: 62px;
+  height: 62px;
+  border: 6px solid #d9ecf8;
+  border-top-color: var(--majorana-blue);
+  border-radius: 50%;
+  animation: majorana-spin 900ms linear infinite;
+}
+
+.majorana-model-stage__loading.has-error .majorana-model-stage__spinner {
+  display: none;
+}
+
+.majorana-intro {
+  background: #fff;
+}
+
+.majorana-module.is-intro .majorana-model-stage,
+.majorana-module.is-intro .majorana-model-slot--intro {
+  background: transparent;
+}
+
+.majorana-module.is-intro .majorana-model-stage__loading {
+  display: none;
+}
+
+.majorana-module.is-intro .majorana-model-stage__loading.has-error {
+  display: flex;
+}
+
+.majorana-intro__light-sweep {
+  position: absolute;
+  z-index: 3;
+  top: 1514px;
+  left: 580px;
+  width: 1000px;
+  height: 1033px;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.majorana-intro__light-sweep::before {
+  position: absolute;
+  top: -920px;
+  left: -349px;
+  width: 300px;
+  height: 1581px;
+  background: linear-gradient(79.84deg, #8c8c8c 26.718%, #fff 82.517%);
+  content: "";
+  filter: blur(45px);
+  opacity: 0.4;
+  transform: rotate(45deg);
+}
+
+.majorana-model-slot--intro {
+  z-index: 2;
+  top: 653px;
+  left: 180px;
+  width: 1800px;
+  height: 1952px;
+}
+
+.majorana-intro__shadow {
+  position: absolute;
+  z-index: 1;
+  top: 2560px;
+  left: 50%;
+  width: 1260px;
+  height: 130px;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.majorana-primary-action {
+  position: absolute;
+  z-index: 5;
+  bottom: 872.7px;
+  left: 50%;
+  width: 514.7px;
+  min-height: 160.7px;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 80px;
+  border-radius: 26.7px;
+  background: var(--majorana-blue) !important;
+  box-shadow: none;
+  color: #fff !important;
+  font-family: var(--font-text);
+  font-size: 50px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 73.3px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  transition:
+    opacity 520ms 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-primary-action:disabled {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+}
+
+.majorana-primary-action:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+.majorana-next-action:active {
+  transform: scale(0.98);
+}
+
+.majorana-primary-action__icon {
+  display: grid;
+  width: 66.7px;
+  height: 66.7px;
+  flex: 0 0 66.7px;
+  place-items: center;
+}
+
+.majorana-primary-action__icon img {
+  width: 22.5px;
+  height: 40px;
+}
+
+.majorana-section-heading {
+  position: absolute;
+  z-index: 7;
+  top: 105px;
+  left: 112px;
+  width: 1520px;
+}
+
+.majorana-section-heading h2,
+.majorana-pathways__card h2 {
+  margin: 30px 0 0;
+  color: var(--majorana-ink);
+  font-size: 92px;
+  font-weight: 570;
+  letter-spacing: -0.048em;
+  line-height: 1.03;
+}
+
+.majorana-section-heading > p:last-child,
+.majorana-pathways__card > p:last-child {
+  max-width: 1500px;
+  margin: 32px 0 0;
+  color: var(--majorana-muted);
+  font-size: 39px;
+  line-height: 1.42;
+}
+
+.majorana-component-cards {
+  position: absolute;
+  z-index: 8;
+  top: 610px;
+  right: 112px;
+  left: 112px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 34px;
+}
+
+.majorana-info-card {
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+  padding: 48px 52px 50px 148px;
+  border: 2px solid #cddbe7;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 22px 76px rgba(29, 79, 118, 0.09);
+}
+
+.majorana-info-card::after {
+  position: absolute;
+  right: -80px;
+  bottom: -120px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: rgba(0, 120, 212, 0.08);
+  content: "";
+}
+
+.majorana-info-card__number {
+  position: absolute;
+  top: 54px;
+  left: 48px;
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--majorana-pale);
+  color: var(--majorana-blue);
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.majorana-info-card h3 {
+  margin: 0;
+  color: var(--majorana-ink);
+  font-size: 54px;
+  font-weight: 620;
+  letter-spacing: -0.035em;
+}
+
+.majorana-info-card p {
+  max-width: 660px;
+  margin: 22px 0 0;
+  color: var(--majorana-muted);
+  font-size: 31px;
+  line-height: 1.38;
+}
+
+.majorana-model-slot--components {
+  z-index: 2;
+  top: 542px;
+  left: 130px;
+  width: 1900px;
+  height: 2006.25px;
+}
+
+.majorana-components {
+  background: #fff;
+  transition: background-color 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-model-slot--components .majorana-model-stage {
+  transform-origin: 0 0;
+  will-change: transform, filter, opacity;
+  transition:
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-module.is-components-focus .majorana-components {
+  background: #dde4e9;
+}
+
+.majorana-module.is-components-focus .majorana-model-slot--components .majorana-model-stage {
+  filter: blur(18.092px);
+  opacity: 0.2;
+  transform: translate3d(-450px, -369.591797px, 0) scale(1.47368421);
+}
+
+.majorana-components-focus {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.majorana-module[data-components-phase="schematic"] .majorana-components-focus {
+  visibility: visible;
+}
+
+.majorana-module.is-components-focus .majorana-components-focus {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.majorana-components-focus__intro,
+.majorana-components-focus__card {
+  position: absolute;
+  border: 1.25px solid rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 20px 40px rgba(0, 0, 0, 0.14);
+  color: #0e1726;
+  opacity: 0;
+  transform: translate3d(0, 30px, 0) scale(0.985);
+  will-change: transform, opacity;
+  transition:
+    opacity 500ms ease,
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-module.is-components-focus .majorana-components-focus__intro,
+.majorana-module.is-components-focus .majorana-components-focus__card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.majorana-components-focus__intro {
+  top: 295px;
+  left: 645px;
+  display: flex;
+  width: 870px;
+  height: 382px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 48px;
+  padding: 60px;
+  border-radius: 32px;
+  text-align: center;
+  transition-delay: 300ms;
+}
+
+.majorana-components-focus__intro h2,
+.majorana-components-focus__intro p,
+.majorana-components-focus__card h3,
+.majorana-components-focus__card p {
+  margin: 0;
+}
+
+.majorana-components-focus__intro h2 {
+  font-family: var(--font-display);
+  font-size: 37.5px;
+  font-weight: 600;
+  letter-spacing: -0.9375px;
+  line-height: 43.75px;
+}
+
+.majorana-components-focus__intro p {
+  color: rgba(23, 37, 61, 0.8);
+  font-size: 25px;
+  font-weight: 400;
+  letter-spacing: -0.375px;
+  line-height: 35px;
+}
+
+.majorana-focus-component {
+  --inspect-rotate-x: 0deg;
+  --inspect-rotate-y: 0deg;
+  position: absolute;
+  z-index: 3;
+  display: block;
+  padding: 0;
+  border-radius: 48px;
+  opacity: 0;
+  outline-offset: 14px;
+  perspective: 1800px;
+  touch-action: none;
+  transform-origin: 0 0;
+  will-change: transform, opacity;
+  transform:
+    translate3d(var(--component-enter-x), var(--component-enter-y), 0)
+    scale(
+      var(--component-enter-scale-x, var(--component-enter-scale)),
+      var(--component-enter-scale-y, var(--component-enter-scale))
+    );
+  transition:
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 420ms ease;
+}
+
+.majorana-module.is-components-focus .majorana-focus-component {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.majorana-module.has-component-models[data-components-phase="schematic"]
+  .majorana-focus-component {
+  opacity: 1;
+}
+
+.majorana-focus-component:focus-visible {
+  outline: 6px solid #005597;
+}
+
+.majorana-focus-component--qpu {
+  --component-enter-x: 369.4px;
+  --component-enter-y: -52.5px;
+  --component-enter-scale-x: 0.6664;
+  --component-enter-scale-y: 0.6664;
+  --component-base-rx: 1.25deg;
+  --component-base-ry: 0deg;
+  --component-base-rz: 0deg;
+  --component-delta-rx: 0.35deg;
+  --component-delta-ry: 0.8deg;
+  --component-delta-rz: 0deg;
+  --component-float-y: -10px;
+  top: 875px;
+  left: 137px;
+  width: 893.809265px;
+  height: 931.5px;
+}
+
+.majorana-focus-component--cmos {
+  --component-enter-x: -11.4px;
+  --component-enter-y: -52.5px;
+  --component-enter-scale-x: 0.674;
+  --component-enter-scale-y: 0.6664;
+  --component-base-rx: 1.25deg;
+  --component-base-ry: 0deg;
+  --component-base-rz: 0deg;
+  --component-delta-rx: 0.35deg;
+  --component-delta-ry: -0.8deg;
+  --component-delta-rz: 0deg;
+  --component-float-y: -10px;
+  top: 875px;
+  left: 1090.808594px;
+  width: 934.192078px;
+  height: 931.5px;
+}
+
+.majorana-focus-component__idle,
+.majorana-focus-component__rotator {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform-style: preserve-3d;
+}
+
+.majorana-focus-component__idle {
+  animation: majorana-component-idle 6.2s ease-in-out infinite;
+}
+
+.majorana-focus-component--cmos .majorana-focus-component__idle {
+  animation-delay: -3.1s;
+}
+
+.majorana-focus-component__rotator {
+  transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform:
+    rotateX(var(--inspect-rotate-x))
+    rotateY(var(--inspect-rotate-y));
+}
+
+.majorana-focus-component.is-interacting .majorana-focus-component__idle {
+  animation-play-state: paused;
+}
+
+.majorana-focus-component.is-interacting .majorana-focus-component__rotator {
+  transition-duration: 80ms;
+}
+
+.majorana-focus-component__qpu-shell,
+.majorana-focus-component__qpu-crop,
+.majorana-focus-component__pcb-cover,
+.majorana-focus-component__green-mask,
+.majorana-focus-component__cryo-chip,
+.majorana-focus-component__model {
+  position: absolute;
+  display: block;
+}
+
+.majorana-focus-component__qpu-shell,
+.majorana-focus-component__qpu-crop,
+.majorana-focus-component__pcb-cover,
+.majorana-focus-component__green-mask,
+.majorana-focus-component__cryo-chip {
+  transition: opacity 420ms ease;
+}
+
+.majorana-focus-component__qpu-shell {
+  inset: 0;
+  border: 5.41px solid #666;
+  border-radius: 69.12px;
+  background: linear-gradient(180deg, #c5c0c9, #8f8a92);
+  box-shadow:
+    inset -54.108px 0 27.054px rgba(255, 255, 255, 0.4),
+    inset -108.216px 0 81.162px rgba(0, 0, 0, 0.08),
+    inset 54.108px 0 27.054px rgba(255, 255, 255, 0.4),
+    inset 108.216px 0 81.162px rgba(0, 0, 0, 0.08),
+    inset 0 54.108px 27.054px rgba(255, 255, 255, 0.4),
+    inset 0 108.216px 81.162px rgba(0, 0, 0, 0.08),
+    inset 0 -54.108px 27.054px rgba(255, 255, 255, 0.4),
+    inset 0 -108.216px 81.162px rgba(0, 0, 0, 0.08);
+}
+
+.majorana-focus-component__qpu-crop {
+  top: 77.923828px;
+  left: 78.732224px;
+  width: 733.270691px;
+  height: 767.117615px;
+  overflow: hidden;
+}
+
+.majorana-focus-component__qpu-crop img,
+.majorana-focus-component__pcb-cover img,
+.majorana-focus-component__cryo-chip img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+.majorana-focus-component__qpu-crop img {
+  top: -156.53%;
+  left: -79.29%;
+  width: 388.76%;
+  height: 413.06%;
+}
+
+.majorana-focus-component__pcb-cover {
+  inset: 0;
+  overflow: hidden;
+}
+
+.majorana-focus-component__pcb-cover img {
+  top: -152.55%;
+  left: -194.19%;
+  width: 380%;
+  height: 406.27%;
+}
+
+.majorana-focus-component__green-mask {
+  top: 256.481445px;
+  left: 327.124023px;
+  width: 309.74881px;
+  height: 406.941162px;
+  background: #4f653e;
+}
+
+.majorana-focus-component__cryo-chip {
+  top: 323.955078px;
+  left: 394.950195px;
+  width: 145.432693px;
+  height: 273.610535px;
+  overflow: hidden;
+  border-radius: 31.598px;
+  box-shadow: -3.044px 3.044px 3.044px rgba(0, 0, 0, 0.95);
+}
+
+.majorana-focus-component__cryo-chip img {
+  top: -528.29%;
+  left: -1306.06%;
+  width: 1990.91%;
+  height: 1156.57%;
+}
+
+.majorana-focus-component__model {
+  z-index: 3;
+  inset: 0;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms ease;
+}
+
+.majorana-focus-component__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.majorana-module.has-component-models .majorana-focus-component__model {
+  opacity: 1;
+}
+
+.majorana-module.has-component-models .majorana-focus-component__qpu-shell,
+.majorana-module.has-component-models .majorana-focus-component__qpu-crop,
+.majorana-module.has-component-models .majorana-focus-component__pcb-cover,
+.majorana-module.has-component-models .majorana-focus-component__green-mask,
+.majorana-module.has-component-models .majorana-focus-component__cryo-chip {
+  opacity: 0;
+}
+
+.majorana-module.has-component-models .majorana-focus-component__idle {
+  animation: none;
+  transform: none;
+}
+
+.majorana-module.has-component-models .majorana-focus-component__rotator {
+  transform: none;
+}
+
+.majorana-components-focus__card {
+  top: 1919px;
+  display: flex;
+  width: 900px;
+  height: 286px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 48px;
+  padding: 60px;
+  border-radius: 64px;
+}
+
+.majorana-components-focus__card--qpu {
+  left: 137px;
+}
+
+.majorana-components-focus__card--cmos {
+  left: 1110px;
+}
+
+/* QPU travels out first; its explanation waits for the landing. After a clear
+   hold, Cryo-CMOS repeats the same object-then-copy sequence. Delays are scoped
+   to the entrance phase and therefore do not slow later section transitions. */
+.majorana-module[data-components-phase="focusing"]
+  .majorana-components-focus__intro {
+  transition-delay: 0ms;
+}
+
+.majorana-module[data-components-phase="focusing"]
+  .majorana-focus-component--qpu {
+  transition-delay: 200ms, 200ms;
+}
+
+.majorana-module[data-components-phase="focusing"]
+  .majorana-components-focus__card--qpu {
+  transition-delay: 800ms;
+}
+
+.majorana-module[data-components-phase="focusing"]
+  .majorana-focus-component--cmos {
+  transition-delay: 2050ms, 2050ms;
+}
+
+.majorana-module[data-components-phase="focusing"]
+  .majorana-components-focus__card--cmos {
+  transition-delay: 2750ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .majorana-module[data-components-phase="focusing"]
+    .majorana-focus-component,
+  .majorana-module[data-components-phase="focusing"]
+    .majorana-components-focus__intro,
+  .majorana-module[data-components-phase="focusing"]
+    .majorana-components-focus__card {
+    transition-delay: 0ms;
+    transition-duration: 1ms;
+  }
+}
+
+.majorana-components-focus__card h3 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.75px;
+  line-height: 35px;
+}
+
+.majorana-components-focus__card p {
+  color: rgba(14, 23, 38, 0.8);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -1.2px;
+  line-height: 48px;
+}
+
+.majorana-next-action {
+  position: absolute;
+  z-index: 9;
+  right: 106px;
+  bottom: 82px;
+  min-width: 520px;
+  min-height: 122px;
+  justify-content: space-between;
+  gap: 54px;
+  padding: 20px 30px 20px 50px;
+  border-radius: 68px;
+  background: var(--majorana-blue) !important;
+  box-shadow: 0 20px 55px rgba(0, 120, 212, 0.2);
+  color: #fff !important;
+  font-size: 34px;
+  font-weight: 620;
+}
+
+.majorana-next-action img {
+  width: 18px;
+  height: 32px;
+  margin-right: 18px;
+}
+
+.majorana-pathways {
+  --pathways-cmos-glow: 0;
+  --pathways-qpu-glow: 0;
+  background: #dde4e9;
+  isolation: isolate;
+  animation: majorana-pathways-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.majorana-model-slot--pathways {
+  z-index: 2;
+  top: 381px;
+  left: 130px;
+  width: 1900px;
+  height: 2006.246px;
+}
+
+.majorana-model-slot--pathways .majorana-model-stage {
+  overflow: visible;
+}
+
+.majorana-model-slot--pathways .majorana-schematic {
+  overflow: visible;
+  background: transparent;
+  transform: none;
+  transition: none;
+}
+
+.majorana-model-slot--pathways
+  .majorana-model-stage.is-schematic
+  .majorana-schematic {
+  transform: none;
+}
+
+.majorana-model-slot--pathways .majorana-schematic__content {
+  background: transparent;
+}
+
+.majorana-model-slot--pathways .majorana-schematic__backdrop {
+  filter: blur(12px);
+  opacity: 0.5;
+}
+
+.majorana-model-slot--pathways .majorana-schematic__component {
+  display: none;
+}
+
+.majorana-model-slot--pathways .majorana-schematic__groove-outer::after,
+.majorana-model-slot--pathways .majorana-schematic__groove-inner::after {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  content: "";
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+.majorana-model-slot--pathways .majorana-schematic__groove-outer::after {
+  background: linear-gradient(
+    180deg,
+    rgba(94, 182, 255, 0.6) 0%,
+    rgba(22, 69, 221, 0.6) 100%
+  );
+}
+
+.majorana-model-slot--pathways .majorana-schematic__groove-inner::after {
+  background: linear-gradient(
+    180deg,
+    rgba(94, 182, 255, 0.7) 0%,
+    rgba(22, 69, 221, 0.7) 100%
+  );
+}
+
+.majorana-model-slot--pathways .majorana-schematic__groove--qpu
+  .majorana-schematic__groove-outer::after,
+.majorana-model-slot--pathways .majorana-schematic__groove--qpu
+  .majorana-schematic__groove-inner::after {
+  opacity: var(--pathways-qpu-glow);
+}
+
+.majorana-model-slot--pathways .majorana-schematic__groove--cmos
+  .majorana-schematic__groove-outer::after,
+.majorana-model-slot--pathways .majorana-schematic__groove--cmos
+  .majorana-schematic__groove-inner::after {
+  opacity: var(--pathways-cmos-glow);
+}
+
+.majorana-pathways__diagram {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.04) 140px,
+    rgba(0, 0, 0, 0.16) 300px,
+    rgba(0, 0, 0, 0.46) 500px,
+    rgba(0, 0, 0, 0.82) 660px,
+    #000 780px
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    rgba(0, 0, 0, 0.04) 140px,
+    rgba(0, 0, 0, 0.16) 300px,
+    rgba(0, 0, 0, 0.46) 500px,
+    rgba(0, 0, 0, 0.82) 660px,
+    #000 780px
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.majorana-pathways__hit-targets {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  pointer-events: none;
+}
+
+.majorana-pathway-hit {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  color: transparent;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.majorana-pathway-hit:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.majorana-pathway-hit--external {
+  top: -188px;
+  left: 1347.9px;
+  width: 152px;
+  height: 1483px;
+}
+
+.majorana-pathway-hit--control {
+  top: 1308px;
+  left: 1028px;
+  width: 394px;
+  height: 160px;
+}
+
+.majorana-pathway-hit--readout {
+  top: -400px;
+  left: 687.65px;
+  width: 152px;
+  height: 1454px;
+}
+
+.majorana-pathway {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.majorana-pathway--external {
+  top: -188px;
+  left: 1406.145px;
+  width: 35.51px;
+  height: 1482.49px;
+}
+
+.majorana-pathway--control {
+  top: 1355.96px;
+  left: 1076.64px;
+  width: 296.44px;
+  height: 64.44px;
+}
+
+.majorana-pathway--readout {
+  top: -400.09px;
+  left: 749.175px;
+  width: 28.95px;
+  height: 1453.23px;
+}
+
+.majorana-pathway__track {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.majorana-pathway__track img {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: fill;
+}
+
+.majorana-pathway__track::before {
+  position: absolute;
+  z-index: 0;
+  border-radius: 999px;
+  content: "";
+  pointer-events: none;
+}
+
+.majorana-pathway--external .majorana-pathway__track::before,
+.majorana-pathway--readout .majorana-pathway__track::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 24px;
+  transform: translateX(-50%);
+}
+
+.majorana-pathway--control .majorana-pathway__track::before {
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 38px;
+  transform: translateY(-50%);
+}
+
+.majorana-pathway__track--neutral::before {
+  background: linear-gradient(
+    90deg,
+    rgba(93, 111, 125, 0.12),
+    rgba(83, 101, 115, 0.62) 48%,
+    rgba(93, 111, 125, 0.12)
+  );
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.45);
+}
+
+.majorana-pathway--control .majorana-pathway__track--neutral::before {
+  background: linear-gradient(
+    180deg,
+    rgba(93, 111, 125, 0.12),
+    rgba(83, 101, 115, 0.62) 48%,
+    rgba(93, 111, 125, 0.12)
+  );
+}
+
+.majorana-pathway__track--active::before {
+  background: linear-gradient(
+    90deg,
+    rgba(57, 190, 255, 0.22),
+    #0074d4 48%,
+    rgba(57, 190, 255, 0.22)
+  );
+  box-shadow: 0 0 28px rgba(0, 116, 212, 0.56);
+}
+
+.majorana-pathway--control .majorana-pathway__track--active::before {
+  background: linear-gradient(
+    180deg,
+    rgba(57, 190, 255, 0.22),
+    #0074d4 48%,
+    rgba(57, 190, 255, 0.22)
+  );
+}
+
+.majorana-pathway--control .majorana-pathway__track img {
+  top: 50%;
+  left: 50%;
+  width: 64.44px;
+  height: 296.44px;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.majorana-pathway__track--neutral {
+  opacity: 0.54;
+  mix-blend-mode: color-burn;
+}
+
+.majorana-pathway__track--neutral img {
+  filter: grayscale(1) brightness(1.18) contrast(0.74);
+}
+
+.majorana-pathway__track--active {
+  z-index: 1;
+  opacity: 0;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(34%)
+    sepia(91%)
+    saturate(1553%)
+    hue-rotate(176deg)
+    brightness(93%)
+    contrast(105%);
+}
+
+.majorana-pathways .majorana-pathway__track--active {
+  filter: none;
+  mix-blend-mode: normal;
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-pathways .majorana-pathway__track--neutral {
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-pathways .majorana-pathway__track--active::before,
+.majorana-pathways .majorana-pathway__track--active::after {
+  content: none;
+}
+
+.majorana-pathways .majorana-pathway.is-active .majorana-pathway__track--neutral,
+.majorana-pathways .majorana-pathway.is-selected .majorana-pathway__track--neutral {
+  opacity: 0;
+}
+
+.majorana-pathways .majorana-pathway--control
+  .majorana-pathway__track::before {
+  border-radius: 0;
+}
+
+.majorana-pathway__arrow {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  width: 21.716px;
+  height: 15.23px;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease-out;
+}
+
+.majorana-pathway--external .majorana-pathway__arrow,
+.majorana-pathway--readout .majorana-pathway__arrow {
+  left: 50%;
+}
+
+.majorana-pathway--external .majorana-pathway__arrow {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.majorana-pathway--readout .majorana-pathway__arrow {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.majorana-pathway--external .majorana-pathway__arrow--one {
+  top: 46.8%;
+}
+
+.majorana-pathway--external .majorana-pathway__arrow--two {
+  top: 72%;
+}
+
+.majorana-pathway--external .majorana-pathway__arrow--three {
+  top: 96.6%;
+}
+
+.majorana-pathway--readout .majorana-pathway__arrow--one {
+  top: 62.3%;
+}
+
+.majorana-pathway--readout .majorana-pathway__arrow--two {
+  top: 88%;
+}
+
+.majorana-pathway--control .majorana-pathway__arrow {
+  top: 50%;
+  left: 61.8%;
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.majorana-pathway.is-active .majorana-pathway__arrow,
+.majorana-pathway.is-selected .majorana-pathway__arrow {
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.7));
+}
+
+.majorana-pathway__pulse {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: opacity, transform;
+}
+
+.majorana-pathway__pulse::before {
+  position: absolute;
+  z-index: -1;
+  display: block;
+  border-radius: 7.09px;
+  content: "";
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.majorana-pathway--external .majorana-pathway__pulse::before {
+  bottom: 0;
+  left: -10.636px;
+  width: 21.272px;
+  height: 131.18px;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.32) 38%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.majorana-pathway--control .majorana-pathway__pulse::before {
+  top: -10.636px;
+  left: 0;
+  width: 131.18px;
+  height: 21.272px;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.32) 38%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.majorana-pathway--readout .majorana-pathway__pulse::before {
+  top: 0;
+  left: -10.636px;
+  width: 21.272px;
+  height: 131.18px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.32) 38%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.majorana-pathway__pulse img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.majorana-pathway__pulse-glow {
+  width: 157.18px;
+  height: 157.18px;
+}
+
+.majorana-pathway__pulse-core {
+  width: 33.472px;
+  height: 33.472px;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.96));
+}
+
+.majorana-pathway-connector {
+  position: absolute;
+  z-index: 5;
+  display: block;
+  width: 104.784px;
+  height: 22.06px;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.majorana-pathway-connector--external {
+  top: 881.47px;
+  left: 1462.7px;
+  transform: rotate(180deg);
+}
+
+.majorana-pathway-connector--readout {
+  top: 881.47px;
+  left: 628.5px;
+}
+
+.majorana-pathway-connector--control {
+  top: 1468.5px;
+  left: 1125.2px;
+  transform: rotate(-90deg);
+}
+
+.majorana-module .majorana-pathway-tooltip {
+  position: absolute;
+  z-index: 6;
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 1.724px solid rgba(0, 0, 0, 0.3);
+  border-radius: 44.12px;
+  background: #fff;
+  box-shadow:
+    0 4px 2px rgba(0, 0, 0, 0.15),
+    0 28px 27px rgba(0, 0, 0, 0.14);
+  color: #000;
+  opacity: 0;
+  appearance: none;
+  cursor: pointer;
+  pointer-events: auto;
+  text-align: left;
+  touch-action: manipulation;
+  transition:
+    top 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 420ms ease-in-out,
+    border-width 420ms ease-in-out,
+    border-radius 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 520ms ease-in-out,
+    opacity 260ms ease-in-out;
+  will-change: top, left, width, height;
+}
+
+.majorana-pathway-tooltip:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.majorana-pathway-tooltip--external {
+  top: 796px;
+  left: 1556.5px;
+  width: 551.5px;
+  height: 204.2px;
+}
+
+.majorana-pathway-tooltip--readout {
+  top: 819.44px;
+  left: 248px;
+  width: 380.24px;
+  height: 146.24px;
+}
+
+.majorana-pathway-tooltip--control {
+  top: 1526.12px;
+  left: 1116.63px;
+  width: 303.33px;
+  height: 262.24px;
+}
+
+.majorana-pathway-tooltip__title,
+.majorana-pathway-tooltip__body,
+.majorana-pathway-tooltip__icon {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.majorana-pathway-tooltip__title {
+  z-index: 2;
+  top: 44.12px;
+  right: 44.12px;
+  left: 44.12px;
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 44.12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: normal;
+  transition:
+    top 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    right 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-pathway-tooltip--external:not(.is-detail-card)
+  .majorana-pathway-tooltip__title {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.majorana-pathway-tooltip--readout .majorana-pathway-tooltip__title {
+  white-space: nowrap;
+}
+
+.majorana-pathway-tooltip__title--control {
+  height: 159px;
+  line-height: 53px;
+}
+
+.majorana-pathway-tooltip__title-fragment {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  white-space: nowrap;
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-pathway-tooltip__title-fragment--one {
+  transform: translate3d(0, 0, 0);
+}
+
+.majorana-pathway-tooltip__title-fragment--two {
+  transform: translate3d(0, 53px, 0);
+}
+
+.majorana-pathway-tooltip__title-fragment--three {
+  transform: translate3d(0, 106px, 0);
+}
+
+.majorana-pathway-tooltip__icon {
+  z-index: 2;
+  top: 44.12px;
+  left: 44.12px;
+  width: 72px;
+  height: 72px;
+  max-width: none;
+  opacity: 0;
+  transform: translate3d(0, 16px, 0) scale(0.9);
+  transition:
+    opacity 220ms ease-in,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-pathway-tooltip__body {
+  z-index: 2;
+  right: 44.12px;
+  left: 44.12px;
+  color: rgba(23, 37, 61, 0.8);
+  font-family: var(--font-text);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+  line-height: 48px;
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 220ms ease-in,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-pathways__copy {
+  position: absolute;
+  z-index: 6;
+  top: 1895px;
+  left: 645px;
+  width: 870px;
+  height: 476px;
+  margin: 0;
+  padding: 60px 60px 80px;
+  border: 1.25px solid rgba(0, 0, 0, 0.3);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 20px 40px rgba(0, 0, 0, 0.14);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.majorana-pathways__copy h2 {
+  margin: 0;
+  color: #0e1726;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -1.5px;
+  line-height: 70px;
+}
+
+.majorana-pathways__copy p {
+  margin: 30px 0 0;
+  color: rgba(23, 37, 61, 0.8);
+  font-family: var(--font-text);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+  line-height: normal;
+}
+
+.majorana-pathways__component-holder {
+  position: absolute;
+  z-index: 3;
+  top: 2480px;
+  left: 380px;
+  width: 1400px;
+  height: 585px;
+  border: 3.84px dashed rgba(0, 0, 0, 0.3);
+  border-radius: 33.442px;
+  background: rgba(255, 255, 255, 0.6);
+  opacity: 0.3;
+  pointer-events: none;
+  transition: opacity 380ms ease-in-out;
+}
+
+.majorana-pathways__component {
+  position: absolute;
+  top: 73px;
+  display: flex;
+  width: 377.6px;
+  align-items: center;
+  flex-direction: column;
+  margin: 0;
+}
+
+.majorana-pathways__component--qpu {
+  left: 181px;
+  width: 361.2px;
+}
+
+.majorana-pathways__component--cmos {
+  left: 842.2px;
+}
+
+.majorana-pathways__component-visual {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 376.5px;
+  filter: grayscale(1) saturate(0.25) brightness(1.04);
+}
+
+.majorana-pathways__component-model {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: block;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.majorana-module.has-component-models .majorana-pathways__component-model {
+  opacity: 1;
+}
+
+.majorana-module.has-component-models
+  .majorana-pathways__component-visual
+  > :not(.majorana-pathways__component-model) {
+  opacity: 0;
+}
+
+.majorana-pathways__qpu-shell,
+.majorana-pathways__qpu-crop,
+.majorana-pathways__pcb-cover,
+.majorana-pathways__green-mask,
+.majorana-pathways__cryo-chip {
+  position: absolute;
+  display: block;
+}
+
+.majorana-pathways__qpu-shell {
+  inset: 0;
+  box-sizing: border-box;
+  border: 2.05px solid #666;
+  border-radius: 26.19px;
+  background: linear-gradient(180deg, #c5c0c9, #8f8a92);
+  box-shadow:
+    inset -20.502px 0 10.25px rgba(255, 255, 255, 0.4),
+    inset -41.002px 0 30.752px rgba(0, 0, 0, 0.08),
+    inset 20.502px 0 10.25px rgba(255, 255, 255, 0.4),
+    inset 41.002px 0 30.752px rgba(0, 0, 0, 0.08),
+    inset 0 20.502px 10.25px rgba(255, 255, 255, 0.4),
+    inset 0 41.002px 30.752px rgba(0, 0, 0, 0.08),
+    inset 0 -20.502px 10.25px rgba(255, 255, 255, 0.4),
+    inset 0 -41.002px 30.752px rgba(0, 0, 0, 0.08);
+}
+
+.majorana-pathways__qpu-crop {
+  top: 31.476px;
+  left: 31.822px;
+  width: 296.356px;
+  height: 310.034px;
+  overflow: hidden;
+}
+
+.majorana-pathways__qpu-crop img,
+.majorana-pathways__pcb-cover img,
+.majorana-pathways__cryo-chip img {
+  position: absolute;
+  display: block;
+  max-width: none;
+}
+
+.majorana-pathways__qpu-crop img {
+  top: -156.53%;
+  left: -79.29%;
+  width: 388.76%;
+  height: 413.06%;
+}
+
+.majorana-pathways__pcb-cover {
+  inset: 0;
+  overflow: hidden;
+}
+
+.majorana-pathways__pcb-cover img {
+  top: -152.55%;
+  left: -194.19%;
+  width: 380%;
+  height: 406.27%;
+}
+
+.majorana-pathways__green-mask {
+  top: 103.642px;
+  left: 132.212px;
+  width: 125.186px;
+  height: 164.468px;
+  background: #4f653e;
+}
+
+.majorana-pathways__cryo-chip {
+  top: 130.928px;
+  left: 159.6px;
+  width: 58.778px;
+  height: 110.582px;
+  overflow: hidden;
+  border-radius: 11.972px;
+  box-shadow: -1.154px 1.154px 1.154px rgba(0, 0, 0, 0.95);
+}
+
+.majorana-pathways__cryo-chip img {
+  top: -528.29%;
+  left: -1306.06%;
+  width: 1990.91%;
+  height: 1156.57%;
+}
+
+.majorana-pathways__component figcaption {
+  margin-top: 33px;
+  color: #3f4750;
+  font-size: 37.65px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.majorana-pathway-detail {
+  position: absolute;
+  z-index: 41;
+  inset: 0;
+  visibility: hidden;
+  overflow: hidden;
+  outline: 0;
+  opacity: 0;
+  pointer-events: none;
+  touch-action: manipulation;
+  user-select: none;
+  transition:
+    opacity 380ms ease-in-out,
+    visibility 0s linear 380ms;
+}
+
+.majorana-pathway-detail.is-visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition:
+    opacity 380ms ease-in-out,
+    visibility 0s linear 0s;
+}
+
+.majorana-module.is-pathway-detail-visible
+  .majorana-pathway-tooltip:not(.is-detail-card):not(.is-detail-returning),
+.majorana-module.is-pathway-detail-visible .majorana-pathway-connector,
+.majorana-module.is-pathway-detail-visible .majorana-pathways__copy,
+.majorana-module.is-pathway-detail-visible
+  .majorana-pathways__component-holder {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.majorana-module.is-pathway-detail-visible
+  .majorana-pathway-tooltip.is-detail-card,
+.majorana-module.is-pathway-detail-visible
+  .majorana-pathway-tooltip.is-detail-returning {
+  z-index: 42;
+  overflow: visible;
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.majorana-module.is-pathway-detail-visible
+  .majorana-pathway-tooltip.is-detail-returning {
+  overflow: hidden;
+}
+
+.majorana-module.is-pathway-detail-closing
+  .majorana-pathway-tooltip.is-detail-returning
+  .majorana-pathway-tooltip__body,
+.majorana-module.is-pathway-detail-closing
+  .majorana-pathway-tooltip.is-detail-returning
+  .majorana-pathway-tooltip__icon {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition:
+    opacity 90ms ease-out,
+    transform 140ms ease-out;
+  transition-delay: 0ms;
+}
+
+.majorana-module.is-pathway-detail-closing
+  .majorana-pathway-detail.is-visible {
+  visibility: visible;
+  opacity: 0;
+  pointer-events: auto;
+  transition:
+    opacity 380ms ease-in-out,
+    visibility 0s linear 0s;
+}
+
+.majorana-module.is-pathway-detail-visible.is-pathway-detail-closing
+  .majorana-pathway-tooltip:not(.is-detail-returning),
+.majorana-module.is-pathway-detail-visible.is-pathway-detail-closing
+  .majorana-pathway-connector,
+.majorana-module.is-pathway-detail-visible.is-pathway-detail-closing
+  .majorana-pathways__copy {
+  opacity: 1 !important;
+  transition: opacity 380ms ease-in-out;
+}
+
+.majorana-module.is-pathway-detail-visible.is-pathway-detail-closing
+  .majorana-pathways__component-holder {
+  opacity: 0.3 !important;
+  transition: opacity 380ms ease-in-out;
+}
+
+.majorana-pathway-detail__panel {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.majorana-pathway-detail[data-selected-pathway="external"]
+  .majorana-pathway-detail__panel--external,
+.majorana-pathway-detail[data-selected-pathway="control"]
+  .majorana-pathway-detail__panel--control,
+.majorana-pathway-detail[data-selected-pathway="readout"]
+  .majorana-pathway-detail__panel--readout {
+  visibility: visible;
+  opacity: 1;
+}
+
+.majorana-pathway-detail__mask {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 2160px;
+  height: 3840px;
+  max-width: none;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.majorana-pathway-detail__visual {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  max-width: none;
+  border-radius: 44px;
+  box-shadow: 0 0 120px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 28px, 0) scale(0.985);
+  transform-origin: center;
+  transition:
+    opacity 440ms ease-out 80ms,
+    transform 440ms cubic-bezier(0.22, 1, 0.36, 1) 80ms;
+}
+
+.majorana-pathway-detail__panel--external .majorana-pathway-detail__visual {
+  top: 1111px;
+  left: 120px;
+  width: 1130px;
+  height: 1252px;
+}
+
+.majorana-pathway-detail__panel--control .majorana-pathway-detail__visual {
+  top: 563px;
+  left: 549px;
+  width: 1130px;
+  height: 1000px;
+}
+
+.majorana-pathway-detail__panel--readout .majorana-pathway-detail__visual {
+  top: 1111px;
+  left: 940px;
+  width: 1130px;
+  height: 1252px;
+}
+
+.majorana-pathway-tooltip.is-pathway-detail-portal {
+  top: var(--pathway-source-top);
+  left: var(--pathway-source-left);
+  width: var(--pathway-source-width);
+  height: var(--pathway-source-height);
+}
+
+.majorana-pathway-tooltip::before {
+  position: absolute;
+  z-index: 3;
+  background: #0074d4;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease-in;
+}
+
+.majorana-pathway-tooltip::after {
+  position: absolute;
+  z-index: 3;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0074d4;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease-in;
+}
+
+.majorana-pathway-tooltip--external::before {
+  top: 151px;
+  right: 100%;
+  width: 114px;
+  height: 4px;
+}
+
+.majorana-pathway-tooltip--external::after {
+  top: 146px;
+  left: -121px;
+}
+
+.majorana-pathway-tooltip--control::before {
+  bottom: 100%;
+  left: calc(50% - 2px);
+  width: 4px;
+  height: 96px;
+}
+
+.majorana-pathway-tooltip--control::after {
+  top: -103px;
+  left: calc(50% - 7px);
+}
+
+.majorana-pathway-tooltip--readout::before {
+  top: 151px;
+  left: 100%;
+  width: 98px;
+  height: 4px;
+}
+
+.majorana-pathway-tooltip--readout::after {
+  top: 146px;
+  right: -105px;
+}
+
+.majorana-pathway-tooltip.is-detail-card {
+  width: 551.509px;
+  border: 4px solid #0074d4;
+  border-radius: 44px;
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 28px 54px rgba(0, 116, 212, 0.12);
+}
+
+.majorana-pathway-tooltip--external.is-detail-card {
+  top: 1109.5px;
+  left: 1556.493px;
+  height: 642.242px;
+}
+
+.majorana-pathway-tooltip--control.is-detail-card {
+  top: 1899.002px;
+  left: 914.25px;
+  width: 615px;
+  height: 646px;
+}
+
+.majorana-pathway-tooltip--control.is-detail-card
+  .majorana-pathway-tooltip__body,
+.majorana-pathway-tooltip--control.is-detail-returning
+  .majorana-pathway-tooltip__body {
+  right: 52px;
+}
+
+.majorana-pathway-tooltip--readout.is-detail-card {
+  top: 1108.5px;
+  left: 88.998px;
+  height: 638.242px;
+}
+
+.majorana-pathway-tooltip.is-detail-card::before,
+.majorana-pathway-tooltip.is-detail-card::after {
+  opacity: 1;
+  transition-delay: 300ms;
+}
+
+.majorana-pathway-tooltip.is-detail-card .majorana-pathway-tooltip__icon {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-delay: 180ms;
+}
+
+.majorana-pathway-tooltip.is-detail-card .majorana-pathway-tooltip__title {
+  top: 164.12px;
+  transform: translateY(0);
+}
+
+.majorana-pathway-tooltip.is-detail-card
+  .majorana-pathway-tooltip__title-fragment--two {
+  transform: translate3d(var(--control-title-fragment-two-x), 0, 0);
+}
+
+.majorana-pathway-tooltip.is-detail-card
+  .majorana-pathway-tooltip__title-fragment--three {
+  transform: translate3d(var(--control-title-fragment-three-x), 0, 0);
+}
+
+.majorana-pathway-tooltip.is-detail-card .majorana-pathway-tooltip__body {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 300ms;
+}
+
+.majorana-pathway-tooltip--external.is-detail-card
+  .majorana-pathway-tooltip__body,
+.majorana-pathway-tooltip--external.is-detail-returning
+  .majorana-pathway-tooltip__body {
+  top: 328.12px;
+}
+
+.majorana-pathway-tooltip--control.is-detail-card
+  .majorana-pathway-tooltip__body,
+.majorana-pathway-tooltip--readout.is-detail-card
+  .majorana-pathway-tooltip__body,
+.majorana-pathway-tooltip--control.is-detail-returning
+  .majorana-pathway-tooltip__body,
+.majorana-pathway-tooltip--readout.is-detail-returning
+  .majorana-pathway-tooltip__body {
+  top: 270.12px;
+}
+
+.majorana-pathway-detail.is-visible .majorana-pathway-detail__visual {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.majorana-pathway-detail__exit-hint {
+  position: absolute;
+  z-index: 2;
+  top: 2756px;
+  left: 770.5px;
+  display: flex;
+  box-sizing: border-box;
+  width: 620px;
+  height: 150px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 16px 32px rgba(0, 0, 0, 0.14);
+  color: #0e1726;
+  font-family: var(--font-text);
+  font-size: 20px;
+  font-style: italic;
+  letter-spacing: -0.3px;
+  line-height: normal;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition:
+    opacity 360ms ease-out 240ms,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1) 240ms;
+}
+
+.majorana-pathway-detail.is-visible .majorana-pathway-detail__exit-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.majorana-build {
+  background: #dde4e9;
+  isolation: isolate;
+}
+
+.majorana-model-slot--build {
+  z-index: 2;
+  top: 381px;
+  left: 130px;
+  width: 1900px;
+  height: 2006.246px;
+}
+
+.majorana-model-slot--build .majorana-model-stage,
+.majorana-model-slot--build .majorana-schematic {
+  overflow: visible;
+}
+
+.majorana-model-slot--build .majorana-schematic {
+  background: transparent;
+  transform: none;
+  transition: none;
+}
+
+.majorana-model-slot--build
+  .majorana-model-stage.is-schematic
+  .majorana-schematic {
+  transform: none;
+}
+
+.majorana-model-slot--build .majorana-schematic__content {
+  background: transparent;
+}
+
+.majorana-model-slot--build .majorana-schematic__backdrop {
+  filter: blur(12px);
+  opacity: 0.5;
+}
+
+.majorana-model-slot--build .majorana-model-stage.is-schematic
+  .majorana-schematic__component {
+  opacity: 0;
+  transition:
+    opacity 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0ms;
+}
+
+.majorana-build__pathways {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.majorana-build-path .majorana-pathway__track--active,
+.majorana-build-path .majorana-pathway__arrow {
+  opacity: 1;
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-build-path .majorana-pathway__track--active {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+.majorana-build-path .majorana-pathway__track--neutral {
+  opacity: 0.18;
+}
+
+.majorana-build-path .majorana-pathway__track--active::before {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background:
+    linear-gradient(
+      180deg,
+      var(--mj-guide-from, #39beff) 0%,
+      var(--mj-guide-to, #0074d4) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(254, 254, 254, 0.02) 0%,
+      rgba(28, 120, 196, 0.2) 100%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+  box-shadow:
+    inset -5.99px -11.982px 35.944px rgba(0, 0, 0, 0.25),
+    inset 29.954px -11.982px 11.982px rgba(255, 255, 255, 0.25);
+  transform: none;
+}
+
+.majorana-build-path.majorana-pathway--control
+  .majorana-pathway__track--active::before {
+  background:
+    linear-gradient(
+      90deg,
+      var(--mj-guide-to, #0074d4) 0%,
+      var(--mj-guide-from, #39beff) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(28, 120, 196, 0.2) 0%,
+      rgba(254, 254, 254, 0.02) 100%
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15));
+}
+
+.majorana-build-path .majorana-pathway__track--active img {
+  filter: none;
+  opacity: 1;
+}
+
+.majorana-build-path.majorana-pathway--control
+  .majorana-pathway__track--active img {
+  opacity: 0;
+}
+
+.majorana-build__board {
+  position: absolute;
+  z-index: 5;
+  top: 381px;
+  left: 130px;
+  width: 1900px;
+  height: 2006.246px;
+  pointer-events: none;
+}
+
+.majorana-drop-slot {
+  position: absolute;
+  display: block;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+
+.majorana-drop-slot::before {
+  position: absolute;
+  inset: 0;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-radius: inherit;
+  background: transparent;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    background-color 360ms ease,
+    box-shadow 360ms ease,
+    opacity 360ms ease;
+}
+
+.majorana-drop-slot--qpu-stack {
+  top: 674.5px;
+  left: 321.1px;
+  width: 630.8px;
+  height: 657.4px;
+  border-radius: 48.64px;
+}
+
+.majorana-drop-slot--cryo-cmos {
+  top: 674.5px;
+  left: 965.2px;
+  width: 659.3px;
+  height: 657.4px;
+  border-radius: 4.054px;
+}
+
+.majorana-drop-slot--qpu-stack.is-guidance-target::before,
+.majorana-drop-slot--qpu-stack.is-receiving::before,
+.majorana-module[data-dragging-part="qpu-stack"]
+  .majorana-drop-slot--qpu-stack::before {
+  background: rgba(127, 153, 250, 0.4);
+  box-shadow: 0 0 56px rgba(91, 126, 255, 0.4);
+  opacity: 1;
+}
+
+.majorana-drop-slot--cryo-cmos.is-guidance-target::before,
+.majorana-drop-slot--cryo-cmos.is-receiving::before,
+.majorana-module[data-dragging-part="cryo-cmos"]
+  .majorana-drop-slot--cryo-cmos::before {
+  background: rgba(181, 124, 255, 0.3);
+  box-shadow: 0 0 56px rgba(167, 97, 255, 0.34);
+  opacity: 1;
+}
+
+.majorana-drop-slot.is-missing::before {
+  background: rgba(255, 92, 57, 0.4);
+  box-shadow: 0 0 52px rgba(255, 92, 57, 0.34);
+  opacity: 1;
+}
+
+.majorana-drop-slot.is-filled.is-receiving::before {
+  animation: majorana-build-slot-click 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-build__placed-labels {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+}
+
+.majorana-build__placed-label {
+  position: absolute;
+  display: flex;
+  min-height: 134px;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  border: 1.25px solid rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 20px 40px rgba(0, 0, 0, 0.14);
+  color: #0e1726;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 70px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1) 140ms,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1) 140ms;
+}
+
+.majorana-build__placed-label--qpu-stack {
+  top: 1744px;
+  left: 451px;
+  width: 626px;
+}
+
+.majorana-build__placed-label--cryo-cmos {
+  top: 1745px;
+  left: 1094.5px;
+  width: 660px;
+}
+
+.majorana-module.is-build-qpu-placed .majorana-build__placed-label--qpu-stack,
+.majorana-module.is-build-cmos-placed .majorana-build__placed-label--cryo-cmos {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.majorana-build__instruction,
+.majorana-build__completion {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  background: #fff;
+  box-shadow:
+    0 4px 2px rgba(0, 0, 0, 0.15),
+    0 16px 16px rgba(0, 0, 0, 0.14);
+  color: rgba(14, 23, 38, 0.8);
+  font-family: var(--font-text);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 20px);
+  visibility: hidden;
+  transition:
+    opacity 360ms ease-out,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 420ms;
+}
+
+.majorana-build__instruction.is-visible,
+.majorana-build__completion.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
+  transition:
+    opacity 360ms ease-out,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 0s;
+}
+
+.majorana-build__instruction p,
+.majorana-build__completion p {
+  width: 100%;
+  margin: 0;
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+  line-height: 54px;
+}
+
+.majorana-build__instruction strong {
+  color: #0e1726;
+  font-weight: 600;
+}
+
+.majorana-build__instruction[data-build-prompt="initial"] {
+  top: 2081px;
+  width: 1298px;
+  min-height: 150px;
+  padding: 48px;
+  border-radius: 32px;
+  text-align: left;
+}
+
+.majorana-build__instruction[data-build-prompt="qpu-first"],
+.majorana-build__instruction[data-build-prompt="cryo-first"] {
+  top: 2014px;
+  width: 1465px;
+  min-height: 204px;
+  padding: 48px;
+  border-radius: 24px;
+  text-align: center;
+}
+
+.majorana-build__completion {
+  top: 462px;
+  width: 1465px;
+  min-height: 204px;
+  padding: 48px;
+  border-radius: 24px;
+  color: rgba(23, 37, 61, 0.8);
+  text-align: center;
+}
+
+.majorana-build__completion strong {
+  color: #0078d4;
+  font-weight: 600;
+}
+
+.majorana-build__tray {
+  position: absolute;
+  z-index: auto;
+  top: 2480px;
+  left: 380px;
+  width: 1400px;
+  height: 585px;
+  overflow: visible;
+  border: 3.84px dashed rgba(0, 0, 0, 0.3);
+  border-radius: 33.442px;
+  background-color: rgba(217, 217, 217, 0.3);
+  transition:
+    background-color 520ms ease,
+    border-color 520ms ease;
+}
+
+.majorana-module.is-build-complete .majorana-build__tray {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.majorana-build-part {
+  --drag-x: 0px;
+  --drag-y: 0px;
+  --drop-x: 0px;
+  --drop-y: 0px;
+  --drop-scale: 1;
+  --build-tilt-x: 0deg;
+  --build-tilt-y: 0deg;
+  --build-model-seated-scale: 1.14;
+  position: absolute;
+  top: 73px;
+  display: flex;
+  width: 377.56px;
+  height: 500px;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0;
+  border: 0;
+  background: transparent !important;
+  touch-action: none;
+  transform: translate3d(var(--drag-x), var(--drag-y), 0);
+  transition:
+    opacity 280ms ease,
+    filter 360ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  will-change: opacity, transform;
+}
+
+.majorana-build-part--qpu-stack {
+  left: 172.839px;
+}
+
+.majorana-build-part--cryo-cmos {
+  left: 842.2px;
+}
+
+.majorana-build-part.is-dragging {
+  z-index: 30;
+  filter: drop-shadow(0 32px 52px rgba(0, 95, 166, 0.24));
+  transition: none;
+}
+
+.majorana-build-part.is-returning {
+  transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.majorana-build-part.is-snapping {
+  z-index: 30;
+  pointer-events: none;
+  transform: translate3d(var(--drop-x), var(--drop-y), 0);
+  transition:
+    filter 360ms ease,
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-build-part.is-placed {
+  z-index: 3;
+  opacity: 1;
+  pointer-events: none;
+  transform: translate3d(var(--drop-x), var(--drop-y), 0);
+}
+
+.majorana-build-part__visual {
+  position: relative;
+  display: block;
+  height: 376.5px;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0) scale(1);
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  transition:
+    filter 280ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.majorana-build-part.is-dragging .majorana-build-part__visual {
+  filter: drop-shadow(0 36px 38px rgba(14, 23, 38, 0.22));
+  transform: translate3d(0, -22px, 0) scale(1.045);
+  transition-duration: 150ms;
+}
+
+.majorana-module:not(.has-component-models)
+  .majorana-build-part.is-dragging
+  .majorana-build-part__visual {
+  transform:
+    translate3d(0, -22px, 0)
+    rotateX(var(--build-tilt-x))
+    rotateY(var(--build-tilt-y))
+    scale(1.045);
+}
+
+.majorana-build-part.is-snapping .majorana-build-part__visual,
+.majorana-build-part.is-placed .majorana-build-part__visual {
+  filter: drop-shadow(0 16px 24px rgba(14, 23, 38, 0.14));
+  transform: translate3d(0, 0, 0) scale(var(--drop-scale));
+}
+
+.majorana-build-part.is-snapping .majorana-build-part__visual {
+  transition:
+    filter 560ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-build-part__visual--qpu {
+  width: 361.2px;
+  margin-left: 8.161px;
+}
+
+.majorana-build-part__visual--cmos {
+  width: 377.6px;
+}
+
+.majorana-build-part__model {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: block;
+  overflow: visible;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1);
+  transform-origin: 50% 50%;
+  transition:
+    opacity 520ms ease,
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-build-part.is-snapping .majorana-build-part__model,
+.majorana-build-part.is-placed .majorana-build-part__model {
+  transform: scale(var(--build-model-seated-scale));
+}
+
+.majorana-part-model__canvas,
+.majorana-schematic__component-canvas,
+.majorana-pathways__component-canvas,
+.majorana-build-part__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.majorana-module.has-component-models .majorana-build-part__model {
+  opacity: 1;
+}
+
+.majorana-module.has-component-models
+  .majorana-build-part__visual
+  > :not(.majorana-build-part__model) {
+  opacity: 0;
+}
+
+.majorana-build-part.is-seating .majorana-build-part__model {
+  animation: majorana-build-part-click 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.majorana-build-part__label,
+.majorana-build-part__guidance-label {
+  position: absolute;
+  top: 411.18px;
+  left: 0;
+  display: flex;
+  width: 377.56px;
+  min-height: 94px;
+  align-items: center;
+  justify-content: center;
+  color: #0e1726;
+  font-family: var(--font-display);
+  pointer-events: none;
+  transition: opacity 280ms ease;
+}
+
+.majorana-build-part__label {
+  top: 368px;
+  padding: 12px;
+  border: 1.25px solid rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 4px 4px rgba(0, 0, 0, 0.15),
+    0 20px 40px rgba(0, 0, 0, 0.14);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -1px;
+  line-height: 70px;
+}
+
+.majorana-build-part.is-dragging .majorana-build-part__label,
+.majorana-build-part.is-dragging .majorana-build-part__guidance-label,
+.majorana-build-part.is-snapping .majorana-build-part__label,
+.majorana-build-part.is-snapping .majorana-build-part__guidance-label,
+.majorana-build-part.is-placed .majorana-build-part__label,
+.majorana-build-part.is-placed .majorana-build-part__guidance-label {
+  opacity: 0;
+}
+
+.majorana-build-part__guidance-label {
+  top: 409.41px;
+  min-height: 50px;
+  color: #000;
+  font-family: "Segoe UI Variable", var(--font-display);
+  font-size: 37.648px;
+  font-weight: 600;
+  line-height: normal;
+  opacity: 0;
+}
+
+.majorana-build-part.is-guidance-target {
+  animation: majorana-build-guidance-pulse 1800ms ease-in-out infinite;
+}
+
+.majorana-build-part.is-guidance-target.is-dragging,
+.majorana-build-part.is-guidance-target.is-snapping {
+  animation: none;
+}
+
+.majorana-build-part.is-guidance-target .majorana-build-part__label {
+  opacity: 0;
+}
+
+.majorana-build-part.is-guidance-target .majorana-build-part__guidance-label {
+  opacity: 1;
+}
+
+.majorana-build-part--qpu-stack.is-guidance-target {
+  filter: drop-shadow(0 0 28px rgba(91, 126, 255, 0.88));
+}
+
+.majorana-build-part--cryo-cmos.is-guidance-target {
+  filter: drop-shadow(0 0 28px rgba(181, 124, 255, 0.82));
+}
+
+.majorana-build__feedback {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes majorana-build-guidance-pulse {
+  0%,
+  100% {
+    transform: translate3d(var(--drag-x), var(--drag-y), 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(var(--drag-x), var(--drag-y), 0) scale(1.035);
+  }
+}
+
+@keyframes majorana-build-part-click {
+  0% {
+    transform: scale(1.14);
+  }
+
+  42% {
+    transform: scale(1.169);
+  }
+
+  72% {
+    transform: scale(1.131);
+  }
+
+  100% {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes majorana-build-slot-click {
+  0% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+
+  45% {
+    filter: brightness(1.28);
+    transform: scale(1.018);
+  }
+
+  100% {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+}
+
+@keyframes majorana-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes majorana-pathways-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes majorana-nav-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes majorana-component-idle {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      rotateX(var(--component-base-rx))
+      rotateY(var(--component-base-ry))
+      rotateZ(var(--component-base-rz));
+  }
+
+  50% {
+    transform:
+      translate3d(0, var(--component-float-y), 0)
+      rotateX(calc(var(--component-base-rx) + var(--component-delta-rx)))
+      rotateY(calc(var(--component-base-ry) + var(--component-delta-ry)))
+      rotateZ(calc(var(--component-base-rz) + var(--component-delta-rz)));
+  }
+}
+
+/* Design v2 is a linear lesson. The former tab/progress navigation has no
+   runtime surface; the utility header is the only persistent navigation. */
+.majorana-module__views {
+  flex: 1 1 auto;
+}
+
+.majorana-components,
+.majorana-pathways,
+.majorana-build {
+  background: #fff;
+}
+
+.majorana-components-focus__intro,
+.majorana-components-focus__card,
+.majorana-pathways__copy {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.majorana-shared-explainer {
+  width: 100%;
+  height: 100%;
+}
+
+.majorana-shared-explainer--components-summary {
+  --kiosk-explainer-background: rgba(255, 255, 255, 0.24);
+  --kiosk-explainer-body-color: #091f2c;
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-border-radius: 20px;
+  --kiosk-explainer-box-shadow: 0 4px 70px rgba(0, 0, 0, 0.25);
+  --kiosk-explainer-content-gap: 60px;
+  --kiosk-explainer-padding: 80px;
+  --kiosk-explainer-ink: #091f2c;
+  --kiosk-explainer-title-size: 96px;
+}
+
+.majorana-shared-explainer--component {
+  --kiosk-explainer-backdrop-filter: none;
+  --kiosk-explainer-background: transparent;
+  --kiosk-explainer-body-color: rgba(9, 31, 44, 0.6);
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-box-shadow: none;
+  --kiosk-explainer-content-gap: 32px;
+  --kiosk-explainer-ink: rgba(9, 31, 44, 0.7);
+  --kiosk-explainer-padding: 0;
+  --kiosk-explainer-title-size: 96px;
+}
+
+.majorana-shared-explainer--pathways {
+  --kiosk-explainer-background: rgba(255, 255, 255, 0.6);
+  --kiosk-explainer-body-color: #091f2c;
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-border-radius: 20px;
+  --kiosk-explainer-box-shadow: 0 4px 70px rgba(0, 0, 0, 0.25);
+  --kiosk-explainer-content-gap: 60px;
+  --kiosk-explainer-padding: 80px;
+  --kiosk-explainer-ink: #091f2c;
+  --kiosk-explainer-title-size: 96px;
+}
+
+/* The closing line is the same panel as the statements below it, so the two
+   share this rule rather than keeping copies that can drift apart. */
+.majorana-shared-explainer--build,
+.majorana-shared-explainer--build-summary {
+  --kiosk-explainer-background: rgba(255, 255, 255, 0.6);
+  --kiosk-explainer-body-color: #091f2c;
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-border-radius: 20px;
+  --kiosk-explainer-box-shadow: 0 4px 70px rgba(0, 0, 0, 0.25);
+  --kiosk-explainer-padding: 80px;
+}
+
+/* The board sets the two per-chip statements a size down from the closing line
+   above them. They sit beside each other over the chips rather than alone
+   across the stage, so they are read at a shorter measure and take 48px. */
+.majorana-shared-explainer--build {
+  --kiosk-explainer-body-size: 48px;
+}
+
+/* The older local h2/h3 rules have element specificity, so explicitly anchor
+   shared explainer type here; otherwise those legacy 30–60px sizes win. */
+.majorana-components-focus__intro .kiosk-explainer__title,
+.majorana-components-focus__card .kiosk-explainer__title,
+.majorana-pathways__copy .kiosk-explainer__title {
+  font-size: 96px;
+  line-height: 1.330078;
+}
+
+.majorana-components-focus__intro .kiosk-explainer__body,
+.majorana-components-focus__card .kiosk-explainer__body,
+.majorana-pathways__copy .kiosk-explainer__body {
+  font-size: 60px;
+  line-height: 1.330078;
+}
+
+.majorana-components-focus__intro {
+  top: 280px;
+  left: 391.4375px;
+  width: 1378px;
+  height: 588px;
+  visibility: hidden;
+}
+
+.majorana-components-focus__intro .kiosk-explainer__body {
+  max-width: 880px;
+}
+
+.majorana-components-focus__intro .kiosk-explainer__title {
+  white-space: nowrap;
+}
+
+.majorana-components-focus__card {
+  top: 2332px;
+  width: 600px;
+  height: 360px;
+}
+
+.majorana-components-focus__card--qpu {
+  left: 239px;
+}
+
+.majorana-components-focus__card--cmos {
+  left: 1287px;
+}
+
+.majorana-focus-component--qpu {
+  top: 1276.8px;
+  left: 93px;
+  width: 926.913px;
+  height: 966px;
+}
+
+.majorana-focus-component--cmos {
+  top: 1276.8px;
+  left: 1108.17px;
+  width: 957.86px;
+  height: 966px;
+}
+
+.majorana-module.is-components-focus .majorana-components {
+  background: #fff;
+}
+
+.majorana-module.is-components-focus .majorana-model-slot--components .majorana-model-stage {
+  filter: blur(24px) saturate(0.36) brightness(1.08);
+  opacity: 0.42;
+  transform: translate3d(-450px, -262px, 0) scale(1.47368421);
+}
+
+.majorana-module[data-components-phase="focus"]
+  .majorana-components-focus__intro {
+  visibility: visible;
+}
+
+.majorana-module[data-components-phase="focusing"]
+  .majorana-components-focus__intro {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0) scale(0.985);
+}
+
+/* Keep the reparented Three.js canvases at their measured schematic origins
+   for one painted frame. The following `focusing` state then animates the same
+   canvas nodes continuously into the large Figma component positions. */
+.majorana-module[data-components-phase="priming"]
+  .majorana-focus-component {
+  opacity: 1;
+  transform:
+    translate3d(var(--component-enter-x), var(--component-enter-y), 0)
+    scale(
+      var(--component-enter-scale-x, var(--component-enter-scale)),
+      var(--component-enter-scale-y, var(--component-enter-scale))
+    );
+  transition: none;
+}
+
+.majorana-module[data-components-phase="priming"]
+  .majorana-components-focus__intro,
+.majorana-module[data-components-phase="priming"]
+  .majorana-components-focus__card {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0) scale(0.985);
+  transition: none;
+}
+
+/* Each caption lands with its own component. The previous copy-only delay made
+   Cryo-CMOS appear unlabeled until the summary panel entered. */
+.majorana-module[data-components-phase="focusing"]
+  .majorana-components-focus__card--qpu {
+  transition-delay: 200ms;
+}
+
+.majorana-module[data-components-phase="focusing"]
+  .majorana-components-focus__card--cmos {
+  transition-delay: 0ms;
+}
+
+.majorana-module[data-components-phase="focusing"][data-component-spotlight="qpu"]
+  .majorana-focus-component--cmos,
+.majorana-module[data-components-phase="focusing"][data-component-spotlight="cmos"]
+  .majorana-focus-component--qpu,
+.majorana-module[data-components-phase="focusing"][data-component-spotlight="cmos"]
+  .majorana-components-focus__card--qpu {
+  filter: grayscale(1) saturate(0.15);
+  opacity: 0.2;
+}
+
+.majorana-module[data-components-phase="focusing"][data-component-spotlight="qpu"]
+  .majorana-components-focus__card--cmos {
+  filter: grayscale(1) saturate(0.15);
+  opacity: 0;
+}
+
+.majorana-tap-target {
+  position: absolute;
+  z-index: 14;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: transparent !important;
+  touch-action: manipulation;
+}
+
+.majorana-tap-target[hidden] {
+  display: none;
+}
+
+.majorana-stage-tooltip {
+  position: absolute;
+  z-index: 15;
+  left: 50%;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.majorana-stage-tooltip--components {
+  top: 968px;
+}
+
+.majorana-stage-tooltip--pathways {
+  top: 1399px;
+}
+
+/* These tooltips are re-parented between stages. Keep their shared light-grey
+   treatment stable across each stage's local styles. */
+.majorana-module .majorana-shared-tooltip {
+  min-height: 92px;
+  padding: 20px 30px;
+  border: 0;
+  border-radius: 12px;
+  background-color: #f2f4f5 !important;
+  box-shadow: 0 4px 20px rgb(31 55 80 / 0.22);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.majorana-module .majorana-shared-tooltip .kiosk-tooltip__text {
+  color: #7c8282;
+  font-size: 36px;
+  line-height: normal;
+}
+
+.majorana-module .majorana-shared-tooltip,
+.majorana-module .majorana-shared-tooltip .kiosk-tooltip__text {
+  animation: none !important;
+  background-image: none;
+  filter: none;
+}
+
+.majorana-module .majorana-shared-tooltip .kiosk-tooltip__text {
+  -webkit-text-fill-color: currentColor;
+}
+
+.majorana-pathways__component-holder,
+.majorana-build__tray {
+  --majorana-holder-border: rgba(9, 31, 44, 0.48);
+  z-index: 8;
+  top: 80px;
+  left: 424.965px;
+  width: 1310.068px;
+  height: 830.757px;
+  border: 0;
+  border-radius: 33.441px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+}
+
+.majorana-component-holder__border {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.majorana-component-holder__border rect {
+  fill: none;
+  stroke: var(--majorana-holder-border);
+  stroke-width: 4.5px;
+  stroke-dasharray: 34px 26px;
+  stroke-linecap: butt;
+  transition: stroke 520ms ease;
+}
+
+.majorana-component-holder__title {
+  position: absolute;
+  top: 63.84px;
+  right: 0;
+  left: 0;
+  margin: 0;
+  color: #0e1726;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 56px;
+  text-align: center;
+}
+
+.majorana-pathways__component,
+.majorana-build-part {
+  top: 179.84px;
+  height: 584px;
+}
+
+.majorana-pathways__component--qpu,
+.majorana-build-part--qpu-stack {
+  left: 83.84px;
+  width: 463.457px;
+}
+
+.majorana-pathways__component--cmos,
+.majorana-build-part--cryo-cmos {
+  left: 747.298px;
+  width: 478.93px;
+}
+
+.majorana-pathways__component-visual,
+.majorana-build-part__visual {
+  width: 100%;
+  height: 483px;
+}
+
+.majorana-build-part__visual--qpu,
+.majorana-build-part__visual--cmos {
+  width: 100%;
+  margin-left: 0;
+}
+
+.majorana-focus-component__model,
+.majorana-pathways__component-model,
+.majorana-build-part__model {
+  transform: scale(1.18);
+  transform-origin: 50% 50%;
+}
+
+.majorana-build-part.is-snapping .majorana-build-part__model,
+.majorana-build-part.is-placed .majorana-build-part__model {
+  transform: scale(1.18);
+}
+
+/* Fallback raster geometry follows the resized holder cards when WebGL models
+   are unavailable. The artwork-attached pieces remain the documented local exception. */
+.majorana-pathways__qpu-crop {
+  top: 8.36%;
+  left: 8.81%;
+  width: 82.05%;
+  height: 82.35%;
+}
+
+.majorana-pathways__green-mask {
+  top: 27.53%;
+  left: 35.01%;
+  width: 33.15%;
+  height: 43.68%;
+}
+
+.majorana-pathways__cryo-chip {
+  top: 34.77%;
+  left: 42.27%;
+  width: 15.57%;
+  height: 29.37%;
+}
+
+.majorana-pathways__component figcaption {
+  margin-top: 40.076px;
+  color: rgba(9, 31, 44, 0.7);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.8px;
+  line-height: 53px;
+}
+
+.majorana-build-part__label,
+.majorana-build-part__guidance-label {
+  top: 523.076px;
+  width: 100%;
+  min-height: 53px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(9, 31, 44, 0.7);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.8px;
+  line-height: 53px;
+}
+
+.majorana-pathways__component-holder {
+  opacity: 1;
+}
+
+.majorana-pathways__component-holder .majorana-pathways__component {
+  opacity: 0.5;
+}
+
+.majorana-model-slot--pathways,
+.majorana-model-slot--build,
+.majorana-build__board {
+  top: 993px;
+}
+
+.majorana-pathways__diagram,
+.majorana-build__pathways {
+  transform: translateY(609px);
+}
+
+/* The guides run into the chips rather than stopping at them, so a seated chip
+   reads as connected rather than as something the line disappears behind.
+ *
+ * The chips are children of the tray, and the tray is a stacking context at 8,
+ * so the only way over a chip is over the tray. That is why this waits for the
+ * finished board: until then the tray still holds the chip that has not been
+ * placed, and a layer above the tray would draw these lines straight across
+ * it. 9 clears the tray and stays under the statements at 11, which keep the
+ * copy over the lines. */
+.majorana-module.is-build-complete .majorana-build__pathways {
+  z-index: 9;
+}
+
+.majorana-pathway-connector--external,
+.majorana-pathway-connector--readout {
+  top: 1490.47px;
+}
+
+.majorana-pathway-connector--control {
+  top: 2077.5px;
+}
+
+.majorana-module .majorana-pathway-tooltip {
+  border: 1px solid rgba(14, 23, 38, 0.18);
+  border-radius: 32px;
+  box-shadow: 0 8px 24px rgba(14, 23, 38, 0.14);
+  cursor: default;
+  pointer-events: none;
+  transition:
+    opacity 220ms ease,
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.majorana-pathway-tooltip--external {
+  top: 1405px;
+  height: 260px;
+}
+
+.majorana-pathway-tooltip--readout {
+  top: 1428px;
+  height: 230px;
+}
+
+.majorana-pathway-tooltip--control {
+  top: 2135px;
+  height: 220px;
+}
+
+.majorana-pathway-tooltip__title,
+.majorana-pathway-tooltip--external:not(.is-detail-card)
+  .majorana-pathway-tooltip__title,
+.majorana-pathway-tooltip--readout .majorana-pathway-tooltip__title {
+  top: 50%;
+  right: 38px;
+  left: 38px;
+  font-size: 42px;
+  font-weight: 500;
+  line-height: 1.22;
+  white-space: normal;
+  transform: translateY(-50%);
+}
+
+.majorana-pathway-tooltip.is-active {
+  background: #fff;
+  box-shadow: 0 12px 38px rgba(0, 91, 105, 0.24);
+}
+
+.majorana-pathways__copy {
+  top: 2530px;
+  left: 480px;
+  width: 1200px;
+  height: 720px;
+}
+
+.majorana-pathways__copy .kiosk-explainer__body {
+  max-width: 880px;
+}
+
+.majorana-build {
+  --majorana-finale-camera-scale: 1;
+  --majorana-finale-camera-x: 0px;
+  --majorana-finale-camera-y: 0px;
+  --majorana-finale-live-opacity: 1;
+}
+
+.majorana-build__placed-label {
+  min-height: 80px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(9, 31, 44, 0.7);
+  font-size: 60px;
+  font-weight: 400;
+  letter-spacing: -1.2px;
+  line-height: 80px;
+}
+
+.majorana-build__placed-label--qpu-stack,
+.majorana-build__placed-label--cryo-cmos {
+  top: 2348.5px;
+}
+
+/*
+ * One statement per chip, each sized to sit above the component it describes so
+ * both can be read at once.
+ *
+ * The slots sit at board-relative left 321.1 / 965.2 inside a board at stage
+ * left 130, so the two columns are stage x 451.1 and 1095.2 at the slots' own
+ * widths.
+ *
+ * This is the region the two boxes live in, not the boxes themselves: each box
+ * is only as tall as its own words, and hangs from the region's bottom edge so
+ * the pair lines up along the bottom the way the board draws them. The region
+ * ends at stage y 1630, short of the slots, which begin at stage y 1667.5
+ * (board top 993 + slot top 674.5). Its height only has to clear the taller
+ * copy, which sets five 63.8 lines over 80 top and bottom, or 479.
+ */
+.majorana-build__explanation {
+  position: absolute;
+  z-index: 11;
+  top: 1070px;
+  display: flex;
+  height: 560px;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+  transform: none;
+}
+
+/* Set on the explainer itself, not on this slot: the variant declares the
+   padding on that element, and a value declared there beats one inherited from
+   a parent however specific the parent's selector is.
+ *
+ * Sides come in from the variant's 80 to 40. At a column's width rather than
+ * the board's, 80 each side leaves under 500 for the copy and pushes both
+ * statements a line longer than the board draws them. Top and bottom keep the
+ * 80, which is the space the board leaves around these words. */
+.majorana-build__explanation .majorana-shared-explainer {
+  --kiosk-explainer-padding: 80px 40px;
+  height: auto;
+}
+
+.majorana-build__explanation--qpu {
+  left: 451.1px;
+  width: 630.8px;
+}
+
+.majorana-build__explanation--cryo {
+  left: 1095.2px;
+  width: 659.3px;
+}
+
+.majorana-build__explanation .kiosk-explainer__body {
+  max-width: 100%;
+}
+
+/* The closing line above the pair, in the space the tray leaves behind. The
+   tray is stage y 80 to 910.76, so a 400-tall box centred in it starts at 295 —
+   clear of the two statements, which begin at 1020. */
+.majorana-build__summary {
+  position: absolute;
+  z-index: 11;
+  top: 295px;
+  left: 480px;
+  width: 1200px;
+  height: 400px;
+  pointer-events: none;
+  transform: none;
+}
+
+.majorana-build__summary .kiosk-explainer__body {
+  max-width: 880px;
+  font-size: 60px;
+  line-height: 1.330078;
+}
+
+.majorana-build__instruction {
+  position: absolute;
+  z-index: 15;
+  top: 2505px;
+  left: 50%;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+  pointer-events: none;
+  transform: translateX(-50%);
+  visibility: visible;
+}
+
+.majorana-build__instruction:has(.kiosk-tooltip[data-build-prompt="initial"]) {
+  top: 1399px;
+}
+
+.majorana-build__instruction .kiosk-tooltip[data-build-prompt="initial"],
+.majorana-build__instruction .kiosk-tooltip[data-build-prompt="qpu-first"],
+.majorana-build__instruction .kiosk-tooltip[data-build-prompt="cryo-first"] {
+  border-color: rgba(255, 179, 187, 0.7);
+  background-color: rgba(255, 179, 187, 0.5) !important;
+  box-shadow: 0 0 50px rgba(227, 153, 150, 0.5);
+}
+
+.majorana-build__instruction .kiosk-tooltip[data-build-prompt="initial"]
+  .kiosk-tooltip__text,
+.majorana-build__instruction .kiosk-tooltip[data-build-prompt="qpu-first"]
+  .kiosk-tooltip__text,
+.majorana-build__instruction .kiosk-tooltip[data-build-prompt="cryo-first"]
+  .kiosk-tooltip__text {
+  color: #cf3919;
+}
+
+.majorana-module.is-build-missing .majorana-build {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(144, 87, 74, 0) 0%,
+      rgba(246, 148, 127, 0.3) 100%
+    ),
+    #fff;
+}
+
+.majorana-model-slot--build .majorana-schematic__backdrop,
+.majorana-module.is-build-missing .majorana-model-slot--build
+  .majorana-schematic__backdrop {
+  filter: blur(6px);
+  opacity: 0.5;
+}
+
+/* The two vertical channels double as drop guides: readout over the QPU stack,
+   external over the cryo-CMOS, and control spanning the pair. They used to
+   leave with the chip that landed on them; the board keeps them, running into
+   the seated chip and reading as the connection that chip just made, so what
+   changes on a drop is the colour rather than whether the line is there. */
+
+.majorana-build-path {
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .majorana-build-path {
+    transition-duration: 1ms;
+  }
+}
+
+/*
+ * Each guide carries its own chip's state in its colour: the authored blue
+ * while the build is only waiting, the drop slots' own #ff5c39 once the module
+ * is asking for a chip that is still missing, and the authored teal once that
+ * chip is seated. Control spans the pair, so it turns only when both are down.
+ *
+ * Set as the two stops of the gradient the guide is already painted with —
+ * build paths run `filter: none` on purpose and take their colour from that
+ * gradient, so the state belongs in the stops rather than in a recolour chain.
+ */
+.majorana-module.is-build-missing
+  .majorana-build-path.majorana-pathway--readout,
+.majorana-module.is-build-missing
+  .majorana-build-path.majorana-pathway--external,
+.majorana-module.is-build-missing
+  .majorana-build-path.majorana-pathway--control {
+  --mj-guide-from: #ff8a70;
+  --mj-guide-to: #ff5c39;
+}
+
+/* A seated chip settles its own guide, and only its own — the other keeps
+   asking until its chip lands too. Listed after the missing state so it wins
+   while the module is still prompting for the one that is left. */
+.majorana-module.is-build-qpu-placed
+  .majorana-build-path.majorana-pathway--readout,
+.majorana-module.is-build-cmos-placed
+  .majorana-build-path.majorana-pathway--external,
+.majorana-module.is-build-complete
+  .majorana-build-path.majorana-pathway--control {
+  --mj-guide-from: #01c6db;
+  --mj-guide-to: #49c5b1;
+}
+
+/* Both chips are seated, so the tray has no job left: the glass, the dashed
+   frame and the instruction dissolve together and leave the finished board
+   on its own. */
+.majorana-module.is-build-complete .majorana-build__tray {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition:
+    background 420ms ease,
+    -webkit-backdrop-filter 420ms ease,
+    backdrop-filter 420ms ease;
+}
+
+.majorana-module.is-build-complete .majorana-build__tray
+  > .majorana-component-holder__border,
+.majorana-module.is-build-complete .majorana-build__tray
+  > .majorana-component-holder__title {
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity 420ms ease,
+    visibility 0s linear 420ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .majorana-module.is-build-complete .majorana-build__tray,
+  .majorana-module.is-build-complete .majorana-build__tray
+    > .majorana-component-holder__border,
+  .majorana-module.is-build-complete .majorana-build__tray
+    > .majorana-component-holder__title {
+    transition-duration: 1ms;
+  }
+}
+
+.majorana-finale {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease-out;
+}
+
+.majorana-finale.is-showing {
+  opacity: 1;
+}
+
+.majorana-finale__camera,
+.majorana-finale__chip-camera {
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.majorana-finale-chip-overlay {
+  position: absolute;
+  z-index: 9;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.majorana-finale__pullout {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: opacity, transform;
+}
+
+/* Module 08's intrinsic stop-02 bitmap remains the same rendered element from
+   the live-board handoff through the final Cryostat frame. */
+/* Both plates are sized to their own bitmaps in JS, from the nanoscale camera
+   that also positions them -- these are the intrinsic pixels its art transforms
+   are expressed in, and hardcoding them here let one drift from the other. */
+/* Between the chandelier and the package close-up: it replaces the arm the
+   pull-out magnifies, and the package plate still lands on top of it. */
+.majorana-finale__coldfinger {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: opacity, transform;
+}
+
+.majorana-finale__chip {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  display: block;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 0 0;
+  will-change: opacity, transform;
+}
+
+.majorana-module.is-finale .majorana-build {
+  background: transparent;
+}
+
+.majorana-module.is-finale .majorana-model-slot--build,
+.majorana-module.is-finale .majorana-build__board,
+.majorana-module.is-finale .majorana-build__tray {
+  transform:
+    translate3d(
+      var(--majorana-finale-camera-x),
+      var(--majorana-finale-camera-y),
+      0
+    )
+    scale(var(--majorana-finale-camera-scale));
+  will-change: transform;
+}
+
+.majorana-module.is-finale .majorana-model-slot--build,
+.majorana-module.is-finale .majorana-build__board,
+.majorana-module.is-finale .majorana-build__tray .majorana-build-part {
+  opacity: var(--majorana-finale-live-opacity);
+  /* A registered opacity dissolve avoids re-filtering the large board and
+     both WebGL canvases at a different blur radius on every frame. */
+  will-change: opacity, transform;
+}
+
+.majorana-module.is-finale .majorana-model-slot--build,
+.majorana-module.is-finale .majorana-build__board {
+  transform-origin: -130px -993px;
+}
+
+.majorana-module.is-finale .majorana-build__tray {
+  border-color: transparent;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transform-origin: -424.965px -80px;
+}
+
+.majorana-module.is-finale .majorana-build__tray
+  > .majorana-component-holder__border,
+.majorana-module.is-finale .majorana-build__tray
+  > .majorana-component-holder__title,
+.majorana-module.is-finale .majorana-build__explanation,
+.majorana-module.is-finale .majorana-build__summary,
+.majorana-module.is-finale .majorana-build__instruction,
+.majorana-module.is-finale .majorana-build__placed-labels,
+.majorana-module.is-finale .majorana-build__pathways {
+  filter: blur(16px);
+  opacity: 0;
+  transition:
+    filter 420ms ease,
+    opacity 320ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .majorana-finale,
+  .majorana-module.is-finale .majorana-build__tray
+    > .majorana-component-holder__border,
+  .majorana-module.is-finale .majorana-build__tray
+    > .majorana-component-holder__title,
+  .majorana-module.is-finale .majorana-build__explanation,
+  .majorana-module.is-finale .majorana-build__summary,
+  .majorana-module.is-finale .majorana-build__instruction,
+  .majorana-module.is-finale .majorana-build__placed-labels,
+  .majorana-module.is-finale .majorana-build__pathways {
+    transition-duration: 1ms;
+  }
+}

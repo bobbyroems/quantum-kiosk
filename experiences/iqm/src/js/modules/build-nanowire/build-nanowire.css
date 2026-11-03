@@ -1,0 +1,760 @@
+.nw,
+.nw * {
+  box-sizing: border-box;
+}
+
+.nw {
+  --nw-ink: #2a446f;
+  --nw-loupe-x: -700px;
+  --nw-loupe-y: -700px;
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  background: #fff;
+  color: var(--nw-ink);
+  font-family: var(--font-text);
+  isolation: isolate;
+}
+
+.nw button {
+  font: inherit;
+}
+
+.nw__header {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+}
+
+.nw__experience {
+  position: absolute;
+  inset: 120px 0 0;
+  overflow: hidden;
+  background: #fff;
+  outline: none;
+  touch-action: none;
+}
+
+.nw__backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 520ms var(--ease-out);
+}
+
+.nw__backdrop--perturbation {
+  background: linear-gradient(180deg, rgba(102, 102, 102, 0) 0%, rgba(255, 98, 0, 0.4) 100%);
+}
+
+.nw__backdrop--repair {
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(102, 102, 102, 0) 0%,
+    rgba(145, 197, 73, 0.22) 43.446%,
+    rgba(145, 197, 73, 0.6) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+/* A single asymmetric completion sweep, built from broad colour fields rather
+   than a glossy stripe. Transform-only motion keeps the 4K kiosk compositor
+   calm while the uneven radial centres make the gradient feel fluid. */
+.nw__backdrop--repair::before {
+  position: absolute;
+  inset: -18% -28%;
+  background:
+    radial-gradient(ellipse at 17% 83%, rgba(140, 204, 70, 0.42) 0%, rgba(140, 204, 70, 0) 48%),
+    radial-gradient(ellipse at 58% 92%, rgba(93, 175, 48, 0.48) 0%, rgba(93, 175, 48, 0) 53%),
+    radial-gradient(ellipse at 88% 66%, rgba(184, 223, 118, 0.38) 0%, rgba(184, 223, 118, 0) 46%);
+  content: '';
+  opacity: 0;
+  transform: translate3d(-12%, 8%, 0) scale(1.08);
+  transform-origin: 50% 78%;
+}
+
+.nw[data-phase="scanning"] .nw__backdrop--perturbation,
+.nw[data-phase="inspect"] .nw__backdrop--perturbation,
+.nw[data-phase="targeted"] .nw__backdrop--perturbation,
+.nw[data-phase="correcting"] .nw__backdrop--perturbation {
+  opacity: 1;
+}
+
+.nw[data-phase="repaired"]:not([data-repair-exit="true"]) .nw__backdrop--repair {
+  opacity: 1;
+}
+
+.nw[data-phase="repaired"]:not([data-repair-exit="true"]) .nw__backdrop--repair::before {
+  animation: nw-repair-fluid-sweep 1900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
+@keyframes nw-repair-fluid-sweep {
+  0% {
+    opacity: 0.18;
+    transform: translate3d(-12%, 8%, 0) scale(1.08);
+  }
+
+  38% {
+    opacity: 0.88;
+    transform: translate3d(-3%, 1%, 0) scale(1.13) rotate(-0.35deg);
+  }
+
+  72% {
+    opacity: 0.68;
+    transform: translate3d(7%, -3%, 0) scale(1.08) rotate(0.45deg);
+  }
+
+  100% {
+    opacity: 0.42;
+    transform: translate3d(13%, -7%, 0) scale(1.04);
+  }
+}
+
+.nw__scene,
+.nw__canvas,
+.nw__scene-wash {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.nw__atom-start {
+  position: absolute;
+  z-index: 7;
+  top: var(--nw-atom-start-y, 1550px);
+  left: var(--nw-atom-start-x, 850px);
+  width: 460px;
+  height: 460px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  transform: translate(-50%, -50%);
+}
+
+.nw__atom-start:focus-visible {
+  outline: 5px solid rgba(0, 120, 212, 0.72);
+  outline-offset: 12px;
+}
+
+.nw__atom-start[hidden] {
+  display: none;
+}
+
+.nw__scene {
+  z-index: 1;
+}
+
+.nw__canvas {
+  display: block;
+}
+
+.nw__scene-wash {
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 51%, transparent 42%, rgba(255, 255, 255, 0.12) 66%, rgba(255, 255, 255, 0.78) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), transparent 17%, transparent 82%, rgba(255, 255, 255, 0.62));
+}
+
+/* Keep the authored gradients attached to the physical bottom edge. The
+   default white vignette is useful on the opening scene, but over the orange
+   and blue beats it produced a pale oval that cut the gradient short. */
+.nw[data-phase="scanning"] .nw__scene-wash,
+.nw[data-phase="inspect"] .nw__scene-wash,
+.nw[data-phase="targeted"] .nw__scene-wash,
+.nw[data-phase="correcting"] .nw__scene-wash,
+.nw[data-phase="repaired"] .nw__scene-wash {
+  background:
+    radial-gradient(ellipse at 50% 51%, transparent 48%, rgba(255, 255, 255, 0.05) 74%, rgba(255, 255, 255, 0.1) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 18%, transparent 100%);
+}
+
+.nw__prompt {
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-content-gap: 48px;
+  --kiosk-explainer-padding: 0;
+  --kiosk-explainer-title-size: 96px;
+  position: absolute;
+  z-index: 5;
+  top: 430px;
+  left: 50%;
+  width: 1600px;
+  transform: translateX(-50%);
+}
+
+.nw__prompt.is-showing {
+  transform: translateX(-50%);
+}
+
+.nw__prompt .kiosk-explainer__body,
+.nw__prompt .kiosk-explainer__footer {
+  width: 1040px;
+  margin-inline: auto;
+}
+
+.nw__prompt--defect .kiosk-explainer__body {
+  width: 1240px;
+  max-width: 100%;
+  text-wrap: pretty;
+}
+
+.nw__prompt[data-kiosk-explainer-layout="split"] {
+  --kiosk-explainer-border-radius: 20px;
+  --kiosk-explainer-box-shadow: 0 4px 104px rgba(0, 0, 0, 0.1);
+  /* 2.5 here plus the 53.5 margin on the media below is the 56 this gap used to
+     be, so moving the picture across does not carry the copy with it. */
+  --kiosk-explainer-content-gap: 2.5px;
+  --kiosk-explainer-padding: 8px;
+  top: 380px;
+  width: 1894px;
+  height: 672px;
+}
+
+/* Height follows the supplied micrograph's 1764 x 1208 aspect: the shared media
+   image is `object-fit: fill`, so a slot of any other ratio would stretch the
+   lattice out of square. Centred rather than stretched, because the panel is
+   taller than the picture and the split layout would otherwise pin it to the
+   top edge and leave all the slack underneath. */
+.nw__prompt[data-kiosk-explainer-layout="split"] .kiosk-explainer__media {
+  width: 712px;
+  height: 488px;
+  align-self: center;
+  /* Centred in the space it has rather than pinned to the panel's padding: the
+     copy starts 835 in, so a 712 picture sits 61.5 from each side of that, and
+     8 of those 61.5 is already the panel's own padding. */
+  margin-left: 53.5px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.nw__prompt[data-kiosk-explainer-layout="split"] .kiosk-explainer__copy {
+  width: 1098px;
+  justify-content: center;
+}
+
+.nw__prompt[data-kiosk-explainer-layout="split"] .kiosk-explainer__title,
+.nw__prompt[data-kiosk-explainer-layout="split"] .kiosk-explainer__body {
+  width: 980px;
+  text-align: left;
+}
+
+.nw__instruction {
+  position: absolute;
+  z-index: 6;
+  top: 1160px;
+  left: 50%;
+  opacity: 0;
+  transform: translate(-50%, 18px);
+  transition: opacity 380ms var(--ease-out), transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nw__instruction.is-showing {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.nw__instruction.has-swipe-arrow {
+  grid-auto-flow: column;
+  column-gap: 18px;
+}
+
+.nw__instruction-arrow {
+  display: none;
+  width: 44px;
+  height: 54px;
+  flex: 0 0 auto;
+}
+
+.nw__instruction.has-swipe-arrow .nw__instruction-arrow {
+  display: block;
+  animation: nw-swipe-arrow-nudge 1800ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.nw__instruction[hidden] {
+  display: none;
+}
+
+.nw__loupe {
+  position: absolute;
+  z-index: 9;
+  top: 0;
+  left: 0;
+  width: 524px;
+  height: 524px;
+  overflow: visible;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--nw-loupe-x), var(--nw-loupe-y), 0) translate(-50%, -50%);
+  transition: opacity 180ms var(--ease-out), filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.nw__loupe-visual {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform: translate3d(0, 0, 0);
+}
+
+/* The nudge, reworked to IQM's note on the 25 Aug board: "a quick left-right
+   shake, as if nudging the user to grab it. Keep the movement small and snappy,
+   not playful or exaggerated. Pause for a few seconds, then repeat."
+
+   It used to be a single slow diagonal lean with about a second of rest, which
+   read as the loupe drifting rather than asking to be picked up.
+
+   The entrance establishes the loupe immediately; the invitation waits until
+   that arrival has settled. `:not(.has-interacted)` stops both the instant a
+   drag begins, and that class never comes off, so the loupe asks once. */
+.nw[data-phase="inspect"] .nw__loupe:not(.is-dragging):not(.has-interacted) .nw__loupe-visual {
+  animation:
+    nw-loupe-enter 620ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    nw-loupe-invitation 4800ms ease-in-out 1750ms infinite;
+  will-change: filter, transform;
+}
+
+.nw[data-phase="inspect"] .nw__loupe,
+.nw[data-phase="targeted"] .nw__loupe,
+.nw[data-phase="correcting"] .nw__loupe,
+.nw[data-phase="repaired"] .nw__loupe {
+  opacity: 1;
+}
+
+.nw[data-phase="inspect"] .nw__loupe {
+  pointer-events: auto;
+}
+
+.nw[data-phase="inspect"] .nw__loupe {
+  cursor: grab;
+  touch-action: none;
+}
+
+.nw[data-phase="inspect"] .nw__loupe.is-dragging {
+  cursor: grabbing;
+}
+
+.nw__loupe-glass {
+  position: absolute;
+  inset: 37px;
+  overflow: hidden;
+  border: 2px solid rgba(70, 79, 89, 0.58);
+  border-radius: 50%;
+  background: rgba(247, 238, 233, 0.32);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 246, 240, 0.82),
+    inset 0 0 42px rgba(255, 228, 216, 0.24);
+  transition:
+    border-color 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nw__loupe-glass::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 31% 23%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1) 20%, transparent 44%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 56%, rgba(57, 66, 75, 0.04));
+  content: "";
+  pointer-events: none;
+}
+
+/* Laid over the handle in the frame bitmap's own geometry: the source render is
+   1536 x 1024 drawn into 1593 x 1062 at (-338, -94), and the handle measures
+   502 x 158 centred on (1058, 798) at 44.4 degrees in those source pixels. It
+   inherits the loupe's own pointer-events, so it is grabbable exactly when the
+   lens is. */
+.nw__loupe-grip {
+  position: absolute;
+  z-index: 5;
+  top: 733px;
+  left: 759px;
+  width: 520px;
+  height: 164px;
+  border-radius: 82px;
+  transform: translate(-50%, -50%) rotate(44.4deg);
+}
+
+.nw__loupe-frame {
+  position: absolute;
+  z-index: 4;
+  /* The supplied image is a 1536 x 1024 render whose lens centre is at
+     (579, 343). Scaling its 434px opening to the existing 450px live viewport
+     keeps the magnification geometry unchanged; these offsets then put the
+     rendered opening over .nw__loupe-glass exactly. The source is intentionally
+     composited with screen because its black field is part of the delivered
+     bitmap. The radial mask makes the lens itself a genuine live viewport. */
+  top: -94px;
+  left: -338px;
+  display: block;
+  width: 1593px;
+  height: 1062px;
+  background-image: var(--nw-loupe-asset-image);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  filter:
+    hue-rotate(0deg)
+    saturate(1)
+    brightness(1)
+    drop-shadow(0 2px 2px rgba(40, 48, 56, 0.42))
+    drop-shadow(0 14px 26px rgba(37, 45, 54, 0.12));
+  mix-blend-mode: screen;
+  pointer-events: none;
+  transition: filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-mask-image: radial-gradient(
+    circle 225px at 600px 356px,
+    transparent 0 99%,
+    #000 100%
+  );
+  mask-image: radial-gradient(
+    circle 225px at 600px 356px,
+    transparent 0 99%,
+    #000 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Purple is the supplied start state. Once the visitor begins inspecting, the
+   coloured resin shifts to dark blue; the low-saturation metal connector stays
+   silver under hue rotation. A successful correction resolves the frame green. */
+.nw__loupe.has-interacted .nw__loupe-frame,
+.nw[data-phase="targeted"] .nw__loupe-frame,
+.nw[data-phase="correcting"] .nw__loupe-frame {
+  filter:
+    hue-rotate(-35deg)
+    saturate(1.18)
+    brightness(0.72)
+    drop-shadow(0 2px 2px rgba(17, 35, 74, 0.52))
+    drop-shadow(0 14px 26px rgba(15, 36, 82, 0.18));
+}
+
+/* Keep the supplied purple treatment untouched while the loupe is inviting a
+   grab. The first pointer-down or keyboard move adds has-interacted and starts
+   the resin's transition to inspection blue. */
+.nw[data-phase="inspect"] .nw__loupe.has-interacted .nw__loupe-frame {
+  animation: nw-loupe-purple-to-blue 1100ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes nw-loupe-purple-to-blue {
+  0%,
+  18% {
+    filter:
+      hue-rotate(0deg)
+      saturate(1)
+      brightness(1)
+      drop-shadow(0 2px 2px rgba(40, 48, 56, 0.42))
+      drop-shadow(0 14px 26px rgba(37, 45, 54, 0.12));
+  }
+
+  100% {
+    filter:
+      hue-rotate(-35deg)
+      saturate(1.18)
+      brightness(0.72)
+      drop-shadow(0 2px 2px rgba(17, 35, 74, 0.52))
+      drop-shadow(0 14px 26px rgba(15, 36, 82, 0.18));
+  }
+}
+
+.nw[data-phase="repaired"] .nw__loupe-frame {
+  filter:
+    hue-rotate(-112deg)
+    saturate(1.18)
+    brightness(0.88)
+    drop-shadow(0 2px 2px rgba(15, 77, 49, 0.5))
+    drop-shadow(0 14px 28px rgba(21, 122, 77, 0.2));
+}
+
+.nw__loupe-view,
+.nw__loupe-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nw__loupe.is-near-defect .nw__loupe-glass {
+  border-color: rgba(70, 79, 89, 0.7);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    inset 0 0 42px rgba(255, 255, 255, 0.34);
+}
+
+.nw .nw__found,
+.nw .nw__corrected {
+  position: absolute;
+  z-index: 5;
+  top: -168px;
+  bottom: auto;
+  left: 50%;
+  display: flex;
+  width: 458px;
+  height: 140px;
+  flex: 0 0 458px;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 16px;
+  background: #0055d4;
+  box-shadow: 0 10px 28px rgba(0, 44, 116, 0.2);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 50px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.5px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 0) scale(0.76);
+  transform-origin: 50% 100%;
+  transition: background-color 420ms var(--ease-out), box-shadow 420ms var(--ease-out);
+  white-space: nowrap;
+}
+
+.nw .nw__corrected {
+  width: 499px;
+  flex-basis: 499px;
+  background: #549900;
+  box-shadow: 0 12px 30px rgba(49, 103, 0, 0.22);
+}
+
+.nw__action-check {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  place-items: center;
+}
+
+.nw__action-check img {
+  width: 61px;
+  height: 61px;
+}
+
+.nw[data-phase="targeted"] .nw__found,
+.nw[data-phase="correcting"] .nw__found,
+.nw[data-phase="repaired"] .nw__corrected {
+  opacity: 1;
+}
+
+/* These are state labels, not controls. The one-shot pop confirms that the
+   loupe has locked; the restrained breathing loop keeps the automatic
+   calibration legible without suggesting another tap target. */
+.nw[data-phase="targeted"] .nw__found,
+.nw[data-phase="repaired"] .nw__corrected {
+  animation:
+    nw-defect-badge-pop 440ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both,
+    nw-defect-badge-breathe 2300ms ease-in-out 620ms infinite;
+  will-change: transform;
+}
+
+@keyframes nw-defect-badge-pop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.76);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes nw-defect-badge-breathe {
+  0%,
+  100% {
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, 0) scale(1.045);
+  }
+}
+
+.nw[data-phase="correcting"] .nw__found {
+  background: #549900;
+  box-shadow: 0 12px 30px rgba(49, 103, 0, 0.22);
+  animation: none;
+  opacity: 0.9;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.nw[data-phase="repaired"] .nw__loupe-glass {
+  border-color: rgba(84, 153, 0, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.88),
+    inset 0 0 52px rgba(140, 215, 74, 0.42),
+    0 0 34px rgba(84, 153, 0, 0.3);
+}
+
+/* The whole shake is over inside the first 525ms of a 4.2s cycle, leaving the
+   rest as the pause. Each leg is roughly 105ms and each one smaller than the
+   last, so it settles rather than stopping dead — snappy, and over before it
+   can start to look playful. Sideways only: a vertical component would read as
+   a bob, which is a different invitation. */
+@keyframes nw-loupe-enter {
+  0% {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translate3d(96px, -54px, 0) rotate(7deg) scale(0.76);
+  }
+
+  68% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translate3d(-6px, 3px, 0) rotate(-0.6deg) scale(1.025);
+  }
+
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0) scale(1);
+  }
+}
+
+@keyframes nw-loupe-invitation {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  2.5% {
+    transform: translate3d(-16px, 0, 0);
+  }
+
+  5% {
+    transform: translate3d(14px, 0, 0);
+  }
+
+  7.5% {
+    transform: translate3d(-9px, 0, 0);
+  }
+
+  10% {
+    transform: translate3d(5px, 0, 0);
+  }
+
+  12.5%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes nw-swipe-arrow-nudge {
+  0%,
+  18%,
+  100% {
+    transform: translateY(0);
+  }
+
+  42% {
+    transform: translateY(9px);
+  }
+
+  62% {
+    transform: translateY(2px);
+  }
+}
+
+.nw__completion {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  bottom: 440px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 28px);
+  transition: opacity 420ms var(--ease-out), transform 520ms var(--ease-out);
+}
+
+.nw[data-complete="true"] .nw__completion {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+/* The completion block now carries only a screen-reader announcement — the
+   "Back to module menu" button it used to style is gone. */
+
+.nw button:focus-visible,
+.nw__loupe:focus-visible {
+  outline: 5px solid #0078d4;
+  outline-offset: 8px;
+}
+
+.nw__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nw__prompt,
+  .nw__prompt-secondary,
+  .nw__instruction,
+  .nw__loupe,
+  .nw__loupe-visual,
+  .nw__loupe-glass,
+  .nw__found,
+  .nw__corrected,
+  .nw__completion,
+  .nw__backdrop {
+    transition-duration: 1ms;
+  }
+
+  .nw[data-phase="inspect"] .nw__loupe:not(.is-dragging):not(.has-interacted) .nw__loupe-visual {
+    animation: none;
+    transform: none;
+  }
+
+  .nw[data-phase="inspect"] .nw__loupe.has-interacted .nw__loupe-frame {
+    animation: none;
+  }
+
+  .nw[data-phase="targeted"] .nw__found,
+  .nw[data-phase="repaired"] .nw__corrected {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  .nw[data-phase="repaired"]:not([data-repair-exit="true"]) .nw__backdrop--repair::before {
+    animation: none;
+    opacity: 0.62;
+    transform: translate3d(2%, -1%, 0) scale(1.1);
+  }
+
+  .nw__instruction.has-swipe-arrow .nw__instruction-arrow {
+    animation: none;
+  }
+
+}

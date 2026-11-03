@@ -1,0 +1,572 @@
+.qe,
+.qe * {
+  box-sizing: border-box;
+}
+
+.qe {
+  --qe-ink: #243f6a;
+  --qe-surface: #f2f4f5;
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  background: var(--qe-surface);
+  color: var(--qe-ink);
+  font-family: var(--font-text);
+  isolation: isolate;
+  touch-action: none;
+}
+
+.qe button {
+  margin: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.qe__header {
+  width: 100%;
+  min-height: 120px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.qe__experience {
+  position: absolute;
+  z-index: 1;
+  inset: 120px 0 0;
+  overflow: hidden;
+  background: var(--qe-surface);
+  touch-action: none;
+}
+
+.qe__intro {
+  position: absolute;
+  z-index: 4;
+  top: 540px;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 420ms ease, transform 420ms ease;
+}
+
+/* Wide enough for the heading to hold one line. It needs 1645 at the authored
+   96px in Segoe Sans, so 1500 broke "matter." onto a line of its own; 1800 also
+   clears the widest fallback in the stack (Inter, ~1753) and still leaves 180
+   each side of the 2160 stage. */
+.qe__intro-copy h2 {
+  width: 1800px;
+  margin: 0 auto;
+  color: var(--qe-ink);
+  font-family: var(--font-text);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -1.92px;
+  line-height: 1.2;
+}
+
+/* The shared body measure at 60px type: .qvc-pair__body and .qvc-flip__body in
+   module 01, .som__info-copy p in module 03. Nothing here was holding it to
+   940 -- .qe__intro spans the stage and the heading above it runs to 1800 --
+   so it was just narrower than everywhere else the same copy size appears. */
+.qe__intro-copy p {
+  width: 1080px;
+  margin: 80px auto 0;
+  color: var(--qe-ink);
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  line-height: 1.2;
+}
+
+.qe__intro-copy p span {
+  color: #8661c5;
+  font-weight: 600;
+}
+
+.qe[data-intro='dismissed'] .qe__intro {
+  opacity: 0;
+  transform: translateY(-40px);
+}
+
+.qe__scene,
+.qe__canvas,
+.qe__ambient-wash {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.qe__scene {
+  z-index: 1;
+  touch-action: none;
+}
+
+.qe__canvas {
+  display: block;
+  outline: 0;
+}
+
+.qe__ambient-wash {
+  z-index: 2;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(242, 244, 245, 0.62) 0,
+      transparent 14%,
+      transparent 86%,
+      rgba(242, 244, 245, 0.54) 100%
+    ),
+    radial-gradient(
+      ellipse at 50% 53%,
+      transparent 42%,
+      rgba(235, 239, 241, 0.13) 78%,
+      rgba(228, 233, 236, 0.22) 100%
+    );
+  pointer-events: none;
+}
+
+/*
+ * The boxed material lesson panel (Figma 7:2096): artwork left, copy right, on
+ * a solid card rather than the glass the shared explainer defaults to.
+ */
+.qe__panel {
+  --kiosk-explainer-background: #fff;
+  --kiosk-explainer-backdrop-filter: none;
+  --kiosk-explainer-border-radius: 24px;
+  --kiosk-explainer-box-shadow: 0 30px 80px rgba(21, 38, 64, 0.1);
+  --kiosk-explainer-content-gap: 60px;
+  --kiosk-explainer-body-color: var(--qe-ink);
+  --kiosk-explainer-body-size: 40px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-ink: var(--qe-ink);
+  --kiosk-explainer-enter-opacity-duration: 360ms;
+  --kiosk-explainer-enter-opacity-easing: ease;
+  --kiosk-explainer-enter-transform-duration: 480ms;
+  --kiosk-explainer-enter-transform-easing: var(--ease-out);
+  --kiosk-explainer-exit-opacity-duration: 260ms;
+  --kiosk-explainer-exit-opacity-easing: ease;
+  --kiosk-explainer-exit-transform-duration: 320ms;
+  --kiosk-explainer-exit-transform-easing: var(--ease-out);
+  --kiosk-explainer-exit-visibility-delay: 320ms;
+  --kiosk-explainer-padding: 60px;
+  --kiosk-explainer-rest-transform: translateY(24px);
+  position: absolute;
+  z-index: 9;
+  /* Figma 895:4033: the lesson begins at y=600 in the full 3840px frame.
+     .qe__experience starts below the 120px header, hence the 480px offset. */
+  top: 480px;
+  right: 0;
+  left: 0;
+  width: 1806px;
+  margin-inline: auto;
+}
+
+.qe__panel .kiosk-explainer__media {
+  width: 760px;
+  flex-shrink: 0;
+}
+
+.qe__panel .kiosk-explainer__media-image {
+  width: 100%;
+  height: auto;
+}
+
+/* The delivered insets are 4:3 while the slot the panel was authored around is
+   nearer 5:4, so the clip is cropped rather than letterboxed — a band of black
+   inside a white card would read as a broken asset. Rounding matches the card
+   the design places it in. */
+.qe__panel .kiosk-explainer__media-video {
+  width: 100%;
+  aspect-ratio: 800 / 639;
+  height: auto;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+}
+
+.qe__panel .kiosk-explainer__copy {
+  flex: 1;
+  min-width: 0;
+  align-items: stretch;
+  /* Keep the heading and lead anchored when the longer lesson replaces the
+     shorter one; centering the whole copy column makes both jump vertically. */
+  justify-content: flex-start;
+  gap: 45px;
+}
+
+.qe__panel .kiosk-explainer__title {
+  line-height: 1.1;
+  /* Both material names begin with S: compensate its display-font sidebearing
+     so the visible letter aligns with the paragraph's A, not just its box. */
+  text-indent: -0.04em;
+}
+
+.qe__panel .kiosk-explainer__body {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  font-family: var(--font-text);
+  letter-spacing: -0.4px;
+  line-height: 48px;
+}
+
+.qe__panel-lead,
+.qe__panel-detail {
+  display: block;
+}
+
+.qe__callout {
+  position: absolute;
+  z-index: 6;
+  width: 621px;
+  margin: 0;
+  color: var(--qe-ink);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(24px);
+  transition:
+    top 500ms var(--ease-out),
+    left 500ms var(--ease-out),
+    opacity 340ms ease,
+    transform 500ms var(--ease-out),
+    visibility 0s linear 500ms;
+  visibility: hidden;
+}
+
+.qe__callout-title,
+.qe__callout-copy,
+.qe__tuning-title,
+.qe__tuning-description,
+.qe__tuning-footnote {
+  margin: 0;
+  color: var(--qe-ink);
+}
+
+.qe__callout-title {
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  line-height: 87px;
+}
+
+.qe__callout-copy {
+  margin-top: 12px;
+  font-family: var(--font-text);
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: -0.4px;
+  line-height: 48px;
+}
+
+.qe__callout-anchor {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
+/*
+ * The dot marks the end of the connector that touches the material, not the end
+ * at the text — it is pointing at the slab, so that is where it belongs. JS
+ * publishes the far end as --qe-anchor-x/y while it tracks the 3D position.
+ */
+.qe__callout-anchor::after {
+  position: absolute;
+  z-index: 2;
+  top: var(--qe-anchor-y, 0px);
+  left: var(--qe-anchor-x, 0px);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--qe-ink);
+  content: "";
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 240ms 260ms ease;
+}
+
+.qe__callout-line {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  background: var(--qe-ink);
+  opacity: 0;
+  box-shadow: 0 1px 2px rgba(16, 38, 74, 0.16);
+  transition: opacity 240ms 180ms ease;
+}
+
+.qe__callout-line--horizontal {
+  top: -1.5px;
+  height: 3px;
+}
+
+.qe__callout-line--vertical {
+  width: 3px;
+  margin-left: -1.5px;
+}
+
+/* Rides up with the material it labels — the slab's tuning lift moves it about
+   230px, and this keeps the connector the same short length. */
+.qe__callout--topoconductor {
+  top: 1020px;
+  left: 432px;
+  width: 948px;
+  text-align: right;
+}
+
+.qe__callout--topoconductor .qe__callout-copy {
+  width: 590px;
+  margin-left: auto;
+}
+
+.qe__callout--topoconductor .qe__callout-title {
+  font-size: 64px;
+  letter-spacing: -1.28px;
+  line-height: 73.333px;
+}
+
+.qe__callout--topoconductor .qe__callout-copy {
+  margin-top: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.8px;
+}
+
+.qe__callout--topoconductor .qe__callout-anchor {
+  left: 970px;
+}
+
+.qe[data-phase="complete"] .qe__callout--topoconductor {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+  visibility: visible;
+}
+
+.qe[data-phase="complete"] .qe__callout--topoconductor .qe__callout-anchor::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.qe[data-phase="complete"] .qe__callout--topoconductor .qe__callout-line {
+  opacity: 1;
+}
+
+.qe.is-restarting .qe__callout {
+  opacity: 0 !important;
+  transform: translateY(24px) !important;
+  transition: none !important;
+}
+
+/* The shared blue tooltip owns the visual surface. This adjacent transparent
+   button supplies a valid, comfortably sized pointer and keyboard target. */
+.qe .qe__continue {
+  position: absolute;
+  z-index: 8;
+  top: var(--qe-action-prompt-top, 2358px);
+  left: 50%;
+  display: block;
+  width: 510px;
+  height: 92px;
+  padding: 0;
+  border: 0;
+  background: transparent !important;
+  box-shadow: none;
+  pointer-events: auto;
+  transform: translateX(-50%);
+  transition: opacity 260ms var(--ease-out), transform 320ms var(--ease-out);
+}
+
+.qe .qe__continue-tooltip {
+  position: absolute;
+  z-index: 8;
+  top: var(--qe-action-prompt-top, 2358px);
+  left: 50%;
+  opacity: 1;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 320ms var(--ease-out),
+    visibility 0s linear;
+  visibility: visible;
+}
+
+.qe .qe__continue-tooltip[hidden] {
+  display: grid;
+  opacity: 0;
+  transform: translate(-50%, 14px);
+  transition-delay: 0s, 0s, 320ms;
+  visibility: hidden;
+}
+
+.qe .qe__continue[hidden] {
+  display: block;
+  opacity: 0;
+  transform: translate(-50%, 14px);
+  pointer-events: none;
+}
+
+.qe .qe__continue:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.qe .qe__continue:focus-visible {
+  outline: 8px solid rgba(113, 66, 189, 0.92);
+  outline-offset: 12px;
+}
+
+.qe .qe__drag-hint {
+  position: absolute;
+  z-index: 8;
+  top: var(--qe-action-prompt-top, 2358px);
+  left: calc(50% - 6.5px);
+  transform: translateX(-50%);
+}
+
+.qe__tuning {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(24px);
+  transition:
+    opacity 420ms ease,
+    transform 560ms var(--ease-out),
+    visibility 0s linear 560ms;
+  visibility: hidden;
+}
+
+.qe[data-phase="tuning"] .qe__tuning,
+.qe[data-phase="complete"] .qe__tuning {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+  visibility: visible;
+}
+
+.qe__tuning-copy {
+  position: absolute;
+  top: 540px;
+  /* Give the closing title one line while paragraphs keep their own measure. */
+  left: 120px;
+  width: 1920px;
+  color: var(--qe-ink);
+  filter: blur(0);
+  opacity: 1;
+  text-align: center;
+  transform: translateY(0);
+  transition:
+    opacity 420ms ease,
+    transform 520ms var(--ease-out),
+    filter 360ms ease;
+}
+
+.qe__tuning-copy.is-exiting {
+  filter: blur(4px);
+  opacity: 0;
+  transform: translateY(-18px);
+  transition-duration: 220ms, 260ms, 220ms;
+}
+
+.qe__tuning-copy.is-entering {
+  filter: blur(4px);
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+/* The closing screen's second paragraph, which the board sets under the
+   material rather than with the copy above it. Sharing the block above ran it
+   straight across the slab. */
+.qe__tuning-footnote {
+  position: absolute;
+  top: 2360px;
+  left: 50%;
+  width: 940px;
+  margin: 0;
+  /* The same type as the paragraph above the material. Out of that block it
+     also fell out of its type, and inherited the root's — which rendered it at
+     a fraction of the size and on a single line. */
+  color: var(--qe-ink);
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  line-height: 1.2;
+  filter: blur(4px);
+  opacity: 0;
+  text-align: center;
+  transform: translate(-50%, 18px);
+  transition:
+    opacity 420ms ease,
+    transform 520ms var(--ease-out),
+    filter 420ms ease,
+    visibility 0s linear 520ms;
+  visibility: hidden;
+}
+
+.qe__tuning-footnote.is-visible {
+  filter: blur(0);
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 0s;
+  visibility: visible;
+}
+
+.qe__tuning-title {
+  font-family: var(--font-text);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -1.92px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.qe__tuning-description {
+  width: 940px;
+  margin-top: 80px;
+  margin-right: auto;
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -1.2px;
+  line-height: 1.2;
+}
+
+.qe__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  margin: -1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qe__callout,
+.qe__callout-anchor::after,
+.qe__callout-line,
+.qe__tuning,
+.qe__tuning-copy,
+.qe__tuning-footnote,
+.qe__continue,
+.qe__drag-hint {
+    transition-duration: 1ms;
+    transition-delay: 0s;
+    animation-duration: 1ms;
+  }
+}

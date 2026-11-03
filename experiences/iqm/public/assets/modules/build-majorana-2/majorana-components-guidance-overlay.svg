@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="components-spotlight-soften" x="-30" y="20" width="1140" height="205" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feGaussianBlur stdDeviation="9"/>
+</filter>
+<mask id="components-spotlight-mask" x="0" y="0" width="1080" height="1920" maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse">
+<rect width="1080" height="1920" fill="white"/>
+<rect x="17.5" y="52.5" width="141.5" height="141.5" rx="16" fill="black" filter="url(#components-spotlight-soften)"/>
+<rect x="919.5" y="52.5" width="141.5" height="141.5" rx="16" fill="black" filter="url(#components-spotlight-soften)"/>
+</mask>
+</defs>
+<rect width="1080" height="1920" fill="black" fill-opacity="0.5" mask="url(#components-spotlight-mask)"/>
+</svg>

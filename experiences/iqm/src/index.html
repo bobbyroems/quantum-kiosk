@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    >
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' blob: ws://127.0.0.1:*; worker-src 'self' blob:"
+    >
+    <title>IQM Interactive Kiosk</title>
+    <link rel="stylesheet" href="/styles/tokens.css">
+    <link rel="stylesheet" href="/styles/base.css">
+    <link rel="stylesheet" href="/styles/app.css">
+    <link rel="stylesheet" href="/styles/module-host.css">
+    <link rel="stylesheet" href="/js/modules/nanoscale/nanoscale.css">
+    <link rel="stylesheet" href="/js/modules/states-of-matter/styles.css">
+    <link rel="stylesheet" href="/js/modules/qubit-explorer/qubit-explorer.css">
+    <link rel="stylesheet" href="/js/modules/quantum-vs-classical/quantum-vs-classical.css">
+    <link rel="stylesheet" href="/js/modules/protecting-information/protecting-information.css">
+    <link rel="stylesheet" href="/js/modules/build-nanowire/build-nanowire.css">
+    <link rel="stylesheet" href="/js/modules/build-majorana-2/majorana.css">
+    <link rel="stylesheet" href="/js/modules/measurement-based/measurement-based.css">
+    <link rel="stylesheet" href="/js/modules/quantum-platform/quantum-platform.css">
+  </head>
+  <body>
+    <div id="viewport-shell">
+      <main id="kiosk-stage" aria-live="polite">
+        <section class="screen screen--attract is-active" data-screen="attract">
+          <header class="microsoft-header">
+            <div class="microsoft-brand" aria-label="Microsoft Quantum">
+              <span class="microsoft-brand__logo" aria-hidden="true">
+                <img src="/assets/ui/microsoft-logo.png" alt="">
+              </span>
+              <span class="microsoft-brand__divider" aria-hidden="true"></span>
+              <span class="microsoft-brand__quantum">Quantum</span>
+            </div>
+          </header>
+
+          <div class="attract-body">
+            <div class="attract-chip" aria-hidden="true">
+              <img src="/assets/modules/build-majorana-2/majorana-intro-hero.png" alt="">
+            </div>
+
+            <div class="attract-copy">
+              <h1>
+                <span>Building blocks of</span>
+                <span>quantum computing</span>
+              </h1>
+              <p class="attract-intro">
+                Discover the science and engineering behind a new era of computing.
+              </p>
+            </div>
+
+            <div class="attract-footer">
+              <button class="primary-action" id="start-button" type="button">
+                <span>Touch to explore</span>
+                <span class="action-arrow" aria-hidden="true">
+                  <img src="/assets/ui/principle-chevron.svg" alt="">
+                </span>
+                <img class="cta-pointer" src="/assets/ui/hand-pointer.png" alt="" aria-hidden="true">
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen screen--menu" data-screen="menu" aria-hidden="true">
+          <header class="microsoft-header">
+            <div class="microsoft-brand" aria-label="Microsoft Quantum">
+              <span class="microsoft-brand__logo" aria-hidden="true">
+                <img src="/assets/ui/microsoft-logo.png" alt="">
+              </span>
+              <span class="microsoft-brand__divider" aria-hidden="true"></span>
+              <span class="microsoft-brand__quantum">Quantum</span>
+            </div>
+
+            <button
+              class="microsoft-header__action"
+              data-action="home"
+              type="button"
+              aria-label="Return to start"
+            >
+              <span>Exit</span>
+              <span class="microsoft-header__action-icon" aria-hidden="true">
+                <img src="/assets/ui/exit-x.svg" alt="">
+              </span>
+            </button>
+          </header>
+
+          <div class="menu-body">
+            <p class="menu-heading__count" aria-label="Selected module" hidden>
+              <span id="module-carousel-current">01</span>
+              <span aria-hidden="true">/</span>
+              <span id="module-carousel-total">07</span>
+            </p>
+
+            <div class="module-carousel" id="module-carousel">
+              <button
+                class="module-carousel__arrow module-carousel__arrow--previous"
+                id="module-carousel-previous"
+                type="button"
+                aria-label="Previous module"
+              >
+                <img src="/assets/ui/chevron-right.svg" alt="">
+              </button>
+
+              <div class="module-carousel__viewport" id="module-carousel-viewport">
+                <div class="module-carousel__track" id="module-grid"></div>
+              </div>
+
+              <button
+                class="module-carousel__arrow module-carousel__arrow--next"
+                id="module-carousel-next"
+                type="button"
+                aria-label="Next module"
+              >
+                <img src="/assets/ui/chevron-right.svg" alt="">
+              </button>
+            </div>
+
+            <nav
+              class="module-carousel__pagination"
+              id="module-carousel-pagination"
+              aria-label="Choose a module"
+            ></nav>
+          </div>
+        </section>
+
+        <section class="screen screen--module" data-screen="module" aria-hidden="true">
+          <header class="microsoft-header">
+            <div class="microsoft-brand" aria-label="Microsoft Quantum">
+              <span class="microsoft-brand__logo" aria-hidden="true">
+                <img src="/assets/ui/microsoft-logo.png" alt="">
+              </span>
+              <span class="microsoft-brand__divider" aria-hidden="true"></span>
+              <span class="microsoft-brand__quantum">Quantum</span>
+            </div>
+
+            <div class="microsoft-header__actions">
+              <button
+                class="microsoft-header__action"
+                data-action="menu"
+                type="button"
+                aria-label="Back to all modules"
+              >
+                <span class="microsoft-header__action-icon microsoft-header__action-icon--back" aria-hidden="true">
+                  <img src="/assets/ui/chevron-right.svg" alt="">
+                </span>
+                <span>All modules</span>
+              </button>
+
+              <button
+                class="microsoft-header__action"
+                data-action="home"
+                type="button"
+                aria-label="Return to start"
+              >
+                <span>Exit</span>
+                <span class="microsoft-header__action-icon" aria-hidden="true">
+                  <img src="/assets/ui/exit-x.svg" alt="">
+                </span>
+              </button>
+            </div>
+          </header>
+
+          <div class="module-host" id="module-host"></div>
+        </section>
+
+        <!-- Settings cog and its popover. Not a .kiosk-explainer: AGENTS.md
+             exempts interactive dialogs, and this one owns a launcher, an
+             open/closed state and focusable controls the explainer never
+             models. -->
+        <aside class="kiosk-settings" id="kiosk-settings" data-open="false" data-layout="top">
+          <div
+            class="kiosk-settings__panel"
+            id="kiosk-settings-panel"
+            role="dialog"
+            aria-label="Kiosk settings"
+            hidden
+          >
+            <section class="kiosk-settings__group">
+              <h2 class="kiosk-settings__label">Volume</h2>
+              <div class="kiosk-settings__volume">
+                <svg class="kiosk-settings__volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor"/>
+                </svg>
+                <input
+                  class="kiosk-settings__slider"
+                  id="volume-slider"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  aria-label="Sound volume"
+                >
+                <svg class="kiosk-settings__volume-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 9v6h4l5 5V4L7 9H3z" fill="currentColor"/>
+                  <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z" fill="currentColor"/>
+                  <path d="M14 3.8v2.1a6.5 6.5 0 0 1 0 12.2v2.1a8.5 8.5 0 0 0 0-16.4z" fill="currentColor"/>
+                </svg>
+              </div>
+            </section>
+
+            <section class="kiosk-settings__group">
+              <h2 class="kiosk-settings__label">Background music</h2>
+              <!-- The ambient loop only, not the interaction sounds: taps, whooshes
+                   and the per-module foley all stay under the volume slider. -->
+              <div
+                class="kiosk-settings__segments"
+                id="kiosk-settings-music"
+                role="radiogroup"
+                aria-label="Background music"
+              >
+                <span class="kiosk-settings__segment-thumb" aria-hidden="true"></span>
+                <button
+                  class="kiosk-settings__segment"
+                  type="button"
+                  role="radio"
+                  aria-checked="true"
+                  data-music="on"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="6.5" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <circle cx="16.5" cy="16" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                  </svg>
+                  <span>On</span>
+                </button>
+                <button
+                  class="kiosk-settings__segment"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  data-music="off"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9 18V6l10-2v12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="6.5" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <line x1="4" y1="20.5" x2="20" y2="3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                  <span>Off</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="kiosk-settings__group">
+              <h2 class="kiosk-settings__label">Layout</h2>
+              <!-- Top packs the module card into the upper two thirds;
+                   Center spends the empty lower third on the copy, the CTA
+                   and the dots. See the Center block in app.css. -->
+              <div
+                class="kiosk-settings__segments"
+                id="kiosk-settings-layout"
+                role="radiogroup"
+                aria-label="Layout"
+              >
+                <span class="kiosk-settings__segment-thumb" aria-hidden="true"></span>
+                <button
+                  class="kiosk-settings__segment"
+                  type="button"
+                  role="radio"
+                  aria-checked="true"
+                  data-layout="top"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <rect x="6.6" y="6.6" width="10.8" height="4" rx="2" fill="currentColor"/>
+                  </svg>
+                  <span>Top</span>
+                </button>
+                <button
+                  class="kiosk-settings__segment"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  data-layout="center"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="4.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <rect x="6.6" y="10" width="10.8" height="4" rx="2" fill="currentColor"/>
+                  </svg>
+                  <span>Center</span>
+                </button>
+              </div>
+            </section>
+
+            <section class="kiosk-settings__group">
+              <h2 class="kiosk-settings__label">Up next card</h2>
+              <!-- The card that covers a finished result to offer what follows.
+                   Hiding it leaves the quiet band alone, so the way on is still
+                   there; this only stops the interruption. -->
+              <div
+                class="kiosk-settings__segments"
+                id="kiosk-settings-upnext"
+                role="radiogroup"
+                aria-label="Up next card"
+              >
+                <span class="kiosk-settings__segment-thumb" aria-hidden="true"></span>
+                <button
+                  class="kiosk-settings__segment"
+                  type="button"
+                  role="radio"
+                  aria-checked="true"
+                  data-upnext="on"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <rect x="6.5" y="13.5" width="11" height="3" rx="1.5" fill="currentColor"/>
+                  </svg>
+                  <span>Show</span>
+                </button>
+                <button
+                  class="kiosk-settings__segment"
+                  type="button"
+                  role="radio"
+                  aria-checked="false"
+                  data-upnext="off"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.5" y="4.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                    <line x1="5" y1="19.5" x2="19" y2="4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                  </svg>
+                  <span>Hide</span>
+                </button>
+              </div>
+            </section>
+
+            <!-- Idle returns are chained: time in a module returns to the menu,
+                 then a fresh menu countdown returns to the attract screen. -->
+            <section class="kiosk-settings__group">
+              <div class="kiosk-settings__heading">
+                <h2 class="kiosk-settings__label">Return to menu after</h2>
+                <output
+                  class="kiosk-settings__readout"
+                  id="idle-menu-readout"
+                  for="idle-menu-slider"
+                  aria-live="off"
+                ></output>
+              </div>
+              <div class="kiosk-settings__timing">
+                <input
+                  class="kiosk-settings__slider"
+                  id="idle-menu-slider"
+                  type="range"
+                  aria-label="Seconds without a touch inside a module before returning to the menu"
+                >
+              </div>
+            </section>
+
+            <section class="kiosk-settings__group">
+              <div class="kiosk-settings__heading">
+                <h2 class="kiosk-settings__label">Return to home after</h2>
+                <output
+                  class="kiosk-settings__readout"
+                  id="idle-home-readout"
+                  for="idle-home-slider"
+                  aria-live="off"
+                ></output>
+              </div>
+              <div class="kiosk-settings__timing">
+                <input
+                  class="kiosk-settings__slider"
+                  id="idle-home-slider"
+                  type="range"
+                  aria-label="Seconds without a touch on the menu before returning to the home screen"
+                >
+              </div>
+            </section>
+          </div>
+
+          <button
+            class="kiosk-settings__launcher"
+            id="kiosk-settings-launcher"
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="kiosk-settings-panel"
+            aria-label="Settings"
+          >
+            <svg class="kiosk-settings__cog" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9.82 4.41L10.39 1.83L13.61 1.83L14.18 4.41A7.9 7.9 0 0 1 15.83 5.09L18.05 3.67L20.33 5.95L18.91 8.17A7.9 7.9 0 0 1 19.59 9.82L22.17 10.39L22.17 13.61L19.59 14.18A7.9 7.9 0 0 1 18.91 15.83L20.33 18.05L18.05 20.33L15.83 18.91A7.9 7.9 0 0 1 14.18 19.59L13.61 22.17L10.39 22.17L9.82 19.59A7.9 7.9 0 0 1 8.17 18.91L5.95 20.33L3.67 18.05L5.09 15.83A7.9 7.9 0 0 1 4.41 14.18L1.83 13.61L1.83 10.39L4.41 9.82A7.9 7.9 0 0 1 5.09 8.17L3.67 5.95L5.95 3.67L8.17 5.09A7.9 7.9 0 0 1 9.82 4.41Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linejoin="round"
+              />
+              <circle cx="12" cy="12" r="3.35" fill="none" stroke="currentColor" stroke-width="1.7"/>
+            </svg>
+          </button>
+        </aside>
+      </main>
+
+      <aside class="development-hud" id="development-hud" hidden>
+        <strong>DEV</strong>
+        <span id="development-resolution">2160 × 3840</span>
+        <span id="development-scale">100%</span>
+      </aside>
+    </div>
+
+    <script type="module" src="/js/main.js"></script>
+  </body>
+</html>

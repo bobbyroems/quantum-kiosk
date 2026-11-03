@@ -1,0 +1,3289 @@
+#viewport-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: clip;
+  background: var(--color-background-deep);
+}
+
+#kiosk-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2160px;
+  height: 3840px;
+  overflow: clip;
+  background: var(--color-background);
+  color: var(--color-ink);
+  transform: translate(-50%, -50%) scale(var(--stage-scale));
+  transform-origin: center;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: var(--color-background);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 360ms ease,
+    visibility 0s linear 360ms;
+}
+
+.screen.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+/* ---------------------------------------------------------------------------
+ * Secondary nav (Figma Kiosk_Vertical_NavBars / SecondaryNav)
+ * ------------------------------------------------------------------------- */
+
+.microsoft-header,
+.microsoft-brand,
+.microsoft-header__action {
+  display: flex;
+  align-items: center;
+}
+
+.microsoft-header {
+  position: relative;
+  z-index: 20;
+  min-height: 120px;
+  flex: 0 0 120px;
+  justify-content: space-between;
+  padding: 0 100px;
+  background: var(--color-panel);
+  box-shadow:
+    0 0 1px rgba(0, 0, 0, 0.12),
+    0 2px 2px rgba(0, 0, 0, 0.14);
+}
+
+.microsoft-brand {
+  gap: 40px;
+}
+
+.microsoft-brand__logo {
+  position: relative;
+  display: block;
+  width: 223px;
+  height: 76px;
+  overflow: hidden;
+}
+
+.microsoft-brand__logo img {
+  position: absolute;
+  top: -22.22%;
+  left: -16.59%;
+  width: 116.59%;
+  height: 153.33%;
+  max-width: none;
+}
+
+.microsoft-brand__divider {
+  width: 2px;
+  height: 50px;
+  background: var(--color-gray);
+}
+
+.microsoft-brand__quantum {
+  color: #737373;
+  font-family: var(--font-text);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Class doubled deliberately. Several modules scope a `.module button { … }`
+   reset over their subtree, and at (0,1,1) that outranks a lone class — it was
+   silently stripping the border, colour and type from the header controls in
+   protecting-information, qubit-explorer and build-nanowire. (0,2,0) wins
+   without needing every module to know this rule exists. */
+.microsoft-header__action.microsoft-header__action {
+  min-height: var(--header-action-min-height);
+  min-width: var(--header-action-min-height);
+  justify-content: center;
+  gap: var(--header-action-gap);
+  padding: var(--header-action-padding);
+  border: var(--header-action-border);
+  border-radius: var(--header-action-radius);
+  background: var(--header-action-bg);
+  color: var(--header-action-color);
+  font-family: var(--font-display);
+  font-size: var(--header-action-font-size);
+  font-weight: var(--header-action-font-weight);
+  letter-spacing: var(--header-action-tracking);
+}
+
+.microsoft-header__action:active {
+  background: var(--header-action-bg-active);
+}
+
+.microsoft-header__action-icon {
+  display: grid;
+  width: var(--header-action-icon-box);
+  height: var(--header-action-icon-box);
+  place-items: center;
+}
+
+.microsoft-header__action-icon img {
+  width: var(--header-action-icon-size);
+  height: var(--header-action-icon-size);
+  filter: var(--header-action-icon-filter);
+  opacity: 0.95;
+}
+
+.microsoft-header__action-icon--back img {
+  width: calc(var(--header-action-icon-size) * 0.6);
+  height: var(--header-action-icon-size);
+  transform: rotate(180deg);
+}
+
+.microsoft-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--header-actions-gap);
+}
+
+.screen--module .module-host {
+  min-height: 0;
+  flex: 1;
+  height: auto;
+}
+
+/* ---------------------------------------------------------------------------
+ * Gradient CTA (Figma Button component: "Touch to explore" / "Open experience")
+ * ------------------------------------------------------------------------- */
+
+.primary-action,
+.module-card__footer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  min-height: 140px;
+  padding: 0 48px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--color-cta);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(42, 68, 111, 0.22);
+  font-family: var(--font-text);
+  font-size: 50px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  transition:
+    box-shadow 180ms ease,
+    transform 220ms ease;
+}
+
+.primary-action:active {
+  box-shadow: 0 4px 12px rgba(42, 68, 111, 0.24);
+  transform: scale(0.992);
+}
+
+/* The chevron rides a lightened disc of the button's own fill rather than
+   sitting bare on it (Figma Button > Icon, node 416:759). The disc and the glyph
+   inside it are both authored sizes: 10.131px of padding around a 60.786px
+   chevron comes to the 81.047px circle. */
+.action-arrow {
+  display: grid;
+  width: 81.047px;
+  height: 81.047px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.2);
+}
+
+/* principle-chevron.svg is the stroked chevron the Figma Button draws, and the
+   same one module 01 sets on its principle cards. Authored white, so unlike the
+   filled chevron-right.svg the carousel arrows and header back control use, it
+   needs no filter to invert. */
+.action-arrow img {
+  width: 60.786px;
+  height: 60.786px;
+}
+
+/* Hand-pointer that taps the welcome CTA on an idle loop, to make the button
+   read as obviously interactive on an unattended kiosk. Hidden by default;
+   the attract-screen rule further down animates it in, through a tap, and
+   back out. Anchored near the button's own content, not the viewport, so it
+   keeps working regardless of where the button lands on screen. */
+.cta-pointer {
+  position: absolute;
+  z-index: 1;
+  right: 18px;
+  bottom: -34px;
+  width: 260px;
+  height: 260px;
+  opacity: 0;
+  transform-origin: 68% 22%;
+  pointer-events: none;
+  filter: drop-shadow(0 14px 20px rgba(10, 22, 46, 0.35));
+  /* Start (off/retracted) and end (tap) positions for the cta-pointer-tap
+     keyframes below, so the travel path can be tuned without touching the
+     animation itself. */
+  --cta-pointer-start-x: 396px;
+  --cta-pointer-start-y: -206px;
+  --cta-pointer-end-x: 90px;
+  --cta-pointer-end-y: 125px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Attract screen (Figma "Home -1")
+ * ------------------------------------------------------------------------- */
+
+/* Aurora motion is painted into a fixed 360 × 640 bitmap by
+   aurora-background.js. Keep the element within the screen and let the stage
+   scale it: no oversized pseudo-elements, CSS rotation or will-change hints.
+   The static colour field also covers startup and unavailable Canvas 2D. */
+.screen--attract,
+.screen--menu {
+  background:
+    radial-gradient(ellipse 62% 30% at 76% 24%, rgba(0, 120, 212, 0.1), transparent 72%),
+    radial-gradient(ellipse 58% 30% at 22% 38%, rgba(186, 28, 118, 0.05), transparent 72%),
+    radial-gradient(ellipse 48% 24% at 50% 30%, rgba(122, 95, 212, 0.07), transparent 76%),
+    var(--color-background);
+}
+
+.screen.has-aurora-background {
+  background: var(--color-background);
+}
+
+.aurora-background {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Kiosk ergonomics: primary content + CTA live in the eye-level band
+   (~y 560–2530 of the 3840 stage), so everything sits higher than the
+   bottom-weighted Figma layout. */
+.attract-body {
+  --attract-chip-half-height: 602.5px;
+  --attract-chip-gap: 200px;
+
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding: 0 200px;
+}
+
+.attract-chip {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 1500px;
+  height: 1205px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.attract-chip img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: attract-chip-float 7s ease-in-out infinite;
+  filter: drop-shadow(0 70px 90px rgba(42, 68, 111, 0.28));
+  object-fit: contain;
+}
+
+.attract-copy {
+  position: absolute;
+  z-index: 3;
+  right: 200px;
+  bottom: calc(50% + var(--attract-chip-half-height) + var(--attract-chip-gap));
+  left: 200px;
+  width: auto;
+  text-align: center;
+}
+
+.attract-footer {
+  position: absolute;
+  z-index: 3;
+  top: calc(50% + var(--attract-chip-half-height) + var(--attract-chip-gap));
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.attract-copy h1 {
+  max-width: 1760px;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-size: 160px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+}
+
+.attract-copy h1 .reveal-word__inner {
+  color: var(--color-headline);
+}
+
+.screen--attract.is-active .attract-copy h1 .reveal-word__inner {
+  animation: reveal-word-in 980ms var(--ease-out) both;
+  animation-delay: calc(400ms + var(--word-index, 0) * 85ms);
+}
+
+.attract-intro {
+  max-width: 940px;
+  margin: 100px auto 0;
+  color: var(--color-navy);
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+}
+
+/* ---------------------------------------------------------------------------
+ * Module menu / carousel (Figma "Module 01"–"Module 08")
+ * ------------------------------------------------------------------------- */
+
+.menu-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 0 100px;
+}
+
+.menu-heading__count {
+  display: none;
+}
+
+.module-carousel {
+  position: relative;
+  flex: 0 0 auto;
+  height: 2460px;
+}
+
+.module-carousel__viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.module-carousel__track {
+  --carousel-card-width: 2160px;
+  --carousel-drag: 0px;
+  --carousel-offset: 0px;
+
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  height: 100%;
+  align-items: flex-start;
+  gap: 64px;
+  transform: translate3d(
+    calc((var(--carousel-card-width) / -2) - var(--carousel-offset) + var(--carousel-drag)),
+    0,
+    0
+  );
+  transition: transform 760ms var(--ease-out);
+  will-change: transform;
+}
+
+.module-carousel.is-dragging .module-carousel__track,
+.module-carousel.is-jumping .module-carousel__track {
+  transition: none;
+}
+
+.module-card {
+  position: relative;
+  display: flex;
+  width: var(--carousel-card-width);
+  height: 2460px;
+  min-width: var(--carousel-card-width);
+  flex-direction: column;
+  overflow: visible;
+  padding: 380px 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  text-align: center;
+  transform: scale(0.92);
+  opacity: 0.2;
+  transition:
+    opacity 520ms ease,
+    transform 760ms var(--ease-out);
+}
+
+.module-card.is-active {
+  z-index: 2;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.module-card.is-neighbour {
+  opacity: 0.32;
+  transform: scale(0.95);
+}
+
+.module-card.is-distant {
+  pointer-events: none;
+}
+
+.module-card.is-active:active {
+  transform: scale(0.995);
+}
+
+.module-card__visual {
+  position: relative;
+  display: block;
+  height: 1200px;
+  flex: 0 0 1200px;
+}
+
+.module-card__visual[data-has-preview="true"]:not([data-preview-layout="portal"]) {
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+.module-card__preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.module-card__preview-portal {
+  position: absolute;
+  top: 22.53%;
+  left: 50%;
+  display: block;
+  width: 32.13%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #dcecff;
+  box-shadow:
+    inset 0 0 0 3px rgba(130, 190, 255, 0.5),
+    inset -18px -24px 46px rgba(35, 100, 190, 0.14),
+    0 40px 70px rgba(42, 68, 111, 0.2);
+  pointer-events: none;
+  transform:
+    translate(-50%, -50%)
+    translate3d(var(--carousel-preview-motion-x, 0px), 0, 0)
+    rotate(var(--carousel-preview-motion-rotation, 0rad));
+  will-change: transform;
+}
+
+.module-card__preview-swing {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+  transform:
+    translate3d(var(--carousel-preview-motion-x, 0px), 0, 0)
+    rotate(var(--carousel-preview-motion-rotation, 0rad));
+  will-change: transform;
+}
+
+.module-card__preview-swing .module-card__preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* Preview cards can reuse only the floor pass from the shared navigation
+   renderer. Media stays above it and keeps the carousel gesture surface. */
+.module-card__shape-scene[data-navigation-grid-only] {
+  z-index: 0;
+  pointer-events: none;
+}
+
+.module-card__shape-scene[data-navigation-grid-only] .module-card__scene-canvas {
+  pointer-events: none;
+}
+
+.module-card__preview-portal {
+  z-index: 1;
+}
+
+.module-card__preview-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.module-card__3d-host {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.module-card[data-module-id="build-majorana-2"] .module-card__preview-image {
+  object-fit: contain;
+  transform: translateY(-100px) scale(0.76);
+  transform-origin: center;
+}
+
+/* Module 07 is a wide, opaque still rather than a cutout model. This keeps its
+   ratio while placing its silhouette in the same band as Majorana 2's live
+   navigation model; everything below remains the shared card layout. */
+.module-card[data-module-id="measurement-based"] .module-card__preview-image {
+  position: relative;
+  object-fit: contain;
+  filter: drop-shadow(0 26px 22px rgba(42, 68, 111, 0.2));
+  transform: translateY(-260px) scale(0.34);
+  transform-origin: center;
+}
+
+/* Module 09's preview is a tall cutout rather than a plate that fills its box,
+   so it is contained rather than cropped, and lifted: the card's copy is set to
+   overlap the lower third of the visual, which a column filling the box would
+   run straight into. It ends up the same height as the Majorana model beside
+   it, which is what keeps the two reading as one set. */
+.module-card[data-module-id="quantum-platform"] .module-card__preview-image {
+  object-fit: contain;
+  transform: translateY(-114px) scale(0.79);
+  transform-origin: center;
+}
+
+.module-card[data-module-id="build-majorana-2"] .module-card__3d-host {
+  bottom: 240px;
+}
+
+.module-card.is-active[data-module-id="build-majorana-2"] .module-card__3d-host {
+  pointer-events: auto;
+}
+
+.module-card.is-active[data-module-id="build-majorana-2"] .majorana-model-stage__canvas {
+  cursor: grab;
+  touch-action: none;
+}
+
+.module-card.is-active[data-module-id="build-majorana-2"] .majorana-model-stage__canvas:active {
+  cursor: grabbing;
+}
+
+.module-card__3d-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.module-card.has-live-preview .module-card__preview-image {
+  opacity: 0;
+}
+
+.module-card.has-live-preview .module-card__3d-host {
+  opacity: 1;
+}
+
+.module-card__preview-placeholder {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--color-panel-hover);
+  color: var(--color-subtle);
+}
+
+/* The mark standing in for module 07's artwork until it is produced. */
+.module-card__preview-fpo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 28px;
+  background: var(--color-panel-hover);
+  font-size: 200px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background-image: linear-gradient(100deg, #e2409e 0%, #9567ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* A slot with nothing behind it yet reads as present but not enterable: the
+   card keeps its place in the run of eight without offering a way in. */
+.module-card[data-module-status="concept"] {
+  cursor: default;
+}
+
+.module-card[data-module-status="concept"] .module-card__footer-label,
+.module-card[data-module-status="concept"] .module-card__summary {
+  opacity: 0.55;
+}
+
+.module-card[data-module-status="concept"] .action-arrow {
+  opacity: 0.3;
+}
+
+.module-card__preview-label {
+  position: absolute;
+  top: 56px;
+  right: 64px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.module-card__preview-number {
+  position: absolute;
+  right: 22px;
+  bottom: -150px;
+  color: rgba(42, 68, 111, 0.08);
+  font-family: var(--font-display);
+  font-size: 560px;
+  font-weight: 600;
+  letter-spacing: -0.09em;
+  line-height: 1;
+}
+
+.module-card__shape-scene {
+  position: absolute;
+  z-index: 1;
+  /* Extends up into the card's top padding: the camera FOV is fixed, so a
+     taller host buys vertical headroom for the scenes without resizing any
+     object on screen (compositions are sized in % of frustum width). */
+  top: -280px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: block;
+  overflow: hidden;
+}
+
+.module-card__scene-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+/*
+ * Caption for the error-correction ball, naming the phase it is in. Sits over the
+ * scene canvas, under the sphere: --ball-status-top is the sphere's lower edge in
+ * this host's box, so moving a composition in SCENE_DEFS moves the pill with it.
+ */
+.module-card__ball-status {
+  position: absolute;
+  z-index: 2;
+  top: var(--ball-status-top, 62%);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 20px 46px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(8px);
+  color: #3a4150;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.module-card__ball-status-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  /* Same 0.4s as the tiles' own colour drift, so caption and ball turn together. */
+  background: var(--ball-status-color, #2f63c9);
+  transition: background 400ms ease;
+}
+
+.module-card__scene-canvas[data-user-orbit="false"] {
+  cursor: default;
+}
+
+.module-card__scene-canvas[data-user-orbit="true"]:active {
+  cursor: grabbing;
+}
+
+/* CSS fallback sphere shown until WebGL scenes are ready. */
+.ss {
+  position: absolute;
+  display: block;
+  transform: translate(-50%, -50%);
+  animation: ss-float var(--ss-dur, 6s) ease-in-out var(--ss-delay, 0s) infinite alternate;
+  will-change: transform;
+}
+
+/* Held back until app.js decides the 3D pool is not coming — see the note on
+   revealCssShapeFallback. display rather than visibility so the float animation
+   costs nothing in the usual case, where these are removed without ever showing. */
+.module-card__shape-scene .ss {
+  display: none;
+}
+
+.module-card__shape-scene[data-shape-fallback="shown"] .ss {
+  display: block;
+}
+
+.ss--sphere {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 46%),
+    radial-gradient(
+      circle at 44% 40%,
+      var(--ss-color),
+      color-mix(in srgb, var(--ss-color) 60%, #12325e) 96%
+    );
+  box-shadow:
+    inset -14px -20px 42px rgba(18, 50, 94, 0.28),
+    0 40px 70px rgba(42, 68, 111, 0.24);
+}
+
+.ss--topoconductor {
+  filter: drop-shadow(0 28px 28px rgba(42, 68, 111, 0.18));
+}
+
+.ss--topoconductor::before,
+.ss--topoconductor::after {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 22%;
+  border-radius: 999px;
+  content: "";
+}
+
+.ss--topoconductor::before {
+  background: linear-gradient(180deg, #80a7ef, #477ad9);
+  animation: ss-topoconductor-upper 9.6s ease-in-out infinite;
+}
+
+.ss--topoconductor::after {
+  background: linear-gradient(180deg, #e27b68, #cc4535);
+  animation: ss-topoconductor-lower 9.6s ease-in-out infinite;
+}
+
+@keyframes ss-topoconductor-upper {
+  0%,
+  100% {
+    background: linear-gradient(180deg, #80a7ef, #477ad9);
+    transform: translateY(-185%) rotate(4deg);
+  }
+
+  46%,
+  64% {
+    background: linear-gradient(180deg, #c58be8, #a358d6);
+    transform: translateY(-62%);
+  }
+}
+
+@keyframes ss-topoconductor-lower {
+  0%,
+  100% {
+    background: linear-gradient(180deg, #e27b68, #cc4535);
+    transform: translateY(85%) rotate(-4deg);
+  }
+
+  46%,
+  64% {
+    background: linear-gradient(180deg, #c58be8, #a358d6);
+    transform: translateY(-38%);
+  }
+}
+
+@keyframes ss-float {
+  from {
+    transform: translate(-50%, -50%) translateY(calc(var(--ss-drift, 14px) * -0.5));
+  }
+
+  to {
+    transform: translate(-50%, -50%) translateY(calc(var(--ss-drift, 14px) * 0.5));
+  }
+}
+
+.module-card__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  /* Pulled up ~15% of the card so the copy sits closer to the scene. */
+  margin-top: -370px;
+  padding: 160px 200px 0;
+  text-align: center;
+}
+
+.module-card__copy {
+  display: block;
+  max-width: 1760px;
+}
+
+.module-card h3 {
+  margin: 0;
+  color: var(--color-headline);
+  font-family: var(--font-display);
+  font-size: 120px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+}
+
+.module-card__summary {
+  /* Two lines, always: longer summaries clamp rather than pushing the
+     CTA down the card. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  max-width: 950px;
+  height: calc(2 * 48px * 1.33);
+  margin: 60px auto 0;
+  overflow: hidden;
+  color: var(--color-navy);
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+}
+
+.module-card__footer {
+  position: absolute;
+  /* Three of the eight titles run to two lines on the 25 Aug board, and a
+     second line is 160px here — 120px type at 1.33 — which used to land the
+     summary underneath the button.
+
+     The offset is measured off the board rather than guessed. There the button
+     occupies the same rows on all eight cards while the titles all start on the
+     same row, so the button is fixed and the summaries ride down under the
+     taller titles. Taking the ratio of the two gaps it draws — summary bottom
+     to button, on a two-line card against a one-line card — gives 0.571, and
+     the offset that reproduces it here is 879. Working from the ratio avoids
+     having to know the scale of the screenshot it was measured from. */
+  top: 880px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.module-card.is-active:active .module-card__footer {
+  box-shadow: 0 4px 12px rgba(42, 68, 111, 0.24);
+}
+
+/* Round gradient previous / next buttons (Figma Next Button / Back Button). */
+.module-carousel__arrow {
+  position: absolute;
+  z-index: 6;
+  top: 980px;
+  display: grid;
+  width: 120px;
+  height: 120px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(131deg, #1163ab 0%, #0078d4 100%);
+  box-shadow:
+    0 2px 2px rgba(0, 0, 0, 0.14),
+    0 6px 14px rgba(0, 120, 212, 0.28);
+  transform: translateY(-50%);
+  transition:
+    background 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.module-carousel__arrow--previous {
+  left: 120px;
+}
+
+.module-carousel__arrow--next {
+  right: 120px;
+}
+
+.module-carousel__arrow img {
+  width: 25px;
+  height: 46px;
+  filter: brightness(0) invert(1);
+}
+
+.module-carousel__arrow--previous img {
+  transform: rotate(180deg);
+}
+
+.module-carousel__arrow:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.module-carousel__arrow:disabled {
+  background: var(--color-gray);
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+/* Pagination dots (Figma Pagination). */
+.module-carousel__pagination {
+  display: flex;
+  flex: 0 0 64px;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+  /* The board sets the dots 3.47 button-heights below the button — measured off
+     it, button at rows 176-190 and dots at 242-244 — which is 555px here. They
+     used to sit 165px under it, so this is that difference applied to the pull
+     the copy block already had. */
+  margin-top: 344px;
+  padding: 0 118px;
+}
+
+.module-carousel__indicator {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.module-carousel__indicator span {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(42, 68, 111, 0.18);
+  transition:
+    background 320ms ease,
+    transform 320ms var(--ease-out);
+}
+
+.module-carousel__indicator.is-visited:not(.is-active) span {
+  background: rgba(42, 68, 111, 0.36);
+}
+
+.module-carousel__indicator.is-active span {
+  background: var(--color-navy);
+  transform: scale(1.15);
+}
+
+/* ---------------------------------------------------------------------------
+ * Menu layout: Center
+ *
+ * Top (the default above) packs the card into the upper two thirds and leaves
+ * the lower third empty. Center keeps the artwork exactly where it is — the
+ * arrows are anchored to it, and it is the one element that already sits well —
+ * and spends the empty third on the copy, the CTA and the dots instead.
+ *
+ * The card grows from 2460 to 2990 so the extra room lands below the artwork:
+ *   artwork    500 -> 1700   (unchanged: padding-top 380 + the 1200 visual)
+ *   title      2080          (content box starts at 1700 + its 380 padding)
+ *   CTA        2765          (absolute inside the content box, so a two-line
+ *                             title never pushes it off its mark)
+ *   dots       3110          (carousel bottom, with the pull-up removed)
+ * ------------------------------------------------------------------------- */
+
+#kiosk-stage[data-layout="center"] .module-carousel,
+#kiosk-stage[data-layout="center"] .module-card {
+  height: 2990px;
+}
+
+#kiosk-stage[data-layout="center"] .module-card__content {
+  /* Top pulls the copy back over the artwork; Center lets it start below it. */
+  margin-top: 0;
+  padding-top: 380px;
+}
+
+/* This layout starts the copy below the artwork instead of over it, so it has
+   its own padding and its own button offset. Solving the board's 0.571 gap
+   ratio against this padding gives 1099 rather than the 880 the default layout
+   needs — it already had more room, so it moves far less. */
+#kiosk-stage[data-layout="center"] .module-card__footer {
+  top: 1099px;
+}
+
+#kiosk-stage[data-layout="center"] .module-carousel__pagination {
+  margin-top: 424px;
+}
+
+/* Crossfade between the two layouts. */
+.menu-body {
+  transition: opacity 200ms ease;
+}
+
+.menu-body.is-relayouting {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-body {
+    transition-duration: 1ms;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Touch feedback
+ * ------------------------------------------------------------------------- */
+
+.primary-action,
+.microsoft-header__action {
+  position: relative;
+}
+
+.microsoft-header__action {
+  --press-glow-strong: rgba(0, 120, 212, 0.3);
+  --press-glow-soft: rgba(0, 120, 212, 0.12);
+}
+
+@property --press-radius {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.primary-action::after,
+.microsoft-header__action::after,
+.module-carousel__arrow::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  content: "";
+  background: radial-gradient(
+    circle var(--press-radius) at var(--press-x, 50%) var(--press-y, 50%),
+    var(--press-glow-strong, rgba(255, 255, 255, 0.6)) 0%,
+    var(--press-glow-soft, rgba(255, 255, 255, 0.24)) 30%,
+    transparent 72%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 320ms ease,
+    --press-radius 460ms var(--ease-out);
+}
+
+.primary-action.is-pressing::after,
+.microsoft-header__action.is-pressing::after,
+.module-carousel__arrow.is-pressing::after {
+  --press-radius: 1500px;
+
+  opacity: 1;
+  transition:
+    opacity 90ms ease,
+    --press-radius 1600ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+/* Vertical wipe into a module: a gradient panel sweeps up over the stage,
+   the module mounts underneath, and the panel continues up and away. */
+.screen-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  background: linear-gradient(180deg, #0078d4 0%, #1163ab 30%, #185998 62%, #2a446f 100%);
+  transform: translateY(101%);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.screen-wipe.is-active {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.screen-wipe.is-covering {
+  transform: translateY(0);
+  transition: transform 540ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.screen-wipe.is-revealing {
+  transform: translateY(-101%);
+  transition: transform 540ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ============ Default hint tooltip ============ */
+
+/* The kiosk's standard hint: a white pill with an optional gesture slot.
+   app.css is linked before every module sheet, so modules can position and
+   animate it without restating the surface. Values match the sub-menu and
+   interference bubbles this generalises. */
+.kiosk-hint {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  padding: 12px 48px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 2px 6px rgba(21, 38, 64, 0.1),
+    0 18px 40px rgba(21, 38, 64, 0.16);
+}
+
+.kiosk-hint p {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Sized for the Lottie gesture animations; the negative margin lets the hand
+   overhang the pill without growing it. */
+.kiosk-hint__gesture {
+  display: block;
+  flex: 0 0 auto;
+  width: 132px;
+  height: 132px;
+  margin: -14px 0;
+}
+
+.kiosk-hint__gesture svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Compact glass tooltip shared by States of Matter and Interference. Position,
+   visibility and stage transitions stay with each module; the surface and type do not. */
+.kiosk-tooltip {
+  /* The band is expressed relative to whatever the text colour turns out to be,
+     so a module that restyles its tooltip by setting `color` — several do — gets
+     a wipe that suits it rather than one built for the default white. Variants
+     with an authored band override these two. */
+  --kiosk-tooltip-text-mid: color-mix(in srgb, currentColor 72%, transparent);
+  --kiosk-tooltip-text-peak: color-mix(in srgb, currentColor 44%, transparent);
+  --kiosk-tooltip-sheen-duration: 2.2s;
+  --kiosk-tooltip-breathe-duration: 3s;
+  /* How far down the breath goes. A variable rather than a number in the
+     keyframe so a module whose pill sits on a busier background can hold it
+     higher without a second set of keyframes. */
+  --kiosk-tooltip-breathe-floor: 0.72;
+
+  display: grid;
+  min-height: 92px;
+  padding: 20px 30px;
+  border-radius: 12px;
+  /* background-color rather than the shorthand: the wipe lives in
+     background-image, and a variant re-declaring `background` would drop it. */
+  background-color: rgba(0, 0, 0, 0.12);
+  background-image: linear-gradient(
+    105deg,
+    transparent 36%,
+    rgba(0, 120, 212, 0.05) 42%,
+    rgba(133, 202, 255, 0.16) 46%,
+    rgba(133, 202, 255, 0.32) 50%,
+    rgba(0, 120, 212, 0.12) 55%,
+    transparent 62%
+  );
+  background-position: 130% 50%;
+  background-repeat: no-repeat;
+  background-size: 260% 100%;
+  /* A pill may be given a width — nanoscale writes the authored Figma box
+     onto its instruction inline, and the finale prompt is a fixed 487px — and
+     the text inside never wraps. So any content that outgrows that width has
+     nowhere to go and spills, which is what the info mark did to every pill
+     sized that way. min-width wins over width, including an inline one, so
+     the authored figure becomes a floor and the pill grows when it has to.
+     Both of those are centred by a translate, so growing stays put. */
+  min-width: max-content;
+  /* Dark tooltip: keep a small dark contact shadow plus the authored light halo. */
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.18),
+    0 0 28px rgba(255, 255, 255, 0.22);
+  place-items: center;
+  pointer-events: none;
+}
+
+/* Only while on screen. A tooltip the module keeps built but hidden should not
+   be repainting its text every frame behind a WebGL scene. */
+.kiosk-tooltip:not([hidden]) {
+  animation:
+    kiosk-tooltip-sheen var(--kiosk-tooltip-sheen-duration) ease-in-out infinite,
+    kiosk-tooltip-breathe var(--kiosk-tooltip-breathe-duration) ease-in-out infinite;
+}
+
+.kiosk-tooltip__text {
+  /* Flex so the badge and the words are centred against each other rather
+     than against the font metrics. vertical-align put the badge a fixed
+     distance off the baseline, which only stayed centred at the size it was
+     tuned for and drifted the moment the badge was resized. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-text);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 0;
+  /* Tall enough to contain descenders. The sheen below paints the glyphs by
+     clipping a gradient to the text, and a gradient only covers the element's
+     own box — at line-height 1 the box stops at the baseline, so the tails of
+     "y" and "p" fell outside it and went unpainted, reading as clipped type.
+     The pill's min-height absorbs the extra leading, so nothing moves. */
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* The badge before the words.
+
+   currentColor and em throughout, so it takes each module type colour and
+   type size without a single per-module rule: against the usual 36px type the
+   mark lands at about 44px, and it tracks the pill wherever that size differs.
+
+   The mark is drawn as SVG in kiosk-tooltip.js rather than set as the letter
+   i — see the note there. It sits inside .kiosk-tooltip__text, which is the
+   element modules colour, so currentColor resolves to the words colour rather
+   than the pill background. */
+.kiosk-tooltip__icon {
+  display: inline-block;
+  width: 1.22em;
+  height: 1.22em;
+  margin-right: 0.42em;
+  /* Higher than the 0.55 it started at: the mark has far less ink than the
+     words beside it, so matching their weight numerically left it fainter. */
+  opacity: 0.72;
+  /* Never squeezed when the words are long — the pill grows instead. */
+  flex: 0 0 auto;
+}
+
+.kiosk-tooltip__icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The same band passes through the glyphs, so the pill and its text read as one
+   cue rather than two effects that happen to share a rhythm.
+
+   The resting stops are currentColor rather than a variable, so a module that
+   restyles its tooltip by setting `color` — several do — keeps its own text
+   colour and still gets the wipe. That is also why the fill is knocked out with
+   -webkit-text-fill-color alone: setting `color: transparent` would make
+   currentColor transparent and paint nothing at all. */
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .kiosk-tooltip:not([hidden]) .kiosk-tooltip__text {
+    background-image: linear-gradient(
+      105deg,
+      currentColor 0%,
+      currentColor 42%,
+      var(--kiosk-tooltip-text-mid) 47%,
+      var(--kiosk-tooltip-text-peak) 50%,
+      var(--kiosk-tooltip-text-mid) 53%,
+      currentColor 58%,
+      currentColor 100%
+    );
+    background-position: 130% 50%;
+    background-size: 260% 100%;
+    background-clip: text;
+    animation: kiosk-tooltip-sheen var(--kiosk-tooltip-sheen-duration) ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Action callouts breathe between half and full opacity (IQM, 25 Aug), so the
+   cue keeps drawing the eye rather than leaving the sheen to carry it alone.
+
+   This animates `filter: opacity()` rather than the `opacity` property, which
+   is not a stylistic choice. Several callouts are revealed by transitioning
+   their own opacity up from 0 — the interference interaction tip is one — and
+   an infinite animation on that property would take precedence over the
+   transition and strand them on screen. A filter multiplies whatever opacity
+   the variant has already set instead of replacing it, so the reveal and the
+   breathing both survive. */
+@keyframes kiosk-tooltip-breathe {
+  0%,
+  100% {
+    filter: opacity(1);
+  }
+
+  50% {
+    filter: opacity(var(--kiosk-tooltip-breathe-floor, 0.72));
+  }
+}
+
+@keyframes kiosk-tooltip-sheen {
+  0%,
+  18% {
+    background-position: 130% 50%;
+  }
+
+  70%,
+  100% {
+    background-position: -30% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-tooltip:not([hidden]),
+  .kiosk-tooltip:not([hidden]) .kiosk-tooltip__text {
+    animation: none;
+  }
+
+  .kiosk-tooltip:not([hidden]) .kiosk-tooltip__text {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+/* Shared light modifier matching the authored QVC action callout. Modules may
+   add state-specific artwork, but the underlying glass surface stays identical. */
+.kiosk-tooltip.kiosk-tooltip--light {
+  /* Light glyphs on a light pill, so the authored band darkens rather than
+     fading out, which here would read as the text dropping away. */
+  --kiosk-tooltip-text-mid: #929797;
+  --kiosk-tooltip-text-peak: #7c8282;
+
+  border: 2px solid #d9d9d6;
+  background-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 4px 20px rgba(21, 38, 64, 0.18),
+    0 0 50px rgba(185, 210, 229, 0.5);
+  backdrop-filter: blur(120px);
+}
+
+.kiosk-tooltip.kiosk-tooltip--light .kiosk-tooltip__text {
+  color: #b1b3b3;
+}
+
+/* The educational action cue from the Build a qubit flow. Kept central so
+   compositor fallbacks and motion semantics stay consistent across modules.
+
+   It used to be the blue pill the class is named for; it now takes the same
+   light grey surface as the Nanoscale splash callout, which is the treatment
+   every instruction pill in the kiosk shares. The name is left alone so the
+   four modules that ask for it by string keep working.
+
+   Two things go with the blue: the tinted band stops, so the type sheen falls
+   back to the currentColor-derived one on .kiosk-tooltip, and the pill's own
+   wipe, which the `background` shorthand drops. On an opaque light surface
+   that band read as a smear rather than a sweep, which is why the Nanoscale
+   pill never carried one. The sheen through the type stays. */
+.kiosk-tooltip.kiosk-tooltip--blue {
+  border: 0;
+  background: #f2f4f5;
+  /* Light pill on a light module: a dark contact shadow rather than the halo,
+     which needs something dark behind it to register. */
+  box-shadow: 0 4px 20px rgb(31 55 80 / 0.22);
+  backdrop-filter: none;
+}
+
+.kiosk-tooltip.kiosk-tooltip--blue .kiosk-tooltip__text {
+  color: #7c8282;
+}
+
+/* ---------------------------------------------------------------------------
+ * The band under a module's header, and the two surfaces that share its colour
+ * (Figma "Module Specific": direction 255:1719, pagination 255:3555, pop-up
+ * 255:1843 over overlay 255:1842).
+ *
+ * This replaces the blue "Up next" band of 25 Aug. That band only ever
+ * appeared at the end of a module; the 27 Aug board runs the same surface for
+ * the whole visit, stating where the visitor is and then what is next, so the
+ * band is no longer a thing that arrives — it is there from the start and
+ * changes. The per-module blue and purple went with it: every direction bar on
+ * the board draws the same teal, so the colour is a token now rather than
+ * something each module overrides.
+ * ------------------------------------------------------------------------- */
+
+.kiosk-module-band {
+  position: absolute;
+  top: var(--band-top);
+  right: 0;
+  left: 0;
+  z-index: 40;
+  display: flex;
+  min-height: var(--band-height);
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px;
+  background-image: var(--band-gradient);
+  touch-action: manipulation;
+}
+
+/* Every state is the same bar at the same height — one chrome, not one that
+   resizes under the visitor. The 1-2-3 is 151 tall against a title line’s 85,
+   so it takes the difference out of its own padding: 27 + 151 + 27 is the same
+   205. (The board draws this one at 271 with the full 60; the bar holding still
+   is worth more here than matching that number.) */
+.kiosk-module-band[data-state='pagination'] {
+  padding-top: 27px;
+  padding-bottom: 27px;
+}
+
+.kiosk-module-band__where {
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+}
+
+.kiosk-module-band__where[hidden],
+.kiosk-module-band__pagination[hidden],
+.kiosk-module-band__offer[hidden] {
+  display: none;
+}
+
+.kiosk-module-band__pagination {
+  width: 100%;
+}
+
+/* The whole offer is the target — on a touchscreen the forgiving hit area is
+   the point — so the chevron is decoration inside the button, not a control
+   beside it. It simply replaces the title: no fade, because the bar is not
+   arriving, it is already there and saying something else. */
+.kiosk-module-band__offer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: 0;
+  background: none;
+  gap: 40px;
+}
+
+/* A row here, unlike the pop-up's stacked version: the bar keeps the height of
+   a single title line, and chip-above-title needs twice that. */
+.kiosk-module-band__label {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  text-align: left;
+}
+
+/* Was a line of accent-coloured text above the title on the blue band; the
+   board draws it as a filled chip again — the band's pale tint carrying its
+   deepest stop as ink, the same pairing the restart action uses. */
+.kiosk-module-band__chip,
+.kiosk-up-next-popup__chip {
+  padding: 6px 24px;
+  border-radius: 12px;
+  background: var(--band-bright);
+  color: var(--band-deep);
+  font-family: var(--font-text);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.34;
+  white-space: nowrap;
+}
+
+.kiosk-module-band__title,
+.kiosk-up-next-popup__title {
+  color: var(--band-offwhite);
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+}
+
+/* The bar is 2160 wide and one line tall, so its title must never wrap — there
+   is no second line to wrap into. */
+.kiosk-module-band__title {
+  white-space: nowrap;
+}
+
+/* The panel is 1000 wide, and the board wraps the longer titles across two
+   lines there (255:2321 is drawn 796 x 170). The panel has no fixed height, so
+   it grows with them — which is why Figma draws that pop-up at 1241 rather than
+   1156. */
+.kiosk-up-next-popup__title {
+  align-self: stretch;
+}
+
+/* The popup's chevron rides a lightened disc of the panel's own fill, the same
+   way the home CTA's does. The band's does not — see .kiosk-continue-action. */
+.kiosk-up-next-popup__action {
+  display: grid;
+  width: 84px;
+  height: 84px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.kiosk-up-next-popup__glyph {
+  display: block;
+  width: 60px;
+  height: 60px;
+}
+
+/* The offer's own control, on the band and on every next-principle banner.
+   Nothing here is a target — the whole row is the button — so it is a mark
+   saying which way this goes, and the lightest one that still reads as
+   pressable: the band's own ink on a hairline capsule. It replaces the opaque
+   white pill, which landed on the gradient like a sticker and outshouted the
+   title it was meant to sit beside.
+
+   105px tall, against the title line's 85. The bar does not grow to fit it —
+   the up-next state gives the difference back out of its own padding, the same
+   trade the pagination state makes — so this can be sized for a 4K panel seen
+   across a room without the chrome moving when the offer arrives.
+
+   The capsule is padded 6px tighter on the chevron's side. The word ends on a
+   stem and the chevron ends on a point, so equal numbers leave the right side
+   looking the roomier of the two.
+
+   The corner is the kiosk's button corner rather than a capsule: the same 16px
+   the home CTA is drawn with, which is what the header's actions are drawn
+   with too at their own smaller size. A pill read as a different kind of
+   control from every other button on the screen. */
+.kiosk-continue-action {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 34px;
+  padding: 0 48px 0 54px;
+  border: 2px solid rgb(255 255 255 / 0.45);
+  border-radius: 16px;
+  /* background-color rather than the shorthand: the shine lives in
+     background-image, and anything re-declaring `background` would drop it. */
+  background-color: rgb(255 255 255 / 0.08);
+  background-image: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgb(255 255 255 / 0.05) 46%,
+    rgb(255 255 255 / 0.3) 50%,
+    rgb(255 255 255 / 0.05) 54%,
+    transparent 58%
+  );
+  /* Parked where the band is off the left edge, so at rest — and under reduced
+     motion, which never runs the sweep — the capsule is simply a capsule. */
+  background-position: 130% 50%;
+  background-repeat: no-repeat;
+  background-size: 260% 100%;
+  color: var(--band-offwhite);
+  font-family: var(--font-text);
+  font-size: 56px;
+  font-weight: 400;
+  line-height: 101px;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+/* The bar is 205 in every state and this one holds it: 50 + 105 + 50. Growing
+   the button is not worth a chrome that jumps the moment a module finishes. */
+.kiosk-module-band[data-state='up-next'] {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+/* Centring the chevron on the capsule centres it on the line box, which is not
+   where the word is: the font reserves more room above the caps than it does
+   below the baseline, so the line box's middle sits high of the word's. The
+   2.7px is that difference, measured on "Continue" at this size — the chevron
+   is centred on the cap height of the writing rather than on the space the
+   writing is set in. */
+.kiosk-continue-action__arrow {
+  display: grid;
+  place-items: center;
+  transform: translateY(2.7px);
+}
+
+.kiosk-continue-action__glyph {
+  display: block;
+  width: 24px;
+  height: 40px;
+}
+
+/* Three passes of the band the tooltips already carry — same angle, same
+   travel, same hold at each end — so the two cues in the kiosk that say "this
+   one, now" say it the same way. Left to right, with the chevron.
+
+   The bar itself does not move; it was on screen before the offer and stays
+   put. Done at 4.8s, just inside the five the band waits before escalating to
+   the popup. Leaving the offer state resets it for the replay. */
+@media (prefers-reduced-motion: no-preference) {
+  .kiosk-module-band[data-state='up-next'] .kiosk-continue-action {
+    animation: kiosk-continue-shine 1600ms ease-in-out 3;
+  }
+}
+
+@keyframes kiosk-continue-shine {
+  0%,
+  20% {
+    background-position: 130% 50%;
+  }
+
+  62%,
+  100% {
+    background-position: -30% 50%;
+  }
+}
+
+/* The press reads on the capsule rather than the whole row: brightening a
+   gradient the width of the screen is not a button being pressed. */
+.kiosk-module-band__offer:active .kiosk-continue-action {
+  border-color: rgb(255 255 255 / 0.7);
+  background-color: rgb(255 255 255 / 0.2);
+}
+
+/* ---------------------------------------------------------------------------
+ * The 1-2-3, on the band while a module runs sub-modules and on the sub-menu
+ * screen that lists them (Figma 255:3555 and 255:3786).
+ *
+ * One drawing, two inks. On the band it is white on teal; on the sub-menu it is
+ * teal on white, with the labels off and the circles further apart. Everything
+ * else — the 100px circles, the 4px dashed rail at half opacity, the 8px gap
+ * under each circle — is identical, so the difference is a set of tokens rather
+ * than a second component.
+ * ------------------------------------------------------------------------- */
+
+.kiosk-submodule-nav {
+  --nav-ink: #fff;
+  --nav-on-ink: var(--band-deep);
+  --nav-soft: rgba(255, 255, 255, 0.2);
+  --nav-rail: rgba(255, 255, 255, 0.5);
+  --nav-locked: rgba(255, 255, 255, 0.7);
+  --nav-gap: 460px;
+
+  width: 100%;
+}
+
+.kiosk-submodule-nav[data-tone='on-light'] {
+  --nav-ink: #225b62;
+  --nav-on-ink: #fff;
+  --nav-soft: rgba(34, 91, 98, 0.2);
+  --nav-rail: rgba(34, 91, 98, 0.5);
+  --nav-locked: rgba(34, 91, 98, 0.7);
+  --nav-gap: 560px;
+}
+
+/* 100 circle + 8 gap + 43 label. The label is positioned, so without this the
+   track measures as the circle alone. */
+.kiosk-submodule-nav[data-labels='true'] .kiosk-submodule-nav__track {
+  min-height: 151px;
+}
+
+.kiosk-submodule-nav__track {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The step is the circle and nothing else. The label is taken out of flow
+   underneath it, because a label wider than the circle would push the rails
+   apart and leave the dashes stopping short of the numbers — the board runs
+   them edge to edge. */
+.kiosk-submodule-nav__step {
+  position: relative;
+  display: flex;
+  width: 100px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.kiosk-submodule-nav__index {
+  display: grid;
+  width: 100px;
+  height: 100px;
+  place-items: center;
+  /* Transparent on the steps that carry no ring, so taking the ring on and off
+     never changes the circle's size. */
+  border: 4px solid transparent;
+  border-radius: 50%;
+  background: var(--nav-soft);
+  color: var(--nav-ink);
+  font-family: var(--font-text);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+/* The number and the tick occupy the same cell, so swapping them cannot move
+   the disc or change its size. */
+.kiosk-submodule-nav__number,
+.kiosk-submodule-nav__check {
+  grid-area: 1 / 1;
+}
+
+.kiosk-submodule-nav__check {
+  display: block;
+  width: 60px;
+  height: 60px;
+}
+
+.kiosk-submodule-nav__step:not([data-state='done']) .kiosk-submodule-nav__check,
+.kiosk-submodule-nav__step[data-state='done'] .kiosk-submodule-nav__number {
+  display: none;
+}
+
+.kiosk-submodule-nav__step[data-state='current'] .kiosk-submodule-nav__index {
+  border-color: var(--nav-ink);
+  background: var(--nav-ink);
+  color: var(--nav-on-ink);
+}
+
+/* Been there: the same filled disc as the current step, carrying a tick instead
+   of its number, and no ring (255:1828). Without this a finished step was
+   indistinguishable from one never started, so a completed module read as
+   untouched. */
+.kiosk-submodule-nav__step[data-state='done'] .kiosk-submodule-nav__index {
+  background: var(--nav-ink);
+  color: var(--nav-on-ink);
+}
+
+.kiosk-submodule-nav__label {
+  position: absolute;
+  top: 108px;
+  left: 50%;
+  color: var(--nav-ink);
+  transform: translateX(-50%);
+  font-family: var(--font-text);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.34;
+  white-space: nowrap;
+  transition: color 220ms ease;
+}
+
+/* Only what the visitor cannot open yet fades. A step they have finished, and
+   the one waiting for them next, both read at full strength — which is what the
+   board draws on the Superposition screen: 1 lit, 2 lit, 3 held back. */
+.kiosk-submodule-nav__step[data-locked='true'] .kiosk-submodule-nav__label {
+  color: var(--nav-locked);
+}
+
+/* The rail is the gap itself, which keeps the dashes clear of the circles.
+   Dashed at half strength while the route ahead is untravelled, and solid at
+   full once the step behind it is done — 255:4301 draws both on one control. */
+.kiosk-submodule-nav__rail {
+  width: var(--nav-gap);
+  height: 4px;
+  /* Half the 100px circle, less half the rail, so it meets the numbers. */
+  margin-top: 48px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--nav-rail) 0 8px,
+    transparent 8px 16px
+  );
+}
+
+.kiosk-submodule-nav__rail[data-travelled='true'] {
+  background-image: linear-gradient(to right, var(--nav-ink) 0 100%);
+}
+
+/* ---------------------------------------------------------------------------
+ * The pop-up the band escalates to (Figma 255:1843 over overlay 255:1842).
+ * ------------------------------------------------------------------------- */
+
+.kiosk-up-next-popup {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+}
+
+.kiosk-up-next-popup[hidden] {
+  display: none;
+}
+
+.kiosk-up-next-popup__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  backdrop-filter: blur(15px);
+  transition: opacity 320ms ease;
+}
+
+.kiosk-up-next-popup[data-showing='true'] .kiosk-up-next-popup__scrim {
+  opacity: 1;
+}
+
+.kiosk-up-next-popup__panel {
+  position: relative;
+  display: flex;
+  width: 1000px;
+  flex-direction: column;
+  overflow: clip;
+  border-radius: 24px;
+  background-image: var(--band-gradient);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: scale(0.96) translateY(24px);
+  transition:
+    opacity 260ms ease,
+    transform 420ms var(--ease-out);
+}
+
+.kiosk-up-next-popup[data-showing='true'] .kiosk-up-next-popup__panel {
+  opacity: 1;
+  transform: none;
+}
+
+.kiosk-up-next-popup__visual {
+  position: relative;
+  width: 1000px;
+  height: 700px;
+  background-image:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0%, rgba(255, 255, 255, 0.06) 57.097%),
+    linear-gradient(90deg, #fff 0%, #fff 100%);
+}
+
+/* One box for every offer's artwork, contained.
+
+   The board sizes each cutout to its own subject — the ice cube wide and short,
+   the Majorana assembly 705px tall. That works on the board and not in the
+   build: the tallest is taller than the 700px area it sits in, so it overflowed
+   the panel, and the rest landed at visibly different sizes popup to popup.
+   Contained in one box, every offer reads the same and nothing escapes.
+
+   142 top and 142 bottom of the 700px area, so the artwork sits centred in what
+   the close control leaves. */
+.kiosk-up-next-popup__art {
+  position: absolute;
+  top: 142px;
+  left: 50%;
+  width: 700px;
+  height: 416px;
+  object-fit: contain;
+  transform: translateX(-50%);
+}
+
+/* Full-bleed plates rather than cutouts: they are the whole picture, so they
+   fill the area instead of floating inside it. */
+.kiosk-up-next-popup__art[data-fit='cover'] {
+  top: 0;
+  width: 100%;
+  height: 700px;
+  object-fit: cover;
+}
+
+/* The current chip render is tall; give its circuitry more of the visual well
+   while preserving clearance around the close control. */
+.kiosk-up-next-popup__art[data-layout='majorana'] {
+  top: 90px;
+  width: 760px;
+  height: 520px;
+}
+
+/* Module 09's plate is a tall column of spheres rather than a wide object.
+   Contained in the shared landscape box it would render a fifth of the panel
+   wide; a portrait box lets the column stand at the height it was drawn. */
+.kiosk-up-next-popup__art[data-layout='stack'] {
+  top: 50px;
+  width: 700px;
+  height: 600px;
+}
+
+/* Keep the same muted, bare cross in every offer. Scope beats module-wide
+   button colours, including the white ink inherited from .pqi button. */
+.kiosk-up-next-popup .kiosk-up-next-popup__close {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  display: grid;
+  width: 70px;
+  height: 70px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-navy);
+  opacity: 0.5;
+}
+
+.kiosk-up-next-popup__close .kiosk-up-next-popup__glyph {
+  width: 70px;
+  height: 70px;
+}
+
+.kiosk-up-next-popup__go {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px;
+  border: 0;
+  background: none;
+  gap: 40px;
+}
+
+.kiosk-up-next-popup__go:active {
+  filter: brightness(1.06);
+}
+
+.kiosk-up-next-popup__label {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+  text-align: left;
+}
+
+/* The restart row sits on white rather than the gradient: it is the quieter of
+   the two offers, and the board separates them by surface instead of by size. */
+.kiosk-up-next-popup__restart {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 60px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.8);
+  gap: 40px;
+}
+
+.kiosk-up-next-popup__restart:active {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.kiosk-up-next-popup__restart-label {
+  color: var(--band-ink);
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+  text-align: left;
+}
+
+.kiosk-up-next-popup__action--restart {
+  background: var(--band-pale);
+  color: var(--band-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-up-next-popup__panel,
+  .kiosk-up-next-popup__scrim {
+    transition: opacity 320ms ease;
+    transform: none;
+  }
+}
+
+/* Floating educational panel shared by authored explainers. Modules provide
+   stage placement and exact dimensions; this component owns the glass surface,
+   type hierarchy, semantic parts and the standard enter/exit choreography. */
+.kiosk-explainer {
+  --kiosk-explainer-active-transform: translateY(0);
+  --kiosk-explainer-backdrop-filter: blur(20px);
+  --kiosk-explainer-background: rgba(255, 255, 255, 0.24);
+  --kiosk-explainer-body-color: #2a446f;
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: nowrap;
+  --kiosk-explainer-border-radius: 12px;
+  --kiosk-explainer-box-shadow:
+    0 4px 50px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+  --kiosk-explainer-content-gap: 80px;
+  --kiosk-explainer-enter-opacity-duration: 180ms;
+  --kiosk-explainer-enter-opacity-easing: cubic-bezier(0.2, 0, 0, 1);
+  --kiosk-explainer-enter-transform-duration: 180ms;
+  --kiosk-explainer-enter-transform-easing: cubic-bezier(0.2, 0, 0, 1);
+  --kiosk-explainer-exit-opacity-duration: 120ms;
+  --kiosk-explainer-exit-opacity-easing: cubic-bezier(0.3, 0, 1, 1);
+  --kiosk-explainer-exit-transform-duration: 120ms;
+  --kiosk-explainer-exit-transform-easing: cubic-bezier(0.3, 0, 1, 1);
+  --kiosk-explainer-exit-visibility-delay: 120ms;
+  --kiosk-explainer-ink: #2a446f;
+  --kiosk-explainer-padding: 60px;
+  --kiosk-explainer-rest-transform: translateY(6px);
+  --kiosk-explainer-strong-color: #091f2c;
+  --kiosk-explainer-title-size: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kiosk-explainer-content-gap);
+  margin: 0;
+  padding: var(--kiosk-explainer-padding);
+  overflow: hidden;
+  border-radius: var(--kiosk-explainer-border-radius);
+  background: var(--kiosk-explainer-background);
+  box-shadow: var(--kiosk-explainer-box-shadow);
+  -webkit-backdrop-filter: var(--kiosk-explainer-backdrop-filter);
+  backdrop-filter: var(--kiosk-explainer-backdrop-filter);
+  color: var(--kiosk-explainer-ink);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: var(--kiosk-explainer-rest-transform);
+  visibility: hidden;
+  transition:
+    opacity var(--kiosk-explainer-exit-opacity-duration)
+      var(--kiosk-explainer-exit-opacity-easing),
+    transform var(--kiosk-explainer-exit-transform-duration)
+      var(--kiosk-explainer-exit-transform-easing),
+    visibility 0s linear var(--kiosk-explainer-exit-visibility-delay);
+}
+
+.kiosk-explainer.is-showing {
+  opacity: 1;
+  transform: var(--kiosk-explainer-active-transform);
+  visibility: visible;
+  transition:
+    opacity var(--kiosk-explainer-enter-opacity-duration)
+      var(--kiosk-explainer-enter-opacity-easing),
+    transform var(--kiosk-explainer-enter-transform-duration)
+      var(--kiosk-explainer-enter-transform-easing),
+    visibility 0s linear 0s;
+}
+
+.kiosk-explainer[data-kiosk-explainer-variant='plain'] {
+  --kiosk-explainer-backdrop-filter: none;
+  --kiosk-explainer-background: transparent;
+  --kiosk-explainer-box-shadow: none;
+}
+
+.kiosk-explainer[hidden],
+.kiosk-explainer__media[hidden],
+.kiosk-explainer__title[hidden],
+.kiosk-explainer__subtitle[hidden],
+.kiosk-explainer__body[hidden],
+.kiosk-explainer__footer[hidden] {
+  display: none;
+}
+
+.kiosk-explainer[data-kiosk-explainer-layout='split'] {
+  flex-direction: row;
+  align-items: stretch;
+  text-align: left;
+}
+
+.kiosk-explainer__media {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.kiosk-explainer__media-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+}
+
+.kiosk-explainer__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--kiosk-explainer-content-gap);
+}
+
+.kiosk-explainer__title,
+.kiosk-explainer__subtitle,
+.kiosk-explainer__body,
+.kiosk-explainer__footer {
+  margin: 0;
+  color: var(--kiosk-explainer-body-color);
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.330078;
+}
+
+.kiosk-explainer__title {
+  color: var(--kiosk-explainer-ink);
+  font-size: var(--kiosk-explainer-title-size);
+  font-weight: 600;
+}
+
+/* Qualifies the heading, so it keeps the heading's ink and weight and gives up
+   only size. Defaults to three-fifths of the title, which is the ratio the
+   boards set it at; panels that need an exact value set the property. */
+.kiosk-explainer__subtitle {
+  color: var(--kiosk-explainer-ink);
+  font-size: var(--kiosk-explainer-subtitle-size, calc(var(--kiosk-explainer-title-size) * 0.6));
+  font-weight: 600;
+}
+
+.kiosk-explainer__body,
+.kiosk-explainer__footer {
+  font-size: var(--kiosk-explainer-body-size);
+  font-weight: 400;
+  white-space: var(--kiosk-explainer-body-white-space);
+}
+
+.kiosk-explainer__body strong,
+.kiosk-explainer__footer strong {
+  color: var(--kiosk-explainer-strong-color);
+  font-weight: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-explainer,
+  .kiosk-explainer.is-showing {
+    transition: none;
+  }
+}
+
+/* Every module enters the same way: the whole stage rises into place as one
+   unit and fades in. Driven by the stage's own class (set when the module's
+   content lands) so a module's internal markup can't change the feel. */
+.module-host__stage.is-arriving,
+.module-host__system-view {
+  animation: module-arrive 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes module-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(46px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-wipe.is-covering,
+  .screen-wipe.is-revealing {
+    transition-duration: 1ms;
+  }
+
+  .module-host__stage.is-arriving,
+  .module-host__system-view {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+}
+
+.screen--menu.is-diving .module-card__content,
+.screen--menu.is-diving .module-carousel__pagination,
+.screen--menu.is-diving .module-carousel__arrow {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+.is-experience-transitioning .screen {
+  pointer-events: none !important;
+}
+
+.is-experience-transitioning .module-card:focus {
+  outline: none;
+}
+
+.experience-portal {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.experience-portal__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: var(--color-background);
+  opacity: 0;
+  will-change: opacity;
+}
+
+.experience-portal__field {
+  position: absolute;
+  z-index: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(0, 120, 212, 0.34) 52%,
+    rgba(0, 120, 212, 0.12) 63%,
+    rgba(0, 120, 212, 0) 76%
+  );
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+.experience-portal__scene-surface {
+  position: absolute;
+  z-index: 3;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+}
+
+.experience-portal__handoff {
+  position: absolute;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.experience-portal__scene-surface .majorana-model-stage__canvas,
+.module-card__3d-host .majorana-model-stage__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: none;
+}
+
+.module-card.is-preview-warming .module-card__3d-host::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 82px;
+  height: 82px;
+  border: 7px solid rgba(0, 120, 212, 0.16);
+  border-top-color: var(--color-blue);
+  border-radius: 50%;
+  content: "";
+  transform: translate(-50%, -50%);
+  animation: majorana-menu-preview-spin 900ms linear infinite;
+}
+
+/* ---------------------------------------------------------------------------
+ * Concept / placeholder module view
+ * ------------------------------------------------------------------------- */
+
+.screen-header {
+  display: flex;
+  min-height: 210px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 64px;
+  border-bottom: 2px solid var(--color-line);
+}
+
+.icon-action,
+.back-action {
+  border: 2px solid var(--color-line);
+  background: var(--color-panel);
+  color: var(--color-ink);
+}
+
+.icon-action {
+  display: grid;
+  width: 132px;
+  height: 132px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 58px;
+}
+
+.icon-action:active,
+.back-action:active {
+  background: var(--color-panel-hover);
+  transform: scale(0.97);
+}
+
+.screen-header--module {
+  min-height: 150px;
+  padding-bottom: 42px;
+}
+
+.back-action {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  min-height: 112px;
+  padding: 0 46px;
+  border-radius: 60px;
+  font-size: 34px;
+}
+
+.eyebrow,
+.module-kicker {
+  color: var(--color-accent);
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.module-shell {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  padding-top: 100px;
+}
+
+.module-heading {
+  flex: 0 0 auto;
+}
+
+.module-heading h2 {
+  max-width: 1750px;
+  margin-top: 34px;
+  font-size: 116px;
+  font-weight: 580;
+  letter-spacing: -0.052em;
+  line-height: 1.02;
+}
+
+.module-summary {
+  max-width: 1560px;
+  margin-top: 50px;
+  color: var(--color-muted);
+  font-size: 42px;
+  line-height: 1.4;
+}
+
+.interaction-placeholder {
+  position: relative;
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  place-items: center;
+  margin: 100px 0 66px;
+  overflow: hidden;
+  border: 2px solid var(--color-line);
+  border-radius: 56px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.06) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.06) 2px, transparent 2px),
+    rgba(0, 0, 0, 0.02);
+  background-size: 120px 120px;
+}
+
+.interaction-placeholder__scene {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 32%, #f5f6f8 0%, #e6e8eb 55%, #d8dbdf 100%);
+}
+
+.interaction-placeholder__scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.placeholder-orbit,
+.placeholder-core {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.placeholder-orbit {
+  border: 3px solid rgba(0, 120, 212, 0.26);
+}
+
+.placeholder-orbit--outer {
+  width: 1050px;
+  height: 1050px;
+  animation: breathe 5s ease-in-out infinite;
+}
+
+.placeholder-orbit--inner {
+  width: 660px;
+  height: 660px;
+  border-color: rgba(122, 95, 212, 0.34);
+  animation: breathe 5s 0.8s ease-in-out infinite reverse;
+}
+
+.placeholder-core {
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle at 38% 32%, #ffffff 0%, #85caff 18%, #1163ab 65%, transparent 72%);
+  box-shadow: 0 0 180px rgba(0, 120, 212, 0.4);
+}
+
+.placeholder-label {
+  position: absolute;
+  right: 64px;
+  bottom: 58px;
+  left: 64px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 80px;
+  padding-top: 36px;
+  border-top: 2px solid var(--color-line);
+  color: var(--color-subtle);
+  font-size: 28px;
+}
+
+.placeholder-label strong {
+  max-width: 930px;
+  color: var(--color-muted);
+  font-size: 30px;
+  font-weight: 560;
+  text-align: right;
+}
+
+.module-status {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 20px;
+  color: var(--color-subtle);
+  font-size: 28px;
+}
+
+.status-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-teal);
+  box-shadow: 0 0 28px rgba(26, 158, 143, 0.5);
+}
+
+/* ---------------------------------------------------------------------------
+ * Dev HUD + kiosk settings
+ * ------------------------------------------------------------------------- */
+
+.development-hud {
+  position: absolute;
+  z-index: 40;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(10, 14, 26, 0.86);
+  color: #cdd6e4;
+  font-family: Consolas, "SFMono-Regular", monospace;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.development-hud strong {
+  color: #65b8ff;
+}
+
+#development-resolution,
+#development-scale {
+  color: rgba(221, 228, 239, 0.76);
+}
+
+.development-hud__fps {
+  width: 180px;
+  padding-left: 10px;
+  border-left: 1px solid rgba(205, 214, 228, 0.22);
+  font-weight: 700;
+  text-align: right;
+}
+
+.development-hud__materials {
+  min-height: 28px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(205, 214, 228, 0.12);
+  color: #e6ebf2;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: auto;
+  transition: background 140ms ease;
+}
+
+.development-hud__materials:hover,
+.development-hud__materials:active,
+.development-hud__materials[aria-expanded="true"] {
+  background: rgba(101, 184, 255, 0.24);
+}
+
+.development-hud__materials:focus-visible {
+  outline: 2px solid #65b8ff;
+  outline-offset: 2px;
+}
+
+/* Collapse control. Shares the Materials chip's shape so the dock reads as one
+   row of controls, and is the only child left standing once collapsed. */
+.development-hud__toggle {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(205, 214, 228, 0.12);
+  color: #e6ebf2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: auto;
+  transition: background 140ms ease;
+}
+
+.development-hud__toggle:hover,
+.development-hud__toggle:active {
+  background: rgba(101, 184, 255, 0.24);
+}
+
+.development-hud__toggle:focus-visible {
+  outline: 2px solid #65b8ff;
+  outline-offset: 2px;
+}
+
+/* Collapsed: the dock becomes a faint DEV chip in the corner. Everything else is
+   taken out of layout so the pill shrinks to the button, and the panel's own
+   position recalculates off the smaller dock. */
+.development-hud[data-collapsed="true"] {
+  padding: 3px;
+  background: rgba(10, 14, 26, 0.42);
+}
+
+.development-hud[data-collapsed="true"] > *:not(.development-hud__toggle) {
+  display: none;
+}
+
+.development-hud[data-collapsed="true"] .development-hud__toggle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.development-hud[data-collapsed="true"] .development-hud__toggle:hover {
+  opacity: 1;
+}
+
+.development-material-panel {
+  position: fixed;
+  z-index: 9999;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  max-height: min(36vh, 320px);
+  overflow: auto;
+  padding: 10px 14px 14px;
+  border-radius: 10px;
+  background: rgba(10, 14, 26, 0.92);
+  box-shadow: 0 12px 32px rgba(10, 14, 26, 0.22);
+  color: #cdd6e4;
+  font: 13px/1.35 Consolas, "SFMono-Regular", monospace;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+.development-material-panel__value {
+  width: 64px;
+  min-width: 0;
+  padding: 3px 4px;
+  border: 1px solid rgba(205, 214, 228, 0.22);
+  border-radius: 4px;
+  background: rgba(205, 214, 228, 0.08);
+  color: #f1f5fb;
+  font: inherit;
+  text-align: right;
+}
+
+.development-material-panel__value:focus-visible,
+.development-material-panel__action:focus-visible,
+.development-material-panel__group > summary:focus-visible {
+  outline: 2px solid #65b8ff;
+  outline-offset: 2px;
+}
+
+.development-material-panel__group {
+  margin: 8px 0;
+  border-block: 1px solid rgba(205, 214, 228, 0.14);
+}
+
+.development-material-panel__group + .development-material-panel__group {
+  margin-top: -9px;
+  border-top: 0;
+}
+
+.development-material-panel__group > summary {
+  padding: 7px 0;
+  color: #ffd479;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.development-material-panel__group-body {
+  padding: 0 0 8px;
+}
+
+.development-material-panel__note {
+  margin: 0 0 7px;
+  color: #9eaabd;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.development-material-panel__action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 7px 0;
+}
+
+.development-material-panel__action {
+  min-height: 28px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(101, 184, 255, 0.2);
+  color: #f1f5fb;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.development-material-panel__action:hover,
+.development-material-panel__action:active {
+  background: rgba(101, 184, 255, 0.32);
+}
+
+.development-material-panel__action-status {
+  color: #7ef2a5;
+  font-size: 11px;
+}
+
+@media (orientation: landscape) and (max-height: 800px) {
+  #development-resolution {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .development-hud {
+    gap: 7px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  #development-resolution,
+  #development-scale {
+    display: none;
+  }
+
+  .development-hud__fps {
+    width: 164px;
+    padding-left: 8px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Kiosk settings: cog launcher + frosted popover
+ *
+ * One spring drives the panel, the cog and the segment thumb, so everything
+ * that moves on open moves together. --kiosk-settings-spring is a lively
+ * damped spring (zeta 0.5) sampled every 25ms; it overshoots ~16% once and
+ * settles with a single small bounce, which is what reads as "bubbly" rather
+ * than as an elastic rubber band.
+ * ------------------------------------------------------------------------- */
+
+.kiosk-settings {
+  --kiosk-settings-spring: linear(
+    0, 0.114, 0.367, 0.649, 0.89, 1.055, 1.142, 1.163, 1.141, 1.099, 1.053,
+    1.015, 0.989, 0.976, 0.974, 0.977, 0.985, 0.992, 0.998, 1.002, 1.004,
+    1.004, 1.004, 1.002, 1
+  );
+  --kiosk-settings-spring-duration: 600ms;
+  --kiosk-settings-exit-easing: cubic-bezier(0.4, 0, 1, 1);
+  --kiosk-settings-exit-duration: 200ms;
+  --kiosk-settings-launcher-size: 132px;
+  --kiosk-settings-gap: 36px;
+  --kiosk-settings-ink: var(--color-navy);
+  position: absolute;
+  z-index: 30;
+  right: 100px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--kiosk-settings-gap);
+}
+
+/* The dev dock owns the same corner, so lift the cog clear of it while it is on
+   screen. app.js measures the dock and publishes the offset. */
+#kiosk-stage.has-development-hud .kiosk-settings {
+  bottom: var(--development-settings-bottom, 132px);
+}
+
+/* Minimal at rest: a faint chip that carries the glyph without competing with
+   whatever module is underneath it. */
+.kiosk-settings__launcher {
+  display: grid;
+  width: var(--kiosk-settings-launcher-size);
+  height: var(--kiosk-settings-launcher-size);
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--kiosk-settings-ink);
+  cursor: pointer;
+  transition:
+    background 240ms ease,
+    box-shadow 240ms ease,
+    transform var(--kiosk-settings-spring-duration) var(--kiosk-settings-spring);
+}
+
+.kiosk-settings__launcher:active {
+  transform: scale(0.94);
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__launcher {
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow:
+    0 8px 30px rgba(9, 20, 45, 0.16),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.55);
+}
+
+.kiosk-settings__cog {
+  width: 64px;
+  height: 64px;
+  transition: transform var(--kiosk-settings-spring-duration) var(--kiosk-settings-spring);
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__cog {
+  transform: rotate(120deg);
+}
+
+.kiosk-settings__panel {
+  display: flex;
+  width: 840px;
+  flex-direction: column;
+  gap: 56px;
+  padding: 56px 64px 64px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow:
+    0 40px 90px rgba(9, 20, 45, 0.22),
+    inset 0 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.45);
+  -webkit-backdrop-filter: blur(48px) saturate(180%);
+  backdrop-filter: blur(48px) saturate(180%);
+  color: var(--color-navy);
+  opacity: 0;
+  /* Grows out of the cog itself: half a launcher in from the panel's right
+     edge, and half a launcher plus the gap below its bottom edge. */
+  transform: scale(0.5);
+  transform-origin:
+    calc(100% - (var(--kiosk-settings-launcher-size) / 2))
+    calc(100% + var(--kiosk-settings-gap) + (var(--kiosk-settings-launcher-size) / 2));
+  transition:
+    opacity var(--kiosk-settings-exit-duration) var(--kiosk-settings-exit-easing),
+    transform var(--kiosk-settings-exit-duration) var(--kiosk-settings-exit-easing);
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__panel {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 140ms ease-out,
+    transform var(--kiosk-settings-spring-duration) var(--kiosk-settings-spring);
+}
+
+/* The rows arrive just behind the panel so the surface reads as inflating
+   rather than as one flat card fading in. */
+.kiosk-settings__group {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  opacity: 0;
+  transform: translateY(24px) scale(0.94);
+  transition:
+    opacity 120ms var(--kiosk-settings-exit-easing),
+    transform 120ms var(--kiosk-settings-exit-easing);
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__group {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 180ms ease-out 70ms,
+    transform var(--kiosk-settings-spring-duration) var(--kiosk-settings-spring) 70ms;
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(2) {
+  transition-delay: 130ms;
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(3) {
+  transition-delay: 190ms;
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(4) {
+  transition-delay: 250ms;
+}
+
+.kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(5) {
+  transition-delay: 310ms;
+}
+
+.kiosk-settings__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.kiosk-settings__label {
+  color: var(--color-subtle);
+  font-family: var(--font-text);
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.kiosk-settings__readout {
+  min-width: 230px;
+  color: var(--color-navy);
+  font-family: var(--font-text);
+  font-size: 38px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+
+.kiosk-settings__volume,
+.kiosk-settings__timing {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.kiosk-settings__volume-icon {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  color: var(--kiosk-settings-ink);
+}
+
+.kiosk-settings__slider {
+  height: 56px;
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.kiosk-settings__slider::-webkit-slider-runnable-track {
+  height: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-navy) 24%, transparent);
+}
+
+.kiosk-settings__slider::-webkit-slider-thumb {
+  width: 46px;
+  height: 46px;
+  margin-top: -16px;
+  appearance: none;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-navy);
+  box-shadow: 0 4px 12px rgba(9, 20, 45, 0.24);
+}
+
+/* Segmented layout switch. The thumb is a sibling behind the two options so it
+   can spring between them without the labels moving. */
+.kiosk-settings__segments {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-navy) 10%, transparent);
+}
+
+.kiosk-settings__segment-thumb {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 8px;
+  width: calc(50% - 12px);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(9, 20, 45, 0.18);
+  /* Deliberately not the popover spring: the thumb just slides between the two
+     options, so a bounce here would read as a second, competing gesture. */
+  transition: transform 260ms var(--ease-out);
+}
+
+/* Scoped to its own group: there are two segmented controls in the panel now,
+   and an unscoped rule slid both thumbs whenever either changed. */
+.kiosk-settings[data-layout="center"] #kiosk-settings-layout .kiosk-settings__segment-thumb,
+.kiosk-settings[data-music="off"] #kiosk-settings-music .kiosk-settings__segment-thumb,
+.kiosk-settings[data-upnext="off"] #kiosk-settings-upnext .kiosk-settings__segment-thumb {
+  transform: translateX(calc(100% + 8px));
+}
+
+.kiosk-settings__segment {
+  position: relative;
+  display: flex;
+  min-height: 108px;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--color-subtle);
+  cursor: pointer;
+  font-family: var(--font-text);
+  font-size: 38px;
+  font-weight: 600;
+  transition: color 200ms ease;
+}
+
+.kiosk-settings__segment svg {
+  width: 48px;
+  height: 48px;
+  flex: none;
+}
+
+.kiosk-settings__segment[aria-checked="true"] {
+  color: var(--color-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiosk-settings__panel,
+  .kiosk-settings[data-open="true"] .kiosk-settings__panel,
+  .kiosk-settings__group,
+  .kiosk-settings[data-open="true"] .kiosk-settings__group,
+  .kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(2),
+  .kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(3),
+  .kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(4),
+  .kiosk-settings[data-open="true"] .kiosk-settings__group:nth-of-type(5),
+  .kiosk-settings__cog,
+  .kiosk-settings__launcher,
+  .kiosk-settings__segment-thumb {
+    transition-duration: 0s;
+    transition-delay: 0s;
+  }
+}
+
+@keyframes majorana-menu-preview-spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Screen + text transitions
+ * ------------------------------------------------------------------------- */
+
+.reveal-word {
+  display: inline-block;
+  overflow: hidden;
+  margin-bottom: -0.24em;
+  padding-bottom: 0.24em;
+  vertical-align: top;
+}
+
+.reveal-word__inner {
+  display: inline-block;
+  margin-bottom: -0.26em;
+  padding-bottom: 0.26em;
+  will-change: transform;
+}
+
+.screen.is-active .reveal-word__inner {
+  animation: reveal-word-in 980ms var(--ease-out) both;
+  animation-delay: calc(400ms + var(--word-index, 0) * 85ms);
+}
+
+.screen.is-leaving .reveal-word__inner {
+  animation: reveal-word-out 240ms cubic-bezier(0.55, 0, 0.8, 0.4) both;
+  animation-delay: calc(var(--word-index, 0) * 14ms);
+}
+
+.reveal-char {
+  display: inline-block;
+}
+
+.screen.is-active .reveal-char {
+  animation: reveal-char-in 320ms ease both;
+  animation-delay: calc(340ms + var(--char-index, 0) * 24ms);
+}
+
+.screen.is-leaving .reveal-char {
+  animation: reveal-char-out 180ms ease both;
+  animation-delay: calc(var(--char-index, 0) * 4ms);
+}
+
+.screen--attract.is-active .attract-chip {
+  animation: attract-chip-in 1150ms var(--ease-out) 560ms backwards;
+}
+
+.screen--attract.is-active .attract-footer {
+  animation: screen-rise-in 860ms var(--ease-out) 820ms backwards;
+}
+
+.screen--attract.is-active .attract-intro {
+  animation: screen-rise-in 860ms var(--ease-out) 700ms backwards;
+}
+
+.screen--attract.is-leaving .attract-footer,
+.screen--attract.is-leaving .attract-intro {
+  animation: screen-rise-out 280ms ease forwards;
+}
+
+.screen--attract.is-leaving .attract-chip {
+  animation: attract-chip-out 300ms ease forwards;
+}
+
+/* Idle attract CTA: a hand pointer slides in and taps the button on a loop.
+   Starts once the entrance animation above has settled, pauses for the
+   press-bloom ripple and the :active press state (so a real touch doesn't
+   fight the simulated one), and is dropped entirely under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .screen--attract.is-active #start-button .cta-pointer {
+    animation: cta-pointer-tap 4.5s ease-in-out 1700ms infinite;
+  }
+
+  .screen--attract.is-active #start-button:active .cta-pointer,
+  .screen--attract.is-active #start-button.is-pressing .cta-pointer {
+    animation-play-state: paused;
+    opacity: 0;
+  }
+
+  /* Independent glow pulse on the button itself, looping on its own cadence
+     regardless of the tap gesture above. */
+  .screen--attract.is-active #start-button {
+    animation: cta-pulse-glow 1.5s ease-in-out infinite;
+  }
+
+  .screen--attract.is-active #start-button:active,
+  .screen--attract.is-active #start-button.is-pressing {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes cta-pulse-glow {
+  0% {
+    box-shadow: 0 10px 28px rgba(42, 68, 111, 0.22), 0 0 0 0 rgba(0, 85, 212, 0.6);
+  }
+
+  100% {
+    box-shadow: 0 10px 28px rgba(42, 68, 111, 0.22), 0 0 0 48px rgba(0, 85, 212, 0);
+  }
+}
+
+@keyframes cta-pointer-tap {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--cta-pointer-start-x), var(--cta-pointer-start-y)) scale(0.8);
+  }
+
+  18% {
+    opacity: 1;
+    transform: translate(var(--cta-pointer-end-x), var(--cta-pointer-end-y)) scale(1);
+  }
+
+  30% {
+    transform: translate(calc(var(--cta-pointer-end-x) - 8px), calc(var(--cta-pointer-end-y) - 14px)) scale(0.94);
+  }
+
+  40% {
+    transform: translate(var(--cta-pointer-end-x), var(--cta-pointer-end-y)) scale(1);
+  }
+
+  55% {
+    opacity: 1;
+    transform: translate(var(--cta-pointer-end-x), var(--cta-pointer-end-y)) scale(1);
+  }
+
+  70% {
+    opacity: 0;
+    transform: translate(var(--cta-pointer-start-x), var(--cta-pointer-start-y)) scale(0.8);
+  }
+}
+
+.screen--menu.is-active .module-carousel {
+  animation: screen-lift-in 940ms var(--ease-out) 560ms backwards;
+}
+
+.screen--menu.is-active .module-carousel__pagination {
+  animation: screen-rise-in 800ms var(--ease-out) 820ms backwards;
+}
+
+.screen--menu.is-leaving .module-carousel__pagination {
+  animation: screen-rise-out 280ms ease forwards;
+}
+
+.screen--menu.is-leaving .module-carousel {
+  animation: screen-lift-out 300ms ease forwards;
+}
+
+@keyframes reveal-word-in {
+  from {
+    transform: translateY(118%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-word-out {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-118%);
+  }
+}
+
+@keyframes reveal-char-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-char-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes screen-rise-in {
+  from {
+    opacity: 0;
+    filter: blur(16px);
+    transform: translateY(90px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes screen-rise-out {
+  to {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(-70px);
+  }
+}
+
+@keyframes screen-lift-in {
+  from {
+    opacity: 0;
+    transform: translateY(110px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes screen-lift-out {
+  to {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.99);
+  }
+}
+
+@keyframes attract-chip-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes attract-chip-out {
+  to {
+    opacity: 0;
+    transform: translate(-50%, -58%) scale(0.94);
+  }
+}
+
+@keyframes attract-chip-float {
+  0%,
+  100% {
+    transform: translateY(-34px) rotate(-0.6deg);
+  }
+
+  50% {
+    transform: translateY(34px) rotate(0.6deg);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}

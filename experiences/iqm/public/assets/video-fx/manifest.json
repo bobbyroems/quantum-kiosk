@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "clips": {
+    "electricity-pulsing-p3-add": {
+      "id": "electricity-pulsing-p3-add",
+      "file": "electricity-pulsing-p3-add.webm",
+      "bytes": 3421786,
+      "layout": "alpha-webm",
+      "blend": "plus-lighter",
+      "codec": "vp9-luma-alpha",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 1278,
+        "y": 1408,
+        "width": 2722,
+        "height": 1010
+      },
+      "color": {
+        "width": 1436,
+        "height": 532
+      },
+      "decoded": {
+        "width": 1436,
+        "height": 532
+      },
+      "premultiplied": false,
+      "fps": 30,
+      "duration": 36.17,
+      "source": {
+        "name": "Electricity-Pulsing_P3-ADD.mxf",
+        "bytes": 11329246828,
+        "modifiedAt": 1787584595242.918,
+        "pixelFormat": "yuva444p12le"
+      },
+      "encode": {
+        "crf": 18,
+        "preset": "slow",
+        "stageWidth": 2160,
+        "oversample": 1
+      }
+    },
+    "electricity-shapes-loop": {
+      "id": "electricity-shapes-loop",
+      "file": "electricity-shapes-loop.webm",
+      "bytes": 333921,
+      "layout": "alpha-webm",
+      "blend": "plus-lighter",
+      "codec": "vp9-luma-alpha",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 1358,
+        "y": 1250,
+        "width": 2738,
+        "height": 1180
+      },
+      "color": {
+        "width": 1444,
+        "height": 622
+      },
+      "decoded": {
+        "width": 1444,
+        "height": 622
+      },
+      "premultiplied": false,
+      "fps": 30,
+      "duration": 2.17,
+      "source": {
+        "name": "Electricity_Shapes_LOOP.mxf",
+        "bytes": 123075144,
+        "modifiedAt": 1787582171389.665,
+        "pixelFormat": "yuva444p12le"
+      },
+      "encode": {
+        "crf": 18,
+        "preset": "slow",
+        "stageWidth": 2160,
+        "oversample": 1
+      }
+    },
+    "tpt-add-on-fx": {
+      "id": "tpt-add-on-fx",
+      "file": "tpt-add-on-fx.webm",
+      "bytes": 7805199,
+      "layout": "alpha-webm",
+      "codec": "vp9-alpha",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 172,
+        "y": 1190,
+        "width": 3924,
+        "height": 2108
+      },
+      "color": {
+        "width": 2070,
+        "height": 1112
+      },
+      "decoded": {
+        "width": 2070,
+        "height": 1112
+      },
+      "premultiplied": false,
+      "fps": 30,
+      "duration": 50,
+      "source": {
+        "name": "TPT_Add-on-FX.mxf",
+        "bytes": 20488663040,
+        "modifiedAt": 1787589580859.0964,
+        "pixelFormat": "yuva444p12le"
+      },
+      "encode": {
+        "crf": 18,
+        "preset": "slow",
+        "stageWidth": 2160,
+        "oversample": 1
+      }
+    },
+    "tpt-base-layer": {
+      "id": "tpt-base-layer",
+      "file": "tpt-base-layer.webp",
+      "bytes": 1959298,
+      "layout": "still",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 397,
+        "y": 1428,
+        "width": 3581,
+        "height": 1650
+      },
+      "source": {
+        "name": "TPT_Base-Layer.png",
+        "bytes": 2902209,
+        "modifiedAt": 1787623838715.6968,
+        "pixelFormat": "rgba"
+      },
+      "encode": {
+        "codec": "libwebp",
+        "lossless": true,
+        "compressionLevel": 6
+      }
+    },
+    "tpt-device-fade-top": {
+      "id": "tpt-device-fade-top",
+      "file": "tpt-device-fade-top.webm",
+      "bytes": 475371,
+      "layout": "alpha-webm",
+      "codec": "vp9-alpha",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 386,
+        "y": 1406,
+        "width": 3614,
+        "height": 1680
+      },
+      "color": {
+        "width": 1906,
+        "height": 886
+      },
+      "decoded": {
+        "width": 1906,
+        "height": 886
+      },
+      "premultiplied": false,
+      "fps": 30,
+      "duration": 1.23,
+      "source": {
+        "name": "TPT_DeviceFadeTop.mxf",
+        "bytes": 220664904,
+        "modifiedAt": 1787582290163.2485,
+        "pixelFormat": "yuva444p12le"
+      },
+      "encode": {
+        "crf": 18,
+        "preset": "slow",
+        "stageWidth": 2160,
+        "oversample": 1
+      }
+    },
+    "tpt-h-bar": {
+      "id": "tpt-h-bar",
+      "file": "tpt-h-bar.webp",
+      "bytes": 107452,
+      "layout": "still",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 1546,
+        "y": 1683,
+        "width": 1463,
+        "height": 601
+      },
+      "source": {
+        "name": "TPT_H-Bar.png",
+        "bytes": 3322677,
+        "modifiedAt": 1787623852781.0146,
+        "pixelFormat": "rgba"
+      },
+      "encode": {
+        "codec": "libwebp",
+        "lossless": true,
+        "compressionLevel": 6
+      }
+    },
+    "tpt-intro-reveal-short": {
+      "id": "tpt-intro-reveal-short",
+      "file": "tpt-intro-reveal-short.webm",
+      "bytes": 1103808,
+      "layout": "alpha-webm",
+      "codec": "vp9-alpha",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 386,
+        "y": 1406,
+        "width": 3614,
+        "height": 1680
+      },
+      "color": {
+        "width": 1906,
+        "height": 886
+      },
+      "decoded": {
+        "width": 1906,
+        "height": 886
+      },
+      "premultiplied": false,
+      "fps": 30,
+      "duration": 4.47,
+      "source": {
+        "name": "TPT_Intro-Reveal_SHORT.mxf",
+        "bytes": 1589046344,
+        "modifiedAt": 1787582513880.6802,
+        "pixelFormat": "yuva444p12le"
+      },
+      "encode": {
+        "crf": 18,
+        "preset": "slow",
+        "stageWidth": 2160,
+        "oversample": 1
+      }
+    },
+    "tpt-layer-over-particle-a": {
+      "id": "tpt-layer-over-particle-a",
+      "file": "tpt-layer-over-particle-a.webp",
+      "bytes": 2973106,
+      "layout": "still",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 395,
+        "y": 1415,
+        "width": 3597,
+        "height": 1601
+      },
+      "source": {
+        "name": "TPT_LayerOverParticleA.png",
+        "bytes": 13051662,
+        "modifiedAt": 1787623870033.7168,
+        "pixelFormat": "rgba"
+      },
+      "encode": {
+        "codec": "libwebp",
+        "lossless": true,
+        "compressionLevel": 6
+      }
+    },
+    "tpt-outro-de-reveal-short": {
+      "id": "tpt-outro-de-reveal-short",
+      "file": "tpt-outro-de-reveal-short.webm",
+      "bytes": 457808,
+      "layout": "alpha-webm",
+      "codec": "vp9-alpha",
+      "frame": {
+        "width": 4096,
+        "height": 4096
+      },
+      "crop": {
+        "x": 386,
+        "y": 1406,
+        "width": 3614,
+        "height": 1680
+      },
+      "color": {
+        "width": 1906,
+        "height": 886
+      },
+      "decoded": {
+        "width": 1906,
+        "height": 886
+      },
+      "premultiplied": false,
+      "fps": 30,
+      "duration": 1.63,
+      "source": {
+        "name": "TPT_Outro-DeReveal_SHORT.mxf",
+        "bytes": 577795144,
+        "modifiedAt": 1787584820799.5098,
+        "pixelFormat": "yuva444p12le"
+      },
+      "encode": {
+        "crf": 18,
+        "preset": "slow",
+        "stageWidth": 2160,
+        "oversample": 1
+      }
+    }
+  }
+}

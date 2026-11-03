@@ -1,0 +1,26 @@
+{
+  "name": "quantum-experience-launcher",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline MAGNE and IQM experience launcher with one shared Electron shell",
+  "main": "electron\\main.cjs",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --windowed",
+    "build": "node scripts\\build.cjs",
+    "test": "node scripts\\test-shell.cjs",
+    "test:experiences": "node scripts\\check-experiences.cjs",
+    "experience:import": "node scripts\\experience-import.cjs",
+    "smoke": "electron scripts\\electron-smoke.cjs --windowed",
+    "smoke:production": "electron scripts\\electron-smoke.cjs --production"
+  },
+  "devDependencies": {
+    "electron": "39.2.7"
+  },
+  "allowScripts": {
+    "electron@39.2.7": true
+  }
+}

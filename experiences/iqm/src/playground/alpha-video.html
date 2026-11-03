@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!-- This page sits under src/ rather than alongside the standalone demos in
+     /playground/ because it imports project source: the dev server is rooted at
+     src/, so nothing outside it is served. Vite only builds src/index.html, so
+     it stays a development page and never reaches dist/.
+
+     assetUrl resolves against document.baseURI and this page is one level down,
+     so without the base the manifest would be looked for under
+     /playground/assets/ instead of the served public root. -->
+<base href="/" />
+<title>Alpha Video Playground — packed-alpha clip check</title>
+<style>
+  :root {
+    --panel: #14171c;
+    --ink: #e8ecf1;
+    --muted: #8a94a3;
+    --accent: #4da3ff;
+  }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #0b0d10;
+    color: var(--ink);
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+
+  #layout { display: flex; height: 100%; }
+
+  #controls {
+    width: 300px;
+    flex: none;
+    padding: 20px;
+    background: var(--panel);
+    overflow-y: auto;
+    border-right: 1px solid #23282f;
+  }
+
+  h1 { font-size: 15px; margin: 0 0 4px; letter-spacing: 0.02em; }
+  .hint { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0 0 18px; }
+
+  fieldset { border: 1px solid #23282f; border-radius: 6px; margin: 0 0 16px; padding: 12px; }
+  legend { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 6px; }
+
+  label { display: block; font-size: 13px; margin: 6px 0; cursor: pointer; }
+  label input { margin-right: 8px; }
+
+  button {
+    background: #222831;
+    color: var(--ink);
+    border: 1px solid #333c47;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    margin: 0 6px 6px 0;
+  }
+  button:hover { border-color: var(--accent); }
+
+  #facts { font-size: 12px; color: var(--muted); line-height: 1.7; }
+  #facts b { color: var(--ink); font-weight: 600; }
+
+  #viewport {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    min-width: 0;
+  }
+
+  /* Stands in for the square composition every master was authored inside.
+     Clips position themselves within it from their manifest crop, so anything
+     misplaced here is misplaced on the kiosk too. */
+  #composition {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    max-width: min(100%, calc(100vh - 48px));
+    width: 100%;
+    outline: 1px dashed #2c333c;
+  }
+
+  .bg-checker {
+    background-image:
+      linear-gradient(45deg, #2a2f36 25%, transparent 25%),
+      linear-gradient(-45deg, #2a2f36 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #2a2f36 75%),
+      linear-gradient(-45deg, transparent 75%, #2a2f36 75%);
+    background-size: 48px 48px;
+    background-position: 0 0, 0 24px, 24px -24px, -24px 0;
+    background-color: #1b2027;
+  }
+  .bg-grey { background: #808080; }
+  .bg-white { background: #ffffff; }
+  .bg-brand { background: radial-gradient(circle at 50% 40%, #1b3a72, #070c18); }
+
+  #packed-view {
+    display: none;
+    max-width: 100%;
+    max-height: calc(100vh - 48px);
+    image-rendering: pixelated;
+    outline: 1px solid #2c333c;
+  }
+  body.show-packed #composition { display: none; }
+  body.show-packed #packed-view { display: block; }
+
+  #status { font-size: 12px; color: var(--muted); margin-top: 10px; min-height: 1.5em; }
+  #status.error { color: #ff8080; }
+</style>
+</head>
+<body>
+<div id="layout">
+  <div id="controls">
+    <h1>Alpha clips</h1>
+    <p class="hint">
+      Clips carry a real alpha channel (VP9 WebM, composited by the browser) or
+      stack colour over matte in one frame (H.264, recombined by a shader). The
+      manifest says which, and the player picks the path. Switch the backdrop to
+      check the matte: a correct clip shows no rectangle edge, no bright fringe
+      on soft falloff, and no dark halo.
+    </p>
+
+    <fieldset>
+      <legend>Clip</legend>
+      <div id="clip-list"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Backdrop</legend>
+      <label><input type="radio" name="bg" value="bg-checker" checked /> Checkerboard</label>
+      <label><input type="radio" name="bg" value="bg-grey" /> Mid grey</label>
+      <label><input type="radio" name="bg" value="bg-white" /> White</label>
+      <label><input type="radio" name="bg" value="bg-brand" /> Brand blue</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Playback</legend>
+      <button id="play">Play</button>
+      <button id="pause">Pause</button>
+      <button id="restart">Restart</button>
+      <label><input type="checkbox" id="loop" checked /> Loop</label>
+      <label><input type="checkbox" id="packed" /> Show the raw decoded frame</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Manifest</legend>
+      <div id="facts">Loading…</div>
+    </fieldset>
+
+    <div id="status"></div>
+  </div>
+
+  <div id="viewport">
+    <div id="composition" class="bg-checker"></div>
+    <video id="packed-view" muted playsinline loop></video>
+  </div>
+</div>
+
+<script type="module">
+import { createAlphaVideo, loadAlphaVideoManifest, placementOf } from '/js/core/alpha-video.js'
+
+const composition = document.querySelector('#composition')
+const packedView = document.querySelector('#packed-view')
+const clipList = document.querySelector('#clip-list')
+const facts = document.querySelector('#facts')
+const status = document.querySelector('#status')
+const loopToggle = document.querySelector('#loop')
+
+let manifest = null
+let current = null
+
+function report(message, isError = false) {
+  status.textContent = message
+  status.classList.toggle('error', isError)
+}
+
+function describe(clip) {
+  const megabytes = (clip.bytes / 1_000_000).toFixed(1)
+  const coverage = ((clip.crop.width * clip.crop.height) / (clip.frame.width * clip.frame.height) * 100).toFixed(1)
+  const placement = placementOf(clip)
+  facts.innerHTML = `
+    <div>source <b>${clip.source.name}</b></div>
+    <div>frame <b>${clip.frame.width}×${clip.frame.height}</b> ${clip.source.pixelFormat}</div>
+    <div>crop <b>${clip.crop.width}×${clip.crop.height}</b> at ${clip.crop.x},${clip.crop.y} (${coverage}%)</div>
+    <div>layout <b>${clip.layout ?? 'over-under'}</b> (${clip.codec ?? 'h264-packed'})</div>
+    <div>decoded frame <b>${clip.decoded.width}×${clip.decoded.height}</b></div>
+    <div>placement <b>${(placement.left * 100).toFixed(1)}%, ${(placement.top * 100).toFixed(1)}%</b></div>
+    <div>duration <b>${clip.duration?.toFixed(2) ?? '?'}s</b> at ${clip.fps}fps</div>
+    <div>size <b>${megabytes} MB</b></div>
+  `
+}
+
+async function select(id) {
+  current?.dispose()
+  current = null
+  report(`Loading ${id}…`)
+  try {
+    current = await createAlphaVideo({
+      manifest,
+      id,
+      container: composition,
+      loop: loopToggle.checked,
+      autoplay: true
+    })
+    packedView.src = current.video.src
+    packedView.play().catch(() => {})
+    describe(manifest.clips[id])
+    report(`Playing ${id}`)
+  } catch (error) {
+    report(error.message, true)
+  }
+}
+
+try {
+  manifest = await loadAlphaVideoManifest()
+  const ids = Object.keys(manifest.clips)
+  if (!ids.length) throw new Error('The manifest lists no clips — run npm run pack:alpha-video first.')
+
+  for (const [index, id] of ids.entries()) {
+    const label = document.createElement('label')
+    const radio = document.createElement('input')
+    radio.type = 'radio'
+    radio.name = 'clip'
+    radio.value = id
+    radio.checked = index === 0
+    radio.addEventListener('change', () => select(id))
+    label.append(radio, document.createTextNode(id))
+    clipList.append(label)
+  }
+  await select(ids[0])
+} catch (error) {
+  report(error.message, true)
+}
+
+for (const radio of document.querySelectorAll('input[name="bg"]')) {
+  radio.addEventListener('change', () => {
+    composition.className = radio.value
+  })
+}
+
+document.querySelector('#play').addEventListener('click', () => current?.play())
+document.querySelector('#pause').addEventListener('click', () => current?.pause())
+document.querySelector('#restart').addEventListener('click', async () => {
+  if (!current) return
+  await current.seek(0)
+  await current.play()
+})
+loopToggle.addEventListener('change', () => {
+  if (current) current.video.loop = loopToggle.checked
+})
+document.querySelector('#packed').addEventListener('change', event => {
+  document.body.classList.toggle('show-packed', event.target.checked)
+})
+</script>
+</body>
+</html>

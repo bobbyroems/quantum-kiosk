@@ -1,0 +1,1995 @@
+.qvc,
+.qvc * {
+  box-sizing: border-box;
+}
+
+.qvc {
+  --qvc-ink: #2a446f;
+  --qvc-muted: #657489;
+  --qvc-blue: #0078d4;
+  --qvc-surface: #f4f3f5;
+  --qvc-gradient: linear-gradient(130deg, #2a446f 18%, #185998 50%, #1163ab 64%, #0078d4 92%);
+  /* The flat blue the principle pills are drawn in on the 25 Aug board. */
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  /* Soft aurora wash (same family as the main carousel screen) instead
+     of a flat surface. */
+  background:
+    radial-gradient(1500px 1300px at 16% 10%, rgba(255, 227, 238, 0.6), transparent 62%),
+    radial-gradient(1700px 1500px at 86% 26%, rgba(217, 235, 252, 0.75), transparent 66%),
+    radial-gradient(1600px 1400px at 50% 92%, rgba(233, 240, 250, 0.6), transparent 70%),
+    var(--qvc-surface);
+  color: var(--qvc-ink);
+  font-family: var(--font-text);
+  isolation: isolate;
+  touch-action: none;
+}
+
+.qvc[data-view='menu'] {
+  background: #f4f3f5;
+}
+
+/* Minimal reset only: each button class declares its own colors, so this
+   must stay lower-specificity than them (no color/background here). */
+.qvc button {
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.qvc__utility-action,
+.qvc-game__replay,
+.qvc__brand button {
+  background: transparent;
+}
+
+.qvc__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Module-specific surface treatment only; shared kiosk classes own the exact
+   header, brand and action geometry used by navigation and every module. */
+.qvc__header {
+  z-index: 30;
+  width: 100%;
+  border-bottom: 2px solid #d9e0e8;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 2px 4px rgba(21, 38, 64, 0.08);
+}
+
+.qvc__brand {
+  color: #52657c;
+}
+
+.qvc__brand-rule {
+  background: #8a95a4;
+}
+
+.qvc__utility-action:active {
+  background: var(--header-action-bg-active);
+}
+
+/* On the sub-menu there is nothing to go back to or restart yet —
+   only Exit applies until a game is open. */
+.qvc[data-view='menu'] .qvc__utility-action--back,
+.qvc[data-view='menu'] [data-qvc-action='restart'] {
+  display: none;
+}
+
+.qvc__experience {
+  position: absolute;
+  z-index: 1;
+  inset: 120px 0 0;
+  overflow: hidden;
+}
+
+/* Renderer creation is intentionally performed behind this module-local
+   scene cover. It is a transition layer, not an explainer surface: the cover
+   keeps the outgoing frame visually stable until the next WebGL canvas has
+   produced its first complete frame. */
+.qvc__transition {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.98) 0 12%, rgba(229, 239, 250, 0.96) 38%, rgba(244, 243, 245, 1) 72%),
+    var(--qvc-surface);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.025);
+  transition:
+    opacity 220ms cubic-bezier(0.32, 0, 0.2, 1),
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Figma 255:4013 "Sub-Module Loding Screen". The cover names where the visitor
+   is going and lets a spinner say it is loading — it used to prefix that with
+   "Opening" / "Returning to", which the board does not draw.
+
+   The two rows are placed at the board's own offsets. This layer sits inside
+   .qvc__experience, which already starts 120px down, so each is the frame
+   coordinate less that header. */
+.qvc__transition-content {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(90px);
+  transition:
+    opacity 180ms ease,
+    transform 440ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qvc__transition-title {
+  position: absolute;
+  top: 739px;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* The board's 95px between the end of the word and the spinner. */
+  gap: 95px;
+  margin: 0;
+  color: var(--band-ink);
+  font-family: var(--font-display);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.33;
+  white-space: nowrap;
+}
+
+.qvc__transition-spinner {
+  display: block;
+  width: 120px;
+  height: 120px;
+  flex: 0 0 auto;
+  color: var(--band-deep);
+  animation: qvc-transition-spin 900ms linear infinite;
+}
+
+.qvc__transition-spinner svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes qvc-transition-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.qvc__transition-path {
+  position: absolute;
+  top: 1167px;
+  right: 0;
+  left: 0;
+}
+
+.qvc[data-transition='covering'] .qvc__transition {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.qvc[data-transition='covering'] .qvc__transition-content {
+  opacity: 1;
+  transform: none;
+}
+
+.qvc[data-transition='revealing'] .qvc__transition {
+  opacity: 0;
+  transform: scale(0.985);
+  transition:
+    opacity 220ms cubic-bezier(0.32, 0, 0.2, 1) 100ms,
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qvc[data-transition='revealing'] .qvc__transition-content {
+  opacity: 0;
+  transform: translateY(-44px);
+  transition:
+    opacity 90ms ease,
+    transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qvc[data-transition-target='entanglement'] [data-qvc-transition-step='superposition'],
+.qvc[data-transition-target='interference'] [data-qvc-transition-step='superposition'],
+.qvc[data-transition-target='interference'] [data-qvc-transition-step='entanglement'] {
+  opacity: 0.76;
+}
+
+.qvc.is-transitioning .qvc__menu,
+.qvc.is-transitioning .qvc__game-host {
+  pointer-events: none;
+}
+
+/* During a sub-module handoff the complete band leaves behind the fixed
+   header, changes its contents offscreen, and returns after the transition
+   cover has gone. This keeps the two shared 1-2-3 controls from overlapping
+   without exposing an empty teal bar or the module title between them. */
+.qvc .kiosk-module-band {
+  transform: translateY(0);
+  transition: transform 180ms cubic-bezier(0.32, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.qvc .kiosk-module-band.qvc-module-band--withdrawn {
+  transform: translateY(calc(-100% - var(--band-top)));
+}
+
+/* The band travels upward behind the persistent header, not across its face. */
+.qvc.is-transitioning .qvc__header {
+  z-index: 50;
+}
+
+/* ============ Sub-menu (Figma 506:2224) ============ */
+
+.qvc__menu {
+  position: absolute;
+  inset: 0;
+}
+
+/* Back precomposes the retained WebGL layers beneath the still-visible game.
+   A nonzero opacity keeps them paintable without exposing duplicate UI. */
+.qvc__menu.is-preparing {
+  opacity: 0.001;
+  pointer-events: none;
+}
+
+.qvc__menu[hidden],
+.qvc__game-host[hidden] {
+  display: none !important;
+}
+
+/* Unified copy block: one heading + sub-copy definition shared by the
+   sub-menu and every game masthead — change here, changes everywhere. */
+.qvc-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 144px;
+  width: 1400px;
+  text-align: center;
+}
+
+.qvc-copy h2 {
+  margin: 0;
+  color: var(--qvc-ink);
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.qvc-copy p {
+  align-self: center;
+  width: 1200px;
+  margin: 0;
+  color: var(--qvc-ink);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/*
+ * Nothing in this module may sit in the bottom 30% of the stage (below stage
+ * y 2688, which is y 2468 here inside .qvc__experience). The menu column is
+ * compressed upward to fit copy, cards, hint and outro above that line.
+ */
+/* Figma 255:3750 "Copy Box": centred at x480/y500, 1200 wide, both lines in
+   Dimensional/Blue Black rather than the navy the rest of the module uses. */
+.qvc__menu-copy {
+  position: absolute;
+  top: 500px;
+  left: 480px;
+  gap: 80px;
+  width: 1200px;
+  margin: 0;
+}
+
+.qvc__menu-copy h2 {
+  width: 1200px;
+  color: var(--band-ink);
+  font-size: 96px;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
+.qvc__menu-copy p {
+  width: 1200px;
+  color: var(--band-ink);
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* The current Figma has no cards: each tappable principle is an authored
+   asset floating over a soft contact shadow with its CTA below. */
+.qvc__menu-cards {
+  position: absolute;
+  top: 1602px;
+  left: 224.9135px;
+  width: 1710.0002px;
+  height: 891.0146px;
+}
+
+.qvc__menu-card {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  touch-action: manipulation;
+}
+
+.qvc__menu-card--superposition {
+  top: 8.6813px;
+  left: 0;
+  width: 465px;
+  height: 882.3334px;
+}
+
+.qvc__menu-card--entanglement {
+  top: 353.0829px;
+  left: 625px;
+  width: 500.0003px;
+  height: 537.9318px;
+}
+
+.qvc__menu-card--interference {
+  top: 0;
+  left: 1285.0002px;
+  width: 425px;
+  height: 891.0146px;
+}
+
+.qvc__menu-card:active {
+  filter: brightness(1.035);
+}
+
+/* A principle the visitor has not earned their way to yet. It stays in place
+   and stays readable — the three are meant to be seen as a sequence, and
+   hiding two of them would lose that — but it is desaturated and dimmed so it
+   plainly is not the thing to tap, and the press highlight is withheld. */
+/* The board fades the whole principle — visual and button together — to 40%
+   and swaps the button to a flat grey, rather than desaturating the teal. */
+.qvc__menu-card[data-locked="true"] {
+  opacity: 0.4;
+  cursor: default;
+  transition: opacity 480ms ease;
+}
+
+.qvc__menu-card[data-locked="true"] .qvc__principle {
+  background: #626262;
+}
+
+.qvc__menu-card[data-locked="false"] {
+  transition: opacity 480ms ease;
+}
+
+.qvc__menu-card-scene {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+  touch-action: none;
+}
+
+.qvc__menu-card--superposition .qvc__menu-card-scene {
+  top: 0;
+  left: 114px;
+  width: 237px;
+  height: 577px;
+}
+
+.qvc__menu-card--entanglement .qvc__menu-card-scene {
+  top: 0;
+  left: 0;
+  width: 500px;
+  height: 232.5984px;
+}
+
+.qvc__menu-card--interference .qvc__menu-card-scene {
+  top: 0;
+  left: 77.5px;
+  width: 270px;
+  height: 611.6813px;
+}
+
+.qvc__menu-render,
+.qvc__menu-poster,
+.qvc__menu-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.qvc__menu-render {
+  background: transparent;
+}
+
+/* WebGL needs vertical breathing room beyond the authored asset bounds: the
+   coins rotate into silhouettes taller than their static Figma thumbnails.
+   Each padded canvas keeps the original visual centre and pixels-per-unit. */
+.qvc__menu-card--superposition .qvc__menu-render {
+  top: -111.5px;
+  bottom: auto;
+  height: 800px;
+}
+
+.qvc__menu-card--entanglement .qvc__menu-render {
+  top: -80px;
+  bottom: auto;
+  height: 392.5984px;
+}
+
+.qvc__menu-canvas {
+  background: transparent !important;
+  opacity: 0;
+}
+
+.qvc__menu-poster {
+  background: transparent;
+  opacity: 0;
+}
+
+.qvc__menu-canvas.is-ready {
+  opacity: 1;
+}
+
+.qvc__menu-render.is-context-lost .qvc__menu-poster {
+  opacity: 1;
+}
+
+.qvc__menu-render.is-context-lost .qvc__menu-canvas {
+  opacity: 0;
+}
+
+.qvc__menu-shadow {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  border-radius: 50%;
+  background: rgba(75, 99, 163, 0.34);
+  filter: blur(18px);
+  transform-origin: center;
+  will-change: opacity, transform;
+}
+
+.qvc__menu-card--superposition .qvc__menu-shadow {
+  top: 558px;
+  left: 6px;
+  width: 231px;
+  height: 19px;
+  animation: qvc-menu-shadow-breathe 4.8s cubic-bezier(0.37, 0, 0.22, 1) infinite alternate;
+}
+
+.qvc__menu-card--entanglement .qvc__menu-shadow {
+  top: 211.0964px;
+  left: 35.0418px;
+  width: 441.204px;
+  height: 21.5027px;
+  animation: qvc-menu-shadow-breathe 4.6s cubic-bezier(0.37, 0, 0.22, 1) infinite alternate;
+}
+
+.qvc__menu-card--interference .qvc__menu-shadow {
+  top: 563.5279px;
+  left: 78.2657px;
+  width: 114.4221px;
+  height: 22.8844px;
+  animation: qvc-menu-buoy-shadow 4.2s cubic-bezier(0.37, 0, 0.22, 1) infinite alternate;
+}
+
+/* Microsoft Q-gradient CTAs, positioned to the source frame. */
+/* The pill IQM drew on 25 Aug: one flat blue, the name against the left edge
+   and a chevron in a soft disc against the right, rather than a centred label
+   on a gradient. */
+.qvc__principle {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  height: 140px;
+  padding: 0 48px;
+  border-radius: 16px;
+  background: var(--band-deep);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 50px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  transition:
+    filter 100ms ease-out,
+    transform 140ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.qvc__principle-label {
+  white-space: nowrap;
+}
+
+/* White at a fifth over whatever the pill is, so the disc reads the same on the
+   blue and on the grey a locked principle is desaturated to. */
+.qvc__principle-icon {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 81.0475px;
+  height: 81.0475px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.qvc__principle-icon img {
+  display: block;
+  width: 60.7856px;
+  height: 60.7856px;
+}
+
+.qvc__menu-card--superposition .qvc__principle {
+  top: 749px;
+  /* The board's own width and offset: wider than before to seat the chevron
+     disc, and pulled left by half that growth so the pill stays centred on the
+     visual above it. */
+  left: -23.5238px;
+  width: 512.0475px;
+}
+
+.qvc__menu-card--entanglement .qvc__principle {
+  top: 404.5984px;
+  left: 0;
+  width: 508.0475px;
+}
+
+.qvc__menu-card--interference .qvc__principle {
+  top: 757.6813px;
+  left: -23.5237px;
+  width: 472.0475px;
+}
+
+.qvc__menu-card:active .qvc__principle {
+  filter: brightness(1.12);
+  transform: scale(0.985);
+}
+
+/* The placement box for the shared 1-2-3 (core/sub-module-nav.js). The board
+   puts the control between the copy and the cards it introduces; this screen's
+   copy and cards sit tighter than the board's, so it keeps this screen's own
+   offset and only the control inside it is the board's. 100px is the circle. */
+.qvc__sequence {
+  position: absolute;
+  z-index: 3;
+  inset: 1287px 0 auto;
+  height: 100px;
+  pointer-events: none;
+}
+
+/* Figma 572:838, "Action Callout", from the Sub Menu Selection Screen. It
+   reuses the shared tooltip markup while keeping this screen's light variant. */
+@keyframes qvc-menu-shadow-breathe {
+  from {
+    opacity: 0.84;
+    transform: scaleX(1.07);
+  }
+
+  to {
+    opacity: 0.66;
+    transform: scaleX(0.97);
+  }
+}
+
+@keyframes qvc-menu-buoy-shadow {
+  from {
+    opacity: 0.84;
+    transform: scaleX(1.12);
+  }
+
+  to {
+    opacity: 0.6;
+    transform: scaleX(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qvc__menu-shadow {
+    animation: none;
+  }
+
+  .qvc[data-transition] .qvc__transition,
+  .qvc[data-transition] .qvc__transition-content {
+    transition-duration: 80ms;
+    transition-delay: 0ms;
+  }
+
+  .qvc__transition-content {
+    transform: none !important;
+  }
+
+  .qvc .kiosk-module-band {
+    transition-duration: 80ms;
+  }
+}
+
+/* ============ Shared game chrome ============ */
+
+.qvc__game-host,
+.qvc-game {
+  position: absolute;
+  inset: 0;
+}
+
+/* The bottom quarter of the tall panel is out of comfortable reach; the
+   playfield and every control live in the top 75%. */
+.qvc-game__scene {
+  position: absolute;
+  inset: 0 0 26%;
+  touch-action: none;
+}
+
+.qvc-game__canvas {
+  display: block;
+  background: transparent !important;
+  opacity: 0;
+  outline: 0;
+}
+
+.qvc-game__canvas.is-ready {
+  opacity: 1;
+}
+
+/* ============ Superposition (Figma 1:2578) ============ */
+
+/*
+ * The authored sequence moves one copy block and one hint pill around the coin
+ * rather than showing several panels at once. `data-place` picks the band:
+ * "high" reads above the resting coin, "low" drops below the airborne one so
+ * bullet time never narrates over the thing it is describing.
+ *
+ * Offsets are measured inside .qvc__experience, which starts 120px down the
+ * stage under the header — subtract that from any figure read off the Figma
+ * frame. The authored coin also sits ~500px lower than this build's camera puts
+ * it, so the arrangement is honoured while the spacing follows the real render.
+ */
+.qvc-flip__copy,
+.qvc-flip__hint,
+.qvc-flip__result,
+.qvc-flip__tally {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.qvc-flip__copy {
+  display: flex;
+  width: 1200px;
+  flex-direction: column;
+  align-items: center;
+  gap: 80px;
+  padding: 60px;
+  text-align: center;
+}
+
+.qvc-flip[data-place='high'] .qvc-flip__copy {
+  top: 340px;
+}
+
+/* Sits just under the airborne coin rather than down by the readout — the gap
+   between the two left the narration stranded at the bottom of the stage. */
+.qvc-flip[data-place='low'] .qvc-flip__copy {
+  top: 1400px;
+}
+
+.qvc-flip__title {
+  margin: 0;
+  color: #091f2c;
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.qvc-flip__title[hidden] {
+  display: none;
+}
+
+/* The measure every other body of copy in the build uses: .qvc-pair__body in
+   this same module and .som__info-copy p in Module 03, all at 60px type. It is
+   also exactly what the container affords -- .qvc-flip__copy is 1200px with
+   60px of padding and border-box sizing -- so 880 was leaving 200px of the
+   block unused. That went unnoticed while these two stages had no body copy;
+   once the document's paragraphs went in, every one of them ran a line longer
+   than it needed to. */
+.qvc-flip__body {
+  width: 1080px;
+  margin: 0;
+  color: #091f2c;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* Two of the 25 Aug stages set their copy as a pair of paragraphs rather than
+   one block. They are spans inside the existing <p> rather than nested
+   paragraphs, which would not be valid, and the gap only appears between them
+   so a single-paragraph stage is unchanged. */
+.qvc-flip__body-line {
+  display: block;
+}
+
+.qvc-flip__body-line + .qvc-flip__body-line {
+  margin-top: 36px;
+}
+
+/* The one phrase the design sets in accent blue. */
+.qvc-flip__accent {
+  color: #0078d4;
+  font-style: normal;
+}
+
+/* Copy and hint cross-fade together on every stage change. */
+.qvc-flip__copy,
+.qvc-flip__hint {
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+/* One pill for this module, not one per game: every callout inside module 01
+   takes it, so the treatment does not change as the visitor moves between the
+   three principles.
+
+   It was mint (#BDDCD2 with #2C5B61 type, sampled off the board) and is now
+   the light grey the Nanoscale splash callout uses, so an instruction pill
+   reads the same wherever the visitor meets one. The mint has not left the
+   module — .qvc-pair__action is still the dark teal it was drawn with.
+
+   All games use the shared kiosk-tooltip. The selectors are three classes
+   deep so they outrank .kiosk-tooltip--light regardless of stylesheet order.
+
+   The band stops the mint needed go with it: grey type takes the shared
+   currentColor sheen from .kiosk-tooltip, the same one Nanoscale gets. */
+.qvc .kiosk-tooltip.kiosk-tooltip--light,
+.kiosk-tooltip.kiosk-tooltip--light.qvc-flip__hint {
+  /* Shorthands override the shared variant and drop the pill's background
+     wipe, matching Nanoscale. */
+  border: 0;
+  background: #f2f4f5;
+  box-shadow: 0 4px 20px rgb(31 55 80 / 0.22);
+  backdrop-filter: none;
+}
+
+.qvc .kiosk-tooltip.kiosk-tooltip--light .kiosk-tooltip__text,
+.kiosk-tooltip.kiosk-tooltip--light.qvc-flip__hint .kiosk-tooltip__text {
+  color: #7c8282;
+}
+
+.qvc-flip.is-copy-in .qvc-flip__copy,
+.qvc-flip.is-copy-in .qvc-flip__hint {
+  opacity: 1;
+}
+
+/* One position for all three stages where the coin is at rest, which is what
+   the Superposition board does — they used to sit at 1300, 1560 and 1000, so
+   the pill jumped around the screen between stages instead of holding its
+   place while the copy above it changed.
+
+   The board puts that shared pill at 1856. It cannot go there here: the coin
+   rests higher in frame in the build than the board draws it, and at 1856 the
+   pill lands on top of the coin rather than introducing it — which is what the
+   comment this replaces had already found.
+
+   So this is measured against where things actually are. The copy ends at 291
+   and the coin's top edge is at 504, in the window the measurement was taken
+   in; centring the pill in that 213px gap puts it at 1360. It clears the
+   tallest of the three copy blocks by 64px and the coin by 95px.
+
+   The mismatch worth settling with design is the coin's rest height, not the
+   pill — fix that and this can go back to the board's own number. */
+.qvc-flip[data-stage='ready'] .qvc-flip__hint,
+.qvc-flip[data-stage='reframed'] .qvc-flip__hint,
+.qvc-flip[data-stage='landed'] .qvc-flip__hint {
+  top: 1230px;
+}
+
+/* Directly under the narration that drops below the airborne coin, roughly a
+   couple of lines beneath it so it reads as belonging to that copy. */
+.qvc-flip[data-stage='bullet'] .qvc-flip__hint {
+  top: 2120px;
+}
+
+/* Landed makes room between the hint and the coin for the result word. */
+
+/* The ready prompt's wipe used to live here, scoped to this one stage. Every
+   tooltip carries it now, so it comes from .kiosk-tooltip in app.css and this
+   game keeps only its placement rules. */
+
+.qvc-flip__result {
+  top: 1450px;
+  color: #225b62;
+  font-size: 128px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  /* Descenders need real line box room — 1.0 cropped the tail of "Tails". */
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 420ms ease 120ms;
+}
+
+.qvc-flip[data-state='landed'] .qvc-flip__result {
+  opacity: 1;
+}
+
+/* Keep the counter row low on the stage, clear of the landed result. */
+.qvc-flip__tally {
+  top: 2570px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  opacity: 0;
+  /* Hidden outright until the first flip, so an all-zero counter is never
+     announced to a screen reader as though it were live. */
+  visibility: hidden;
+  transition: opacity 260ms ease, visibility 0s linear 260ms;
+}
+
+.qvc-flip[data-flipped='true'][data-stage='ready'] .qvc-flip__tally,
+.qvc-flip[data-flipped='true'][data-stage='landed'] .qvc-flip__tally {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 260ms ease, visibility 0s linear 0s;
+}
+
+.qvc-flip__tally-groups {
+  display: flex;
+  gap: 84px;
+  align-items: center;
+}
+
+.qvc-flip__tally-group {
+  display: flex;
+  gap: 34px;
+  align-items: center;
+}
+
+.qvc-flip__tally-label {
+  color: #091f2c;
+  font-family: var(--font-text);
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.qvc-flip__tally-digits {
+  display: flex;
+  gap: 8px;
+}
+
+.qvc-flip__tally-digits.is-counting {
+  animation: qvc-count-pop 460ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Split-flap counter card: two stacked halves that meet at a hairline, lit from
+   above, sitting slightly off the surface. */
+.qvc-flip__tally-digit {
+  position: relative;
+  display: flex;
+  width: 100px;
+  height: 144px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    #3b4450 0%,
+    #2e3742 49.9%,
+    #262d37 50.1%,
+    #1b212a 100%
+  );
+  box-shadow:
+    0 8px 18px rgba(9, 31, 44, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: var(--font-text);
+  font-size: 76px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The seam where the two halves meet. It crosses the digit on purpose — that
+   break is what makes the card read as a flap rather than a printed tile. */
+.qvc-flip__tally-digit::after {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(8, 12, 18, 0.68);
+  content: '';
+  transform: translateY(-50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qvc-flip__copy,
+  .qvc-flip__hint,
+  .qvc-flip__result,
+  .qvc-flip__tally {
+    transition: none;
+  }
+
+  .qvc-flip__tally-digits.is-counting {
+    animation: none;
+  }
+
+  .qvc-flip[data-stage='ready'] .qvc-flip__hint .kiosk-tooltip__text {
+    background-image: none;
+    color: #b1b3b3;
+    animation: none;
+    -webkit-text-fill-color: #b1b3b3;
+  }
+
+  .qvc-flip[data-stage='ready'] .qvc-flip__hint {
+    background-image: none;
+    animation: none;
+  }
+}
+
+/* ============ Entanglement (Figma 1:2579) ============ */
+
+/*
+ * Same staged shape as Superposition: one copy block, one call to action, and
+ * a result row that only the measured stage shows. The pair of coins holds the
+ * middle of the stage throughout, so the copy stays above it and the control
+ * below it rather than either moving between bands.
+ */
+/* Entanglement is the one thing on this screen that cannot be drawn on the
+   coins themselves — they look the same entangled as not. So the stage says
+   it: from the moment the pair are linked the backdrop takes the module's
+   magenta, and keeps it through the measurement.
+
+   Behind everything at z-index 0, and slow enough (900ms) to read as the room
+   changing rather than a flash. */
+.qvc-pair::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  /* Low and light: gathered under the coins rather than washed over the whole
+     screen. The first pass covered the copy too, which turned a tint into a
+     colour cast over the entire module. */
+  background: radial-gradient(
+    86% 42% at 50% 74%,
+    rgba(192, 59, 196, 0.13),
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 900ms ease;
+  pointer-events: none;
+}
+
+/* A latch, not a stage: once the pair are linked the colour stays for the rest
+   of the run, including through another throw. */
+.qvc-pair.is-entangled::before {
+  opacity: 1;
+}
+
+.qvc-pair__lead,
+.qvc-pair__copy,
+.qvc-pair__outcome,
+.qvc-pair__hint {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* The board's upper block, over the coins (Figma 4:3695). Its lead sits at 560
+   on the two stages that name an idea and at 660 on the one that explains it,
+   which is the padding difference below rather than two positions. */
+.qvc-pair__lead {
+  top: 360px;
+  display: flex;
+  width: 1200px;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: 60px;
+  text-align: center;
+  transition: opacity 220ms ease;
+}
+
+.qvc-pair[data-stage='measured'] .qvc-pair__lead {
+  top: 600px;
+  width: 1800px;
+}
+
+/* Honours the authored break in the copy. It was `nowrap`, which held the whole
+   phrase on one line and made it the widest thing on the screen. */
+.qvc-pair[data-stage='measured'] .qvc-pair__lead-title {
+  white-space: pre-line;
+}
+
+.qvc-pair__lead-title {
+  margin: 0;
+  color: #091f2c;
+  font-size: 128px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.qvc-pair__lead-body {
+  width: 1000px;
+  margin: 0;
+  color: #091f2c;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* Down with the coins it labels, rather than stacked under the lead: the board
+   puts the phase label at 1920 and its body at 2098. */
+/* Measured against the board: there the sentence ends around 62% down the
+   screen and the button starts at 67%, leaving a clear five per cent of air.
+   At 1860 this block ended at 65% with the button at 66% — all but touching. */
+.qvc-pair__copy {
+  top: 1700px;
+  display: flex;
+  width: 1200px;
+  flex-direction: column;
+  align-items: center;
+  gap: 60px;
+  padding: 60px;
+  text-align: center;
+  transition: opacity 220ms ease, top 420ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The measured stage carries nothing below the coins — the result does — so
+   this block is hidden there rather than repositioned. */
+.qvc-pair[data-stage='measured'] .qvc-pair__copy {
+  top: 1860px;
+}
+
+/* Phase subtitles use the body ink and sit below the 128px main heading. */
+.qvc-pair__title {
+  margin: 0;
+  color: #091f2c;
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* 1080 rather than the board's 1000: at 1000 this sentence wraps to five lines
+   here where the board's block is sized for four, and the extra line ran the
+   block into the button. Widening keeps the label at the y the board draws it
+   at, which moving the block would not. */
+.qvc-pair__body {
+  width: 1080px;
+  margin: 0;
+  color: #091f2c;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* The one phrase the design sets in accent magenta. */
+.qvc-pair__accent {
+  color: #c03bc4;
+  font-style: normal;
+}
+
+.qvc-pair__lead,
+.qvc-pair__copy,
+.qvc-pair__hint {
+  opacity: 0;
+}
+
+.qvc-pair.is-copy-in .qvc-pair__lead,
+.qvc-pair.is-copy-in .qvc-pair__copy,
+.qvc-pair.is-copy-in .qvc-pair__hint {
+  opacity: 1;
+}
+
+/* Clears the landed pair, which this build's camera puts ~500px higher than the
+   Figma frame does — sitting at the authored offset would print over the coins. */
+/* Full stage width rather than a centred row: each word is placed over its own
+   coin from the projected coin position (see positionOutcomeLabels), so the
+   container is the coordinate space and the children carry the placement. */
+.qvc-pair__outcome {
+  top: 1580px;
+  left: 0;
+  width: 2160px;
+  height: 0;
+  transform: none;
+  color: #225b62;
+  font-size: 128px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  /* Descenders need real line box room — 1.0 cropped the tail of "Tails". */
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 420ms ease 120ms;
+}
+
+.qvc-pair[data-stage='measured'] .qvc-pair__outcome {
+  opacity: 1;
+}
+
+.qvc-pair__outcome-side {
+  position: absolute;
+  top: 0;
+  /* `left` is written per coin by the game; this centres the word on it. */
+  transform: translateX(-50%);
+}
+
+/* The join is structure, not result: it stays quiet so the two outcomes read
+   as the pair that matched. It keeps the centre, which is the midpoint of the
+   pair the coins are always symmetric about. */
+.qvc-pair__outcome-join {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #091f2c;
+  opacity: 0.5;
+}
+
+.qvc-pair__hint {
+  top: 1360px;
+  transition: opacity 220ms ease;
+}
+
+/* Only the measured stage carries a hint; the others carry the button. */
+.qvc-pair:not([data-stage='measured']) .qvc-pair__hint {
+  display: none;
+}
+
+/* Same control as .primary-action everywhere else in the kiosk: the design's
+   87px type read as a different tier of button from every other CTA. */
+/* The board gives this the module's dark teal rather than the shared blue
+   gradient — the same #2C5B61 the mint callouts set their type in, so the
+   button and the pills read as one palette. */
+.qvc-pair__action {
+  position: absolute;
+  bottom: 1093px;
+  left: 50%;
+  display: inline-flex;
+  min-height: 160px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 110px;
+  border: 0;
+  border-radius: 27px;
+  background: #2c5b61;
+  box-shadow: 0 10px 28px rgba(21, 51, 55, 0.24);
+  color: #fff;
+  font-family: var(--font-text);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  transform: translateX(-50%);
+  transition: opacity 220ms ease, filter 160ms ease;
+  touch-action: manipulation;
+}
+
+.qvc-pair__action:disabled {
+  opacity: 0.4;
+}
+
+.qvc-pair__action:not(:disabled):active {
+  filter: brightness(1.08);
+}
+
+/* Measured swaps the button for the swipe hint. */
+.qvc-pair[data-stage='measured'] .qvc-pair__action {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qvc-pair__copy,
+  .qvc-pair__outcome,
+  .qvc-pair__hint,
+  .qvc-pair__action {
+    transition: none;
+  }
+}
+
+/* ============ Interference ============ */
+
+.qvc-interference,
+.qvc-interference__scene {
+  overflow: hidden;
+}
+
+.qvc-interference__scene {
+  inset: 0;
+}
+
+.qvc-interference {
+  --interference-ink: #17252d;
+  --interference-muted: #506875;
+  background: #a4cfd2;
+}
+
+.qvc-interference__canvas {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.qvc-interference[data-phase='settling'] .qvc-interference__canvas {
+  cursor: default;
+}
+
+.qvc-interference__canvas:focus-visible {
+  outline: 6px solid rgba(36, 175, 147, 0.75);
+  outline-offset: -10px;
+}
+
+.qvc-interference__guidance {
+  position: absolute;
+  top: 280px;
+  left: 0;
+  z-index: 27;
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 60px;
+  pointer-events: none;
+}
+
+/* Both cards occupy one row during their crossfade. The next row always starts
+   below the taller card, including after fonts load or the finale appears. */
+.qvc-interference__lesson,
+.qvc-interference__finale {
+  grid-area: 1 / 1;
+}
+
+.qvc-interference__interaction-tip {
+  grid-area: 2 / 1;
+  position: relative;
+  opacity: 0;
+  transform: translateY(8px) scale(0.99);
+  transition:
+    opacity 120ms ease-out,
+    transform 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.qvc-interference__interaction-tip.is-showing {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* The tip reads as the lesson card talking, so it takes the card copy colour
+   rather than the grey the other module-01 pills use. --color-ink is the same
+   #2a446f the card gets from --kiosk-explainer-body-color; it is used here
+   instead because that variable is scoped to .kiosk-explainer and the tip is
+   not inside one, so it would not inherit.
+
+   Surface stays the shared grey. Four classes deep, and after the rule it
+   overrides, so it outranks .kiosk-tooltip--light on both counts. */
+.qvc .kiosk-tooltip.qvc-interference__interaction-tip .kiosk-tooltip__text {
+  /* The card colour held back to 70%, so the tip reads as the quieter of the
+     two. Mixed rather than set as an alpha: the type sheen paints the glyphs
+     by clipping a gradient built from currentColor, and a translucent
+     currentColor would compound with the gradient stops instead of just
+     dimming. Mixed toward the pill it sits on, so the result is what 70%
+     over that surface actually looks like. */
+  color: color-mix(in srgb, var(--color-ink) 70%, #f2f4f5);
+}
+
+/* Content owns the height of every Interference card. Only the outer width and
+   diagram dimensions are authored; text can wrap and the hint follows in flow. */
+.qvc-interference__lesson-panel.kiosk-explainer,
+.qvc-interference__finale.kiosk-explainer {
+  --kiosk-explainer-ink: var(--color-ink);
+  --kiosk-explainer-body-color: var(--color-ink);
+  --kiosk-explainer-strong-color: var(--color-ink);
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-content-gap: 60px;
+  /* Split, because the two axes want opposite things here. Sideways, 40 rather
+     than the shared 60 hands the text a 1120px measure on a 1200px card
+     instead of 1080, and four of the five readings lose a line to it. That
+     bought more height than the padding gave up, so the vertical goes the
+     other way and takes some of it back as breathing room above the title and
+     under the last line. The graphic variant sets padding: 0 on itself and is
+     unaffected by either. */
+  --kiosk-explainer-padding: 72px 40px;
+  width: 1200px;
+  max-width: calc(100% - 120px);
+  height: auto;
+  align-self: start;
+}
+
+.qvc-interference__guidance .kiosk-explainer__copy {
+  width: 100%;
+  min-width: 0;
+}
+
+.qvc-interference__guidance .kiosk-explainer__title {
+  width: 100%;
+}
+
+/* Fills the column rather than stopping 200px short of it. The 880 cap was
+   narrower than every card it applies to, including the graphic variant, whose
+   left-aligned paragraphs are meant to fill the diagram's adjacent column. */
+.qvc-interference__guidance .kiosk-explainer__body {
+  width: 100%;
+}
+
+.qvc-interference__guidance .kiosk-explainer__title,
+.qvc-interference__guidance .kiosk-explainer__body {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+/* Names the buoy the first time one is on screen. Laid out right-to-left from
+   the dot: the element is placed with its right edge on the buoy, so the dot
+   lands on the thing being named and the label reaches away from it into empty
+   water rather than over it. */
+.qvc-interference__annotation {
+  position: absolute;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-100%, -50%);
+  transition: opacity 320ms ease;
+  white-space: nowrap;
+}
+
+/* Only while the single buoy is the whole story. Once a second one arrives the
+   label has done its job, and two buoys with one caption reads as a mistake. */
+.qvc-interference[data-stage='first-source'] .qvc-interference__annotation {
+  opacity: 1;
+}
+
+.qvc-interference__annotation-text {
+  color: #2a446f;
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.qvc-interference__annotation-line {
+  width: 120px;
+  height: 3px;
+  margin-left: 24px;
+  background: #2a446f;
+}
+
+.qvc-interference__annotation-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #2a446f;
+}
+
+.qvc-interference__target-arrow {
+  position: absolute;
+  z-index: 25;
+  width: 164px;
+  color: #168cff;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  visibility: hidden;
+  transition:
+    opacity 140ms cubic-bezier(0.3, 0, 1, 1),
+    visibility 0s linear 140ms;
+}
+
+.qvc-interference__target-arrow.is-showing {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 240ms cubic-bezier(0.05, 0.7, 0.1, 1),
+    visibility 0s;
+}
+
+.qvc-interference__target-arrow-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: qvc-interference-target-bob 760ms cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+}
+
+.qvc-interference__target-arrow svg {
+  display: block;
+  width: 134px;
+  height: 148px;
+  overflow: visible;
+}
+
+.qvc-interference__target-arrow path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 9px;
+}
+
+@keyframes qvc-interference-target-bob {
+  from {
+    transform: translateY(-18px);
+  }
+
+  to {
+    transform: translateY(18px);
+  }
+}
+
+/* ---- Figma-authored top cards ---- */
+
+/*
+ * Moving between explainer cards is a swap, not an arrival. The shared kiosk timing
+ * (120ms out, 180ms in) is tuned for a card appearing once; used for a hand-off it
+ * reads as two separate pops. These are longer, with more travel and a touch of
+ * scale, so one card gives way to the next. INTERFERENCE_TOOLTIP_MOTION_CONFIG.exitMs
+ * waits out the fade below before the content underneath is swapped.
+ */
+.qvc-interference__lesson {
+  position: relative;
+  z-index: 26;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Constructive and destructive carry the same words in the same box, and only
+   the diagram between them changes, so they sit at the same height. Destructive
+   used to be lifted 100px above the rest — a step that read as the panel
+   hopping mid-sentence, and that put it under the direction bar once the bar
+   became permanent. */
+
+.qvc-interference__lesson.is-showing {
+  opacity: 1;
+  transition: opacity 340ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.qvc-interference__lesson-panel.kiosk-explainer {
+  position: relative;
+  margin: 0 auto;
+  transform: translateY(16px) scale(0.985);
+  transition: transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qvc-interference__lesson.is-showing .qvc-interference__lesson-panel {
+  transform: translateY(0) scale(1);
+  transition: transform 340ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* The module rules above outrank the shared kiosk-explainer reduced-motion reset,
+   so the opt-out has to be restated here. */
+@media (prefers-reduced-motion: reduce) {
+  .qvc-interference__lesson,
+  .qvc-interference__lesson.is-showing,
+  .qvc-interference__lesson-panel.kiosk-explainer,
+  .qvc-interference__lesson.is-showing .qvc-interference__lesson-panel {
+    transition: none;
+  }
+}
+
+.qvc-interference__lesson-panel[hidden] {
+  display: none;
+}
+
+.qvc-interference__lesson-panel[data-lesson-stage='bridge'] {
+  width: 1000px;
+}
+
+.qvc-interference__lesson-panel.kiosk-explainer.qvc-interference__lesson-panel--graphic {
+  width: 1800px;
+  align-items: center;
+  padding: 0;
+}
+
+.qvc-interference__lesson-visual {
+  width: 800px;
+  height: 639px;
+}
+
+/* The graphs are 4:3 masters in a slightly wider slot. `contain` rather than
+   `cover` because these are diagrams: cropping would take the ends off the axis
+   the wave is measured against.
+
+   No blend mode: the clips carry a real alpha channel, keyed from the white
+   they were drawn on (see scripts/prepare-panel-video.mjs). mix-blend-mode was
+   tried first and cannot work here — the panel sets a backdrop-filter, which
+   makes it a backdrop root, so the clip can only blend against the panel's own
+   24%-white background rather than what is behind it. Multiplying into an
+   almost entirely transparent backdrop returns the source unchanged, leaving
+   the white exactly where it was. */
+.qvc-interference__lesson-visual .kiosk-explainer__media-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.qvc-interference__lesson-panel[data-lesson-stage='one'] .qvc-interference__lesson-visual {
+  width: 808px;
+}
+
+.qvc-interference__lesson-panel--graphic .qvc-interference__lesson-copy {
+  flex: 1 1 0;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 60px 60px 0;
+}
+
+/* Left-aligned paragraphs fill the diagram's adjacent text column. */
+.qvc-interference__lesson-panel--graphic .kiosk-explainer__body {
+  text-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qvc-interference__interaction-tip,
+  .qvc-interference__target-arrow,
+  .qvc-interference__lesson,
+  .qvc-interference__lesson.is-showing,
+  .qvc-interference__lesson-panel,
+  .qvc-interference__lesson.is-showing .qvc-interference__lesson-panel {
+    transition: none;
+  }
+
+  .qvc-interference__target-arrow-body {
+    animation: none;
+  }
+
+}
+
+/* Game mastheads share the unified copy block, centered up top. */
+.qvc-game__masthead {
+  position: absolute;
+  top: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.qvc-game__tally {
+  position: absolute;
+  bottom: calc(26% + 420px);
+  left: 50%;
+  display: grid;
+  gap: 20px 60px;
+  transform: translateX(-50%);
+  color: var(--qvc-ink);
+  /* Matches the masthead body copy (.qvc-copy p) — the in-scene labels all
+     share one size so nothing reads as a different tier of information. */
+  font-size: 48px;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.qvc-game__tally-title {
+  color: var(--qvc-muted);
+  font-size: 48px;
+}
+
+.qvc-game__tally-row {
+  display: grid;
+  grid-template-columns: 180px auto;
+  gap: 30px;
+  align-items: baseline;
+}
+
+.qvc-game__tally-count {
+  min-width: 96px;
+  padding: 6px 24px;
+  border-radius: 12px;
+  background: #222830;
+  color: #f4f6f8;
+  font-size: 52px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.qvc-game__tally-count.is-counting {
+  animation: qvc-count-pop 460ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qvc-game[data-state='bullet'] .qvc-game__tally {
+  opacity: 0;
+}
+
+.qvc-game__legend {
+  position: absolute;
+  top: 38%;
+  left: 120px;
+  display: grid;
+  gap: 26px;
+  transform: translateY(-50%);
+  color: var(--qvc-muted);
+  font-size: 34px;
+  opacity: 0;
+  transition: opacity 450ms ease;
+  pointer-events: none;
+}
+
+.qvc-game__legend-row {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.qvc-game__legend-mark {
+  width: 52px;
+  height: 5px;
+  background: #171b21;
+}
+
+.qvc-game__legend-row:last-child .qvc-game__legend-mark {
+  background: var(--qvc-blue);
+}
+
+.qvc-game[data-state='bullet'] .qvc-game__legend,
+.qvc-game[data-state='independent'] .qvc-game__legend,
+.qvc-game[data-state='entangling'] .qvc-game__legend {
+  opacity: 1;
+}
+
+.qvc-game__readout {
+  position: absolute;
+  top: 38%;
+  right: 120px;
+  width: 380px;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity 450ms ease;
+  pointer-events: none;
+}
+
+.qvc-game[data-state='bullet'] .qvc-game__readout {
+  opacity: 1;
+}
+
+.qvc-game__readout-label {
+  color: var(--qvc-blue);
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.qvc-game__readout-value {
+  margin-top: 12px;
+  font-size: 110px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.qvc-game__readout-copy {
+  margin: 24px 0 0;
+  color: var(--qvc-muted);
+  font-size: 30px;
+  line-height: 1.5;
+}
+
+.qvc-game__result {
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  color: var(--qvc-ink);
+  font-size: 320px;
+  font-weight: 300;
+  /* Descenders need real line box room — 0.8 cropped the tail of "Tails". */
+  line-height: 1.1;
+  padding: 0 0.06em;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, calc(-50% + 140px));
+  filter: blur(24px);
+  transition:
+    opacity 700ms ease 250ms,
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1) 180ms,
+    filter 900ms ease 180ms;
+  pointer-events: none;
+}
+
+.qvc-game[data-state='landed'] .qvc-game__result,
+.qvc-game[data-state='measured'] .qvc-game__result {
+  opacity: 0.22;
+  transform: translate(-50%, calc(-50% + 80px));
+  filter: blur(0);
+}
+
+/* The resolved outcome is narrated under the big word rather than repeated in
+   a tooltip. Sits between the result's descender and the landed coin. */
+.qvc-game__result-copy {
+  position: absolute;
+  top: 1580px;
+  right: 0;
+  left: 0;
+  color: var(--qvc-muted);
+  font-size: 48px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 700ms ease 250ms;
+  pointer-events: none;
+}
+
+.qvc-game[data-state='landed'] .qvc-game__result-copy,
+.qvc-game[data-state='measured'] .qvc-game__result-copy {
+  opacity: 1;
+}
+
+/* Hint anchors. Centring lives on the anchor so each pill keeps its own
+   transform for the bob and the tip-in rise. */
+.qvc-game__hint {
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Bottom edge lands ~77px above the resting coin's top edge (stage 1956). */
+.qvc-game__hint--cta {
+  bottom: calc(26% + 1020px);
+}
+
+/* Its own band: below the apex coin (which reaches stage 1431) and above the
+   result word (from stage 1427 once landed, but the CTA is gone by then). */
+.qvc-game__hint--narration {
+  top: 1245px;
+}
+
+/* Only the ready state advertises the gesture; the bob drives opacity, so the
+   pill is invisible in every other state. */
+.qvc-game__cta {
+  opacity: 0;
+}
+
+.qvc-game[data-state='ready'] .qvc-game__cta {
+  animation: qvc-hint-bob 8s ease-in-out infinite;
+}
+
+.qvc-game__narration.is-showing {
+  animation: qvc-game-tip-in 480ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.qvc-game__narration.is-leaving {
+  animation: qvc-game-tip-out 260ms ease-in forwards;
+}
+
+/* These narration pills are centred by their flex anchor. */
+@keyframes qvc-game-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes qvc-game-tip-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qvc-game[data-state='ready'] .qvc-game__cta {
+    animation: none;
+    opacity: 1;
+  }
+
+  .qvc-game__narration.is-showing {
+    animation-duration: 1ms;
+  }
+}
+
+.qvc-game__gesture {
+  position: relative;
+  width: 38px;
+  height: 78px;
+  border-left: 4px solid currentColor;
+  animation: qvc-gesture-up 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.qvc-game__gesture::before,
+.qvc-game__gesture::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -3px;
+  width: 20px;
+  height: 4px;
+  background: currentColor;
+  transform-origin: left center;
+}
+
+.qvc-game__gesture::before {
+  transform: rotate(45deg);
+}
+
+.qvc-game__gesture::after {
+  transform: rotate(-45deg);
+}
+
+/* Once the Lottie hand mounts, the CSS chevron yields to it. Matches the
+   shared .kiosk-hint__gesture slot so the pill sizes consistently. */
+.qvc-game__gesture.has-gesture-animation {
+  width: 132px;
+  height: 132px;
+  border-left: 0;
+  animation: none;
+}
+
+.qvc-game__gesture.has-gesture-animation::before,
+.qvc-game__gesture.has-gesture-animation::after {
+  content: none;
+}
+
+.qvc-game__gesture.has-gesture-animation svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ============ Entanglement extras ============ */
+
+.qvc-game__linked-label {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  transform: translate(-50%, 300px);
+  color: var(--qvc-blue);
+  font-size: 38px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 450ms ease;
+  pointer-events: none;
+}
+
+.qvc-game[data-state='entangled'] .qvc-game__linked-label {
+  opacity: 1;
+}
+
+.qvc-game__measure-prompt {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  width: 1300px;
+  margin: 0;
+  transform: translate(-50%, 440px);
+  color: var(--qvc-ink);
+  font-size: 44px;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 450ms ease;
+  pointer-events: none;
+}
+
+.qvc-game[data-state='entangled'] .qvc-game__measure-prompt {
+  opacity: 1;
+}
+
+/* Controls sit directly under the state labels and measure prompt. */
+.qvc-game__controls {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  transform: translate(-50%, 580px);
+}
+
+.qvc-game__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 460px;
+  min-height: 100px;
+  padding: 18px 84px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #2a446f 0%, #185998 42%, #1163ab 68%, #0078d4 100%);
+  color: #ffffff;
+  font-size: 44px;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.qvc-game__action:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.qvc-game__action:not(:disabled):active {
+  filter: brightness(1.12);
+}
+
+.qvc-game__state-copy {
+  margin: 0;
+  color: var(--qvc-muted);
+  font-size: 34px;
+}
+
+@keyframes qvc-gesture-up {
+  0%,
+  28% {
+    opacity: 0.4;
+    transform: translateY(14px);
+  }
+
+  70%,
+  100% {
+    opacity: 1;
+    transform: translateY(-11px);
+  }
+}
+
+@keyframes qvc-count-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qvc-game__gesture {
+    animation: none;
+  }
+
+  .qvc-game__result,
+  .qvc-game__readout,
+  .qvc-game__legend,
+  .qvc-game__replay {
+    transition-duration: 1ms;
+  }
+}

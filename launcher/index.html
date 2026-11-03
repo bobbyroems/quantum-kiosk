@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <meta name="color-scheme" content="light">
+  <title>Quantum experiences</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="renderer.js" defer></script>
+</head>
+<body>
+  <main class="welcome" aria-labelledby="welcome-title">
+    <header>
+      <p class="eyebrow">Quantum experiences</p>
+      <h1 id="welcome-title">Explore quantum.</h1>
+      <p class="introduction">Choose an experience to begin.</p>
+    </header>
+    <div class="experiences" aria-label="Choose an experience">
+      <button class="experience experience--magne" type="button" data-experience="magne">
+        <span class="experience__label">MAGNE</span><span class="experience__action" aria-hidden="true">Begin <span>→</span></span>
+      </button>
+      <button class="experience experience--iqm" type="button" data-experience="iqm">
+        <span class="experience__label">IQM</span><span class="experience__action" aria-hidden="true">Begin <span>→</span></span>
+      </button>
+    </div>
+    <p id="status" class="status" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,107 @@
+@font-face {
+  font-family: "Unica One";
+  src: url("../assets/fonts/UnicaOne/UnicaOne-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("../assets/fonts/Outfit/Outfit-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Segoe UI Variable Display";
+  src: url("/assets/fonts/Segoe-UI-Variable-Static-Display.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Segoe UI Variable Display";
+  src: url("/assets/fonts/Segoe-UI-Variable-Static-Display-Semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Segoe UI Variable Display";
+  src: url("/assets/fonts/Segoe-UI-Variable-Static-Display-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Base design dimensions (1080x1920) - scale factor for 4K is 2x */
+  --base-width: 1080;
+  --base-height: 1920;
+
+  /* Background - for attract screen */
+  --bg-color: #989797;
+  --bg-gradient-top: linear-gradient(180deg, rgba(244, 243, 245, 1) 0%, rgba(245, 245, 245, 0) 66.7%);
+  --bg-gradient-bottom: linear-gradient(0deg, rgba(242, 228, 209, 1) 0%, rgba(245, 245, 245, 0) 66.7%);
+
+  /* Core Colors - Purple */
+  --light-purple: #C5B4E3;
+  --purple: #8661C5;
+  --dark-purple: #463668;
+
+  /* Core Colors - Blue */
+  --light-blue: #8DC8E8;
+  --blue: #0078D4;
+  --dark-blue: #2A446F;
+
+  /* Core Colors - Teal */
+  --light-teal: #B9DCD2;
+  --teal: #49C5B1;
+  --dark-teal: #225B62;
+
+  /* Neutral Colors */
+  --pure-white: #FFFFFF;
+  --off-white: #F4F3F5;
+  --light-gray: #D9D9D6;
+  --cool-gray: #B1B3B3;
+  --blue-black: #091F2C;
+  --brown-black: #291817;
+
+  /* Accent Colors */
+  --light-green: #D4EC8E;
+  --green: #8DE971;
+
+  --light-yellow: #FFE399;
+  --yellow: #FFB900;
+
+  --light-orange: #FFA38B;
+  --orange: #FF5C39;
+
+  --light-red: #FFB3BB;
+  --red: #F4364C;
+
+  --magenta: #C03BC4;
+  --dark-magenta: #702573;
+
+  /* Dot styling - scaled for display */
+  --dot-size: calc(30 / var(--base-width) * 100vw);
+  --dot-gap: calc(15 / var(--base-width) * 100vw);
+  --dot-default: rgba(255, 255, 255, 0.85);
+
+  /* Typography - scaled for display */
+  --font-primary: "Outfit", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-content: "Segoe UI", "Segoe Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Font sizes - scaled for display */
+  --title-size: calc(128 / var(--base-width) * 100vw);
+  --subtitle-size: calc(32 / var(--base-width) * 100vw);
+  --nav-word-size: calc(56 / var(--base-width) * 100vw);
+}

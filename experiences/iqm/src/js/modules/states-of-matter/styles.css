@@ -1,0 +1,526 @@
+.som {
+  --som-ink: #14213b;
+  --som-blue: #0078d4;
+  --som-progress: 0;
+  /* Matches the JS at progress 0 (knob flush left); it overrides these inline
+     from the first render, but the initial paint should not jump. */
+  --som-knob-x: 0px;
+  --som-progress-width: 60px;
+  --som-label-solid: 1;
+  --som-label-liquid: 0;
+  --som-label-gas: 0;
+  --som-label-solid-y: 0px;
+  --som-label-liquid-y: 20px;
+  --som-label-gas-y: 20px;
+  --som-copy-solid: 1;
+  --som-copy-liquid: 0;
+  --som-copy-gas: 0;
+  --som-copy-solid-y: 0px;
+  --som-copy-liquid-y: -12px;
+  --som-copy-gas-y: 12px;
+  /* Solid carries copy now, so the block opens at full height. */
+  --som-info-height: 648px;
+  --som-copy-height: 320px;
+  --som-video-blur: 0px;
+  --som-video-scale: 1;
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  background: #d7d8d9;
+  color: var(--som-ink);
+  cursor: default;
+  font-family: var(--font-text);
+  isolation: isolate;
+  touch-action: none;
+}
+
+.som[data-media-state="ready"] {
+  cursor: ew-resize;
+}
+
+.som[data-media-state="ready"][data-phase="gas"] {
+  cursor: grab;
+}
+
+.som[data-media-state="ready"][data-phase="gas"].som--stirring {
+  cursor: grabbing;
+}
+
+.som *,
+.som *::before,
+.som *::after {
+  box-sizing: border-box;
+}
+
+.som__media,
+.som__poster,
+.som__video,
+.som__vfx-motion,
+.som__wash,
+.som__state-shader,
+.som__steam-volume {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Environmental effects stay inside .som__media, but the wrapper deliberately does
+   not establish a stacking context. That lets the shader sit above the scrubber while
+   the navigation, copy, phase label and interaction guidance remain above the shader. */
+.som__state-shader {
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* WebGPU renders the volume over an opaque black clear. Screen blending makes
+   black neutral and leaves only the white water vapor over the footage. */
+.som__steam-volume {
+  z-index: 7;
+  contain: strict;
+  filter: blur(1px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* The fourth state owns a clean artwork plane. Hide every gas-only compositor
+   layer immediately at its semantic boundary as a guard against a retained GPU
+   frame while the timeline weights settle. */
+.som[data-phase="topoconductor"] .som__state-shader,
+.som[data-phase="topoconductor"] .som__steam-volume,
+.som[data-phase="topoconductor"] .som__vfx-motion {
+  visibility: hidden;
+  opacity: 0;
+}
+
+/* Nothing hides the video: the shader is a transparent overlay and the footage
+   underneath is what the viewer actually sees. */
+
+.som__media {
+  overflow: hidden;
+  background: #d7d8d9;
+  pointer-events: none;
+}
+
+.som__poster,
+.som__video {
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.som__poster {
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 240ms var(--ease-out);
+}
+
+/* The only treatment the footage gets is the gas blur. A tiny blur-linked
+   overscan keeps transparent filter samples outside the viewport, preventing
+   the left, right and bottom edges from reading as a frame. */
+.som__video {
+  z-index: 1;
+  max-width: none;
+  background: #d7d8d9;
+  filter: blur(var(--som-video-blur));
+  opacity: 0;
+  transform: scale(var(--som-video-scale));
+  transition: opacity 240ms var(--ease-out);
+  will-change: filter, transform;
+}
+
+.som--media-ready .som__poster {
+  opacity: 0;
+}
+
+.som--media-ready .som__video {
+  opacity: 1;
+}
+
+.som__vfx-motion {
+  z-index: 6;
+  max-width: none;
+  contain: strict;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.som__wash {
+  z-index: 5;
+  background:
+    radial-gradient(
+      ellipse 58% 30% at 50% 43%,
+      rgba(12, 20, 34, 0.2) 0%,
+      rgba(12, 20, 34, 0.08) 54%,
+      transparent 100%
+    );
+  pointer-events: none;
+}
+
+.som__nav {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  cursor: default;
+}
+
+.som__brand {
+  color: #243c63;
+}
+
+.som__brand-divider {
+  background: #8a95a4;
+}
+
+.som__nav-action {
+  cursor: pointer;
+  transition:
+    background-color 140ms ease,
+    scale 140ms ease;
+}
+
+.som__nav-action:active {
+  background: var(--header-action-bg-active);
+  scale: 0.97;
+}
+
+.som__nav-action:focus-visible {
+  outline: 8px solid var(--som-blue);
+  outline-offset: 8px;
+}
+
+/* Wider than the 1200 it was, and re-centred to match. The fourth stop's
+   heading is the longest in the module and needs about 1234px to hold one
+   line; at 1200 it wrapped onto two and came down on top of the paragraph
+   underneath, which the fixed block height then clipped. */
+.som__info {
+  position: absolute;
+  z-index: 8;
+  top: 700px;
+  left: 320px;
+  width: 1520px;
+  height: var(--som-info-height);
+  overflow: hidden;
+  padding: 60px;
+  background: transparent;
+  transition: height 220ms var(--ease-out);
+  will-change: height;
+}
+
+.som__info h2 {
+  width: 100%;
+  height: 128px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-align: center;
+  /* Wraps now. The heading turns over on the fourth stop to a longer line than
+     the three classic states carry, and nowrap clipped it against the 1200px
+     block rather than letting it take a second line. */
+  text-wrap: balance;
+}
+
+.som__info-copy {
+  position: relative;
+  height: var(--som-copy-height);
+  margin-top: 80px;
+  overflow: hidden;
+}
+
+.som__info-copy p {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  /* Four lines plus room for descenders below the final line box. */
+  height: 320px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  /* 1 was set for the old single-line copy and reads as cramped now that every
+     phase runs to three or four lines. */
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  pointer-events: none;
+  text-align: center;
+  text-wrap: pretty;
+  will-change: opacity, transform;
+}
+
+.som__info-copy [data-som-copy="solid"] {
+  width: 1080px;
+  opacity: var(--som-copy-solid);
+  transform: translate3d(-50%, var(--som-copy-solid-y), 0);
+}
+
+.som__info-copy [data-som-copy="liquid"] {
+  width: 1045px;
+  opacity: var(--som-copy-liquid);
+  transform: translate3d(-50%, var(--som-copy-liquid-y), 0);
+}
+
+.som__info-copy [data-som-copy="gas"] {
+  width: 1080px;
+  opacity: var(--som-copy-gas);
+  transform: translate3d(-50%, var(--som-copy-gas-y), 0);
+}
+
+.som__info-copy [data-som-copy="topoconductor"] {
+  width: 1080px;
+  opacity: var(--som-copy-topoconductor);
+  transform: translate3d(-50%, var(--som-copy-topoconductor-y), 0);
+}
+
+.som__title-group {
+  position: absolute;
+  z-index: 8;
+  top: 1585px;
+  left: 0;
+  width: 2160px;
+  text-align: center;
+}
+
+.som__active-phase {
+  position: relative;
+  height: 170px;
+}
+
+.som__active-phase span {
+  position: absolute;
+  inset: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 128px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  will-change: opacity, transform;
+}
+
+.som__active-phase [data-som-phase="solid"] {
+  opacity: calc(var(--som-label-solid) * 0.5);
+  transform: translate3d(0, var(--som-label-solid-y), 0);
+}
+
+.som__active-phase [data-som-phase="liquid"] {
+  opacity: calc(var(--som-label-liquid) * 0.5);
+  transform: translate3d(0, var(--som-label-liquid-y), 0);
+}
+
+.som__active-phase [data-som-phase="gas"] {
+  opacity: calc(var(--som-label-gas) * 0.5);
+  transform: translate3d(0, var(--som-label-gas-y), 0);
+}
+
+.som__active-phase [data-som-phase="topoconductor"] {
+  opacity: calc(var(--som-label-topoconductor) * 0.5);
+  transform: translate3d(0, var(--som-label-topoconductor-y), 0);
+}
+
+/* The device panel the board puts between the label and the scrubber on the
+   fourth stop. Sized and placed off that screen: it sits under the label, runs
+   most of the width, and stops short of the slider. */
+.som__topoconductor {
+  position: absolute;
+  z-index: 4;
+  top: 1769px;
+  left: 50%;
+  width: 1817px;
+  height: 1145px;
+  overflow: hidden;
+  border-radius: 40px;
+  opacity: var(--som-label-topoconductor, 0);
+  transform: translate3d(-50%, calc((1 - var(--som-label-topoconductor, 0)) * 24px), 0);
+  box-shadow: 0 30px 90px rgba(9, 20, 45, 0.35);
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+.som__topoconductor-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.som__timeline {
+  position: absolute;
+  z-index: 5;
+  top: 3002px;
+  left: 330px;
+  width: 1500px;
+  height: 120px;
+}
+
+.som__track,
+.som__progress {
+  position: absolute;
+  top: 68px;
+  left: 0;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.som__track {
+  width: 100%;
+  background: #000;
+  transition: background-color 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.som:not([data-phase="solid"]) .som__track {
+  background: #b1b3b3;
+}
+
+.som__progress {
+  z-index: 1;
+  width: var(--som-progress-width);
+  max-width: 100%;
+  background: linear-gradient(90deg, #c03bc4 0%, #c03bc4 50%, #0078d4 100%);
+  pointer-events: none;
+}
+
+.som__knob {
+  position: absolute;
+  z-index: 2;
+  /* Concentric with the rail. The track starts 68px down and is 8px tall, so its
+     centre line is at 72px, and a 120px knob has to begin 60px above that. */
+  top: 12px;
+  left: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  box-shadow: 0 2.26px 2.26px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  scale: 1;
+  transform: translate3d(var(--som-knob-x), 0, 0);
+  transition: scale 160ms ease;
+  will-change: transform;
+}
+
+/* Inset to the knob's centre at each endpoint so the marks share its travel. */
+.som__ticks {
+  position: absolute;
+  z-index: 1;
+  top: 54px;
+  left: 60px;
+  right: 60px;
+  height: 36px;
+  pointer-events: none;
+}
+
+.som__tick {
+  position: absolute;
+  left: var(--som-tick-position);
+  width: 5px;
+  height: 100%;
+  border-radius: 3px;
+  background: #555;
+  transform: translateX(-50%);
+}
+
+/* Endpoint marks sit on the rail ends; transition marks follow knob centres. */
+.som__tick:first-child {
+  left: -60px;
+}
+
+.som__tick:last-child {
+  left: calc(100% + 60px);
+}
+
+.som--dragging .som__knob {
+  scale: 1.08;
+}
+
+.som__range-label,
+.som__range {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  height: 120px;
+}
+
+/* Spans the knob's whole swept area, which now starts at the rail's left end
+   rather than 240px in. The 12px offset keeps the band on the knob rather than
+   on the box, so tapping the visible dot always lands on the input. .som__range
+   insets against this label, so it follows without its own offset. */
+.som__range-label {
+  z-index: 3;
+  top: 12px;
+  left: 0;
+  width: 1500px;
+}
+
+.som__range {
+  appearance: none;
+  margin: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.som__range::-webkit-slider-runnable-track {
+  height: 120px;
+  background: transparent;
+}
+
+.som__range::-webkit-slider-thumb {
+  width: 120px;
+  height: 120px;
+  appearance: none;
+  background: transparent;
+}
+
+.som__range:focus-visible {
+  opacity: 0;
+}
+
+.som__hint {
+  position: absolute;
+  z-index: 8;
+  top: 1785px;
+  left: 723px;
+  width: 714px;
+  height: 92px;
+  opacity: 1;
+  transition: opacity 260ms ease;
+}
+
+.som--engaged .som__hint,
+.som:not([data-phase="solid"]) .som__hint {
+  opacity: 0;
+}
+
+
+.som__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .som__poster,
+  .som__video,
+  .som__info,
+  .som__nav-action,
+  .som__track,
+  .som__knob,
+  .som__hint {
+    transition: none;
+  }
+}

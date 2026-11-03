@@ -1,0 +1,905 @@
+/* ========================================
+   CONNECT TAB - QUNORTH PAGE
+   ======================================== */
+
+/* Global map - rendered at interactive-screen level to escape overflow clipping */
+.global-map {
+  position: absolute;
+  top: calc(-520 / 1080 * 100vw);
+  left: 35%;
+  transform: translateX(-50%);
+  width: auto;
+  height: auto;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none; /* decorative layer; never intercepts input */
+  transition: opacity 0.8s ease;
+}
+
+.global-map img {
+  width: auto;
+  height: 82vh;
+  display: block;
+  pointer-events: none;
+}
+
+/* Global locator dot - separate element for z-index control */
+/* IMPORTANT: display:none by default - only shown via .dot-visible class */
+.global-locator-dot {
+  display: none;
+  position: absolute;
+  top: calc(100% + calc(24 / 1080 * 100vw));
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: calc(50 / 1080 * 100vw);
+  height: calc(50 / 1080 * 100vw);
+  pointer-events: none;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 5;
+}
+
+.global-locator-dot.dot-visible {
+  display: block;
+  pointer-events: auto;
+}
+
+/* Show global map only on first Connect slide */
+#interactive-screen[data-active-tab="connect"][data-connect-slide="0"] .global-map {
+  opacity: 1;
+}
+
+/* Dot visibility now controlled by .dot-visible class added/removed by JS */
+
+/* Global QuNorth content - at same level as map */
+.global-qunorth {
+  position: absolute;
+  bottom: calc(1010 / 1080 * 100vw);
+  left: calc(-120 / 1080 * 100vw);
+  width: 100vw;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.global-qunorth,
+.global-qunorth * {
+  pointer-events: none; /* default: don't block other tabs when hidden */
+}
+
+#interactive-screen[data-active-tab="connect"][data-connect-slide="0"] .global-qunorth {
+  opacity: 1;
+}
+
+#interactive-screen[data-active-tab="connect"][data-connect-slide="0"] .global-qunorth,
+#interactive-screen[data-active-tab="connect"][data-connect-slide="0"] .global-qunorth * {
+  pointer-events: auto; /* enable interaction only on Connect slide 0 */
+}
+
+.global-qunorth .qunorth-intro {
+  max-width: calc(700 / 1080 * 100vw);
+}
+
+.global-qunorth .qunorth-subtitle-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.global-qunorth .qunorth-title {
+  font-family: "Segoe Sans", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: calc(48 / 1080 * 100vw);
+  font-weight: 600;
+  margin-bottom: calc(16 / 1080 * 100vw);
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.global-qunorth .qunorth-subtitle {
+  font-family: var(--font-content);
+  font-size: calc(28 / 1080 * 100vw);
+  margin-bottom: calc(20 / 1080 * 100vw);
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.global-qunorth .qunorth-body {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  line-height: 1.5;
+  color: var(--blue-black);
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.global-qunorth .qunorth-location {
+  margin-top: calc(40 / 1080 * 100vw);
+}
+
+/* Hide the old content inside connect tab */
+.qunorth-map-bg,
+.connect-qunorth .qunorth-content {
+  display: none;
+}
+
+/* Animation helper - elements start hidden until JS animates them */
+.anim-hidden {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.connect-qunorth {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.qunorth-map-bg {
+  position: fixed;
+  top: calc(-120 / 1080 * 100vw);
+  left: 50%;
+  transform: translateX(-50%);
+  /* Container sizes to image, dot positions relative to this */
+  width: auto;
+  height: auto;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.qunorth-map-bg img {
+  /* Image defines the container size */
+  width: auto;
+  height: 65vh;
+  display: block;
+}
+
+/* Locator dot - positioned relative to the actual image */
+.qunorth-map-bg .locator-dot {
+  position: absolute;
+  /* Adjust these percentages to place dot on Copenhagen/desired location */
+  top: 95.8%;
+  left: 51%;
+  transform: translate(-50%, -50%);
+  width: calc(80 / 1080 * 100vw);
+  height: calc(80 / 1080 * 100vw);
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform;
+  z-index: 10;
+}
+
+.qunorth-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.qunorth-intro {
+  margin-top: calc(170 / 1080 * 100vw);
+  margin-left: calc(300 / 1080 * 100vw);
+  max-width: calc(368 / 1080 * 100vw);
+}
+
+.qunorth-title {
+  font-family: var(--font-content);
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0 0 calc(12 / 1080 * 100vw) 0;
+}
+
+.qunorth-subtitle {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  margin: 0 0 calc(24 / 1080 * 100vw) 0;
+}
+
+.qunorth-body {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Location section */
+.qunorth-location {
+  max-width: calc(900 / 1080 * 100vw);
+  position: absolute;
+  bottom: calc(-2900 / 1920 * 100%);
+  left: calc(300 / 1080 * 100vw);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Hidden state - revealed on dot tap */
+.qunorth-location.location-hidden {
+  opacity: 0 !important;
+  transform: translateY(20px);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.qunorth-location.location-visible {
+  opacity: 1 !important;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.locator-center {
+  position: absolute;
+  top: 360%;
+  left: 600%;
+  transform: translate(-50%, -50%);
+  width: calc(32 / 1080 * 100vw);
+  height: calc(32 / 1080 * 100vw);
+  background: var(--orange);
+  border-radius: 50%;
+  z-index: 2;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.locator-pulse {
+  position: absolute;
+  top: 360%;
+  left: 600%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: var(--orange);
+  border-radius: 50%;
+  opacity: 0.4;
+  animation: locator-pulse 2s ease-out infinite;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+@keyframes locator-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.location-card {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(16 / 1080 * 100vw);
+}
+
+.location-image {
+  width: calc(283 / 1080 * 100vw);
+  height: calc(190 / 1080 * 100vw);
+  border-radius: calc(16 / 1080 * 100vw);
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  transform-origin: center;
+  will-change: transform;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.location-image:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.location-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.location-image:hover img {
+  transform: scale(1.05);
+}
+
+.location-info {
+  max-width: calc(500 / 1080 * 100vw);
+}
+
+.location-title {
+  font-family: var(--font-content);
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0 0 calc(12 / 1080 * 100vw) 0;
+}
+
+.location-desc {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  color: var(--blue-black);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ========================================
+   CONNECT TAB - MAGNE PAGE
+   ======================================== */
+.connect-magne {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Orange circle container */
+.magne-circle {
+  position: relative;
+  /* From Figma: 945px circle */
+  width: calc(945 / 1080 * 100vw);
+  height: calc(945 / 1080 * 100vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  margin-top: calc(47 / 1080 * 100vw);
+}
+
+/* Orange ring outline */
+.magne-circle-ring {
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--orange);
+  border-radius: 50%;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 80%);
+  mask-image: linear-gradient(to bottom, black 0%, black 30%, transparent 80%);
+}
+
+/* Video wrapper */
+.magne-video-wrap {
+  /* From Figma: 821px wide video */
+  width: calc(821 / 1080 * 100vw);
+  margin-top: calc(100 / 1080 * 100vw);
+  position: relative;
+  touch-action: none;
+}
+
+.magne-video-frame {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Swipe hint overlay */
+.magne-swipe-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.magne-swipe-hint.visible {
+  opacity: 1;
+}
+
+/* Intro text inside circle */
+.magne-intro {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 / 1080 * 100vw);
+  /* From Figma: 474px width */
+  width: calc(474 / 1080 * 100vw);
+  margin-top: calc(30 / 1080 * 100vw);
+  text-align: left;
+}
+
+.magne-title {
+  font-family: var(--font-content);
+  /* From Figma: 36px */
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0;
+}
+
+.magne-body {
+  font-family: var(--font-content);
+  /* From Figma: 24px */
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Specs section below circle */
+.magne-specs {
+  margin-top: calc(60 / 1080 * 100vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(20 / 1080 * 100vw);
+}
+
+.specs-title {
+  font-family: var(--font-content);
+  /* From Figma: 36px */
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0;
+  text-align: center;
+}
+
+.specs-table {
+  display: flex;
+  justify-content: center;
+  gap: calc(20 / 1080 * 100vw);
+}
+
+.specs-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-row {
+  /* From Figma: 40px line height */
+  height: calc(40 / 1080 * 100vw);
+  display: flex;
+  align-items: center;
+}
+
+.spec-label {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  color: var(--blue-black);
+}
+
+.spec-value {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  color: var(--blue-black);
+}
+
+/* ========================================
+   CONNECT TAB - QDK PAGE (Page 3)
+   ======================================== */
+.connect-qdk {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: calc(80 / 1080 * 100vw) calc(69 / 1080 * 100vw);
+}
+
+/* Top section: Title + Logos */
+.qdk-top-section {
+  display: flex;
+  align-items: flex-start;
+  /* From Figma: left 151px relative to content area (69px padding already applied) */
+  padding-left: calc(160 / 1080 * 100vw);
+  margin-top: calc(250 / 1080 * 100vw);
+  margin-bottom: calc(60 / 1080 * 100vw);
+}
+
+.qdk-intro {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 / 1080 * 100vw);
+  /* From Figma: width 443px */
+  width: calc(443 / 1080 * 100vw);
+}
+
+.qdk-title {
+  font-family: var(--font-content);
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0;
+  /* From Figma: width 410px */
+  max-width: calc(410 / 1080 * 100vw);
+}
+
+.qdk-body {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.qdk-logos {
+  /* From Figma: width 195px */
+  width: calc(195 / 1080 * 100vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qdk-logos img {
+  width: 100%;
+  height: auto;
+}
+
+/* Middle section: QDK Window + Molecule + Chemistry info */
+.qdk-middle-section {
+  position: relative;
+  height: calc(500 / 1080 * 100vw);
+  margin-bottom: calc(40 / 1080 * 100vw);
+}
+
+.qdk-window {
+  position: absolute;
+  left: calc(80 / 1080 * 100vw);
+  top: calc(80 / 1080 * 100vw);
+  width: calc(380 / 1080 * 100vw);
+  height: calc(397 / 1080 * 100vw);
+}
+
+.qdk-window img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: calc(16 / 1080 * 100vw);
+}
+
+.qdk-molecule {
+  position: absolute;
+  left: calc(0 / 1080 * 100vw);
+  top: calc(-50 / 1080 * 100vw);
+  width: calc(630 / 1080 * 100vw);
+  filter: drop-shadow(16px 32px 32px rgba(0, 0, 0, 0.1));
+  z-index: 1;
+}
+
+.qdk-molecule img {
+  width: 100%;
+  height: auto;
+}
+
+.qdk-chemistry-info {
+  position: absolute;
+  left: calc(500 / 1080 * 100vw);
+  top: calc(100 / 1080 * 100vw);
+  width: calc(390 / 1080 * 100vw);
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 / 1080 * 100vw);
+}
+
+.qdk-chemistry-title {
+  font-family: var(--font-content);
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.qdk-chemistry-body {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Bottom section: Accelerate info */
+.qdk-bottom-section {
+  padding-top: calc(80 / 1080 * 100vh);
+  padding-left: calc(160 / 1080 * 100vw);
+}
+
+.qdk-accelerate-info {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 / 1080 * 100vw);
+  /* From Figma: width 439px */
+  width: calc(439 / 1080 * 100vw);
+}
+
+.qdk-accelerate-title {
+  font-family: var(--font-content);
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  margin: 0;
+}
+
+.qdk-accelerate-body {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ========================================
+   CONNECT PAGE 4 - FULL STACK (Vertical Dot Column)
+   Matches reference images exactly
+   ======================================== */
+.connect-fullstack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fs-stack-wrapper {
+  position: absolute;
+  top: calc(80 / 1080 * 100vw);
+  left: 50%;
+  transform: translateX(-50%);
+  /* Allow labels to overflow */
+  overflow: visible;
+}
+
+.fs-stack-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Uniform vertical spacing */
+  gap: calc(12 / 1080 * 100vw);
+  position: relative;
+  overflow: visible;
+
+  /* Fixed column grid system */
+  --dot-size: calc(28 / 1080 * 100vw);
+  --col-gap: calc(12 / 1080 * 100vw);
+  --col-1: 0;
+  --col-2: calc(var(--dot-size) + var(--col-gap));
+  --col-3: calc(2 * (var(--dot-size) + var(--col-gap)));
+  --col-4: calc(3 * (var(--dot-size) + var(--col-gap)));
+  --grid-width: calc(4 * var(--dot-size) + 3 * var(--col-gap));
+  --tooltip-width: calc(540 / 1080 * 100vw);
+
+  /* Content width accommodates tooltip */
+  width: var(--tooltip-width);
+}
+
+/* Hide all content initially to prevent flicker - JS will reveal */
+.fs-stack-content .fs-label-endpoint,
+.fs-stack-content .fs-label-row,
+.fs-stack-content .fs-dot,
+.fs-stack-content .fs-tooltip {
+  opacity: 0;
+}
+
+/* ---- Row container ---- */
+.fs-row {
+  position: relative;
+  min-height: var(--dot-size);
+  width: var(--grid-width);
+  overflow: visible;
+}
+
+.fs-row-dots {
+  /* Dots row uses the fixed grid */
+}
+
+.fs-row-layer {
+  /* Layer rows can extend beyond grid for labels */
+}
+
+/* ---- Endpoint Labels (Application & Qubits) ---- */
+.fs-row-label {
+  width: 100%;
+}
+
+.fs-label-endpoint {
+  font-family: var(--font-content);
+  font-size: calc(28 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  text-align: center;
+  padding: calc(8 / 1080 * 100vw) 0;
+  display: block;
+  width: 100%;
+}
+
+/* ---- Layer Labels (Developer Tools, OS, Engine) ---- */
+.fs-row-layer {
+  position: relative;
+  width: var(--grid-width);
+  height: var(--dot-size);
+  overflow: visible;
+}
+
+/* Developer Tools row keeps same width, dot overflows */
+
+.fs-label-row {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Accent dots in label rows - use absolute positioning for grid alignment */
+.fs-label-row .fs-dot {
+  position: absolute;
+  top: 0;
+  flex-shrink: 0;
+}
+
+.fs-label-text {
+  position: absolute;
+  white-space: nowrap;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* No hover color change - touch screens can leave hover "stuck" */
+
+.fs-label-text.is-active {
+  color: var(--blue);
+}
+
+/* Development tools - dot at col 4, text to left of dot */
+.fs-label-row[data-layer="development-tools"] .fs-dot {
+  left: var(--col-4);
+}
+.fs-label-row[data-layer="development-tools"] .fs-label-text {
+  right: calc(var(--grid-width) - var(--col-4) + var(--col-gap));
+}
+
+/* Operating system - purple dot at col 1, text extends right */
+.fs-label-row[data-layer="operating-system"] .fs-dot {
+  left: var(--col-1);
+}
+.fs-label-row[data-layer="operating-system"] .fs-label-text {
+  left: calc(var(--dot-size) + var(--col-gap));
+}
+
+/* Quantum Engine - teal dot at col 4, text to left with small gap */
+.fs-label-row[data-layer="quantum-engine"] .fs-dot {
+  left: var(--col-4);
+}
+.fs-label-row[data-layer="quantum-engine"] .fs-label-text {
+  right: calc(var(--grid-width) - var(--col-4) + var(--col-gap));
+}
+
+/* ---- Dots - Fixed Column Grid ---- */
+.fs-dot-row {
+  position: relative;
+  width: var(--grid-width);
+  height: var(--dot-size);
+}
+
+.fs-dot {
+  position: absolute;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 50%;
+  top: 0;
+}
+
+/* Fixed column positions - dots snap to these */
+.fs-dot.col-1 { left: var(--col-1); }
+.fs-dot.col-2 { left: var(--col-2); }
+.fs-dot.col-3 { left: var(--col-3); }
+.fs-dot.col-4 { left: var(--col-4); }
+
+.fs-dot.spacer {
+  display: none;
+}
+
+/* Exact colors from reference */
+.fs-dot.blue { background-color: #0078D4; }
+.fs-dot.blue-dark { background-color: #115EA3; }
+.fs-dot.purple { background-color: #8661C5; }
+.fs-dot.purple-light { background-color: #C5B4E3; }
+.fs-dot.teal { background-color: #49C5B1; }
+.fs-dot.gray { background-color: #B1B3B3; }
+.fs-dot.gray-light { background-color: #B1B3B3; }
+.fs-dot.white { background-color: #FFFFFF; box-shadow: 0 0 0 1px rgba(0,0,0,0.05); }
+
+/* ---- Tooltip Row - centered ---- */
+.fs-row-tooltip {
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  width: var(--tooltip-width);
+  /* Height controlled by JS for animation */
+}
+
+/* ---- Inline Tooltips ---- */
+.fs-tooltip {
+  width: calc(540 / 1080 * 100vw);
+  padding: calc(16 / 1080 * 100vw) calc(20 / 1080 * 100vw);
+  border-radius: calc(16 / 1080 * 100vw);
+  overflow: hidden;
+  /* Add vertical margin to create spread effect */
+  margin: calc(16 / 1080 * 100vw) 0;
+}
+
+.fs-tooltip-devtools {
+  background: #0078D4;
+}
+
+.fs-tooltip-os {
+  background: #8661C5;
+}
+
+.fs-tooltip-engine {
+  background: #49C5B1;
+}
+
+.fs-tooltip-engine .fs-tooltip-title,
+.fs-tooltip-engine .fs-tooltip-body {
+  color: var(--blue-black);
+}
+
+.fs-tooltip-title {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 600;
+  color: var(--pure-white);
+  margin: 0 0 calc(8 / 1080 * 100vw) 0;
+}
+
+.fs-tooltip-body {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  color: var(--pure-white);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* ---- Footer Section ---- */
+.fs-footer {
+  position: absolute;
+  bottom: calc(350 / 1080 * 100vw);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(600 / 1080 * 100vw);
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 / 1080 * 100vw);
+}
+
+.fs-footer-title {
+  font-family: var(--font-content);
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  color: var(--blue-black);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.fs-footer-body {
+  font-family: var(--font-content);
+  font-size: calc(24 / 1080 * 100vw);
+  font-weight: var(--font-weight-regular);
+  color: var(--blue-black);
+  line-height: 1.5;
+  margin: 0;
+}

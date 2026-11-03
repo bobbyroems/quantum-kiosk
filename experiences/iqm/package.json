@@ -1,0 +1,30 @@
+{
+  "name": "quantum-kiosk-iqm-web",
+  "version": "2.0.1",
+  "private": true,
+  "description": "IQM interactive touchscreen experience - standalone web renderer",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 0",
+    "prebuild:renderer": "node scripts/check-media-assets.mjs public",
+    "build:renderer": "vite build",
+    "postbuild:renderer": "node scripts/check-media-assets.mjs dist",
+    "build": "npm run check && npm run build:renderer",
+    "preview": "vite preview --host 127.0.0.1 --port 0",
+    "check": "node scripts/check-syntax.mjs && npm test && npm run check:nanoscale && npm run check:assets",
+    "test": "node --test test/*.test.mjs",
+    "check:nanoscale": "node scripts/check-nanoscale-camera.mjs",
+    "check:assets": "node scripts/check-media-assets.mjs public"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "dependencies": {
+    "gsap": "3.15.0",
+    "lottie-web": "5.13.0",
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "vite": "7.3.6"
+  }
+}

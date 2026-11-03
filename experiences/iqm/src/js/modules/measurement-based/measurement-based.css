@@ -1,0 +1,647 @@
+.mbqc {
+  --mbqc-surface: #f2f4f5;
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  /* The delivered clips carry their own alpha, so this is the surface the
+     visitor actually sees around the device rather than something the footage
+     covers over. Same soft aurora wash as the carousel screen and Module 03,
+     over the module's own surface tone. */
+  background:
+    radial-gradient(1500px 1300px at 16% 10%, rgba(255, 227, 238, 0.6), transparent 62%),
+    radial-gradient(1700px 1500px at 86% 26%, rgba(217, 235, 252, 0.75), transparent 66%),
+    radial-gradient(1600px 1400px at 50% 92%, rgba(233, 240, 250, 0.6), transparent 70%),
+    var(--mbqc-surface);
+  color: #2a446f;
+  contain: layout paint style;
+  isolation: isolate;
+}
+
+.mbqc__media,
+.mbqc__video {
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+}
+
+.mbqc__media {
+  z-index: 0;
+  overflow: hidden;
+  /* Transparent, deliberately: the clips are VP9-alpha WebM and the browser
+     composites them source-over, so anything painted here would sit between
+     the artwork and the module's gradient and flatten it back out. */
+  background: transparent;
+  pointer-events: none;
+}
+
+.mbqc__video {
+  display: block;
+  object-fit: fill;
+  opacity: 0;
+  user-select: none;
+}
+
+.mbqc__video.is-active {
+  opacity: 1;
+}
+
+/* Joining two clips. Every swap between clips is faded rather than cut; the
+ * cuts were the first round of flashes.
+ *
+ * The arriving clip is stacked underneath at full strength and the leaving one
+ * fades off the top of it. Only one layer is ever in motion, so at every instant
+ * the composite is `a * leaving + (1 - a) * arriving` -- a straight dissolve
+ * with nothing behind it. Fading them in sequence instead, or crossing them
+ * over, both put the two layers near zero together for a moment, and since
+ * these clips are alpha over the module's light surface that moment is the
+ * surface itself coming through where the device should be. That hole was the
+ * second round of flashes.
+ *
+ * The arriving layer still ramps up over the first fifth rather than being
+ * switched on: the two clips do not frame the device identically, so its edges
+ * would otherwise appear from nowhere around the one still covering it.
+ * Durations are kept in step with MEDIA_JOIN_MS. */
+.mbqc__video[data-mbqc-fade='fade-in'],
+.mbqc__video[data-mbqc-fade='shrink-in'] {
+  z-index: 1;
+}
+
+.mbqc__video[data-mbqc-fade='fade-out'],
+.mbqc__video[data-mbqc-fade='shrink-out'] {
+  z-index: 2;
+}
+
+/* How long the copy waits before it moves on a build.
+ *
+ * It used to start 130ms in, which put its 780ms of fade and travel on top of
+ * the heaviest moment in the module: the leaving clip fading out over 620ms
+ * while the arriving one is already decoding, so two VP9-alpha layers are
+ * composited at once and the copy is animating over both. That is what chugs.
+ *
+ * The hold clears that window. Both halves of the choreography wait it out
+ * together: delaying only the entrance left the exit running at 0ms, so the
+ * old paragraph flew off, the space sat empty for 400ms, and the new one
+ * arrived as a second, separate movement in the same place. Held as a pair
+ * they keep the authored 130ms overlap and read as one continuous flow.
+ *
+ * The transition phase runs for the whole build clip -- the shortest is 7s --
+ * so the copy still lands well inside it.
+ */
+.mbqc {
+  --mbqc-copy-hold: 620ms;
+  --mbqc-copy-in-delay: calc(var(--mbqc-copy-hold) + 130ms);
+}
+
+.mbqc__video[data-mbqc-fade='fade-out'] {
+  animation: mbqc-media-out 620ms cubic-bezier(0.4, 0, 0.5, 1) both;
+}
+
+.mbqc__video[data-mbqc-fade='fade-in'] {
+  animation: mbqc-media-in 180ms linear both;
+}
+
+/* The opening edge. The module opens on a close-up card measuring 1490x1010
+   centred at (1079, 1919); the wide grid it becomes is 1540x760 centred at
+   (1080, 2048). The card scales down onto the video's rectangle as it fades,
+   and uncovers it.
+
+   The two axes are scaled separately, which is the only way this can land. The
+   card's proportions are 1.475 to one and the video's are 2.026 to one, so no
+   single factor turns one rectangle into the other: matching the heights at
+   760/1010 also takes the width down to 1120 against the video's 1540, and the
+   card ends up shrinking to something narrower than the frame and disappearing
+   inside it rather than onto it. 1540/1490 across and 760/1010 down puts all
+   four edges on the video's, and the 129px is the gap between the two centres.
+   The width barely moves -- 25px at each side -- so what is actually seen is
+   the card settling down onto the frame it becomes.
+
+   Only the leaving layer moves. transform-origin stays at the layer's centre,
+   which is the card's own centre to within a pixel. */
+.mbqc__video[data-mbqc-fade='shrink-out'] {
+  animation: mbqc-media-shrink-out 380ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.mbqc__video[data-mbqc-fade='shrink-in'] {
+  animation: mbqc-media-in 110ms linear both;
+}
+
+@keyframes mbqc-media-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes mbqc-media-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* The travel finishes at 70%, with the card down to a third of its opacity but
+   still plainly there, so the visitor sees it arrive on the video's rectangle
+   before it goes; the rest of the time is spent thinning out over the frame it
+   has landed on. Holding the card solid for the first half instead and fading
+   it late reads as a card shrinking away in front of a video that was already
+   playing, rather than as the card becoming it. */
+@keyframes mbqc-media-shrink-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1, 1);
+  }
+
+  70% {
+    opacity: 0.32;
+    transform: translateY(129px) scale(1.0336, 0.7525);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(129px) scale(1.0336, 0.7525);
+  }
+}
+
+/* The Figma-authored measurement callout. An intentional exception to the
+   explainer surface: it labels a coordinate in the device footage and
+   disappears once the protected-information state takes over.
+
+   The white corner and bar marks that used to sit alongside it are gone. They
+   stood in while the marks were not yet in the footage; the re-delivered clips
+   carry their own, and the overlay drew a second set on top. */
+.mbqc__measurement-annotations {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.mbqc__effect-defs {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mbqc__glow-mask {
+  mask-type: alpha;
+}
+
+/* Local backdrop luminance smoothly blends soft and pale lavender. Averaging
+   nearby pixels and avoiding a contrast boost keep changes in the video gentle.
+   Each mask combines a defined inner halo and a faint outer falloff, with
+   smaller halos on the dots. Both layers use the same adaptive colour mapping.
+   Keep these small layers directly under .mbqc so fading label wrappers cannot
+   isolate them from the video. No frame readback or video sampling is needed. */
+.mbqc__connector-shadow {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+  backdrop-filter: blur(16px) grayscale(1) invert(1) url('#mbqc-adaptive-glow-tone');
+  mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  mask-mode: alpha;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 220ms cubic-bezier(0.3, 0, 1, 1),
+    visibility 0s 220ms;
+}
+
+.mbqc__connector-shadow--measurement {
+  top: 1460px;
+  left: 662px;
+  width: 532px;
+  height: 382px;
+  mask-image: url('#mbqc-measurement-glow');
+}
+
+/* The callout covers the stage so its leader line can be drawn in the same
+   coordinates as the footage underneath it. Only the label is placed. */
+.mbqc__measurement-callout {
+  position: absolute;
+  inset: 0;
+  color: #2a446f;
+  opacity: 0;
+  transition: opacity 220ms cubic-bezier(0.3, 0, 1, 1);
+}
+
+/* Centred over x 928, the midpoint of the two marks the line points at, and
+   raised clear of the device so the bracket sits on the light surface rather
+   than over the dark grid. */
+.mbqc__measurement-callout span {
+  position: absolute;
+  top: 1392px;
+  left: 508px;
+  display: block;
+  width: 840px;
+  font-family: var(--font-ui);
+  font-size: 67.133px;
+  font-weight: 600;
+  letter-spacing: -1.343px;
+  line-height: 76.924px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mbqc__measurement-connector {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 2160px;
+  height: 3840px;
+  overflow: visible;
+  fill: #9567ff;
+}
+
+.mbqc__connector-ink > path {
+  fill: none;
+  stroke: #9567ff;
+  stroke-width: 5;
+}
+
+.mbqc__reveal-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mbqc[data-step='measurement-pair'][data-phase='stable'] .mbqc__measurement-callout,
+.mbqc[data-step='measurement-pair'][data-phase='stable'] .mbqc__connector-shadow--measurement {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 260ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+.mbqc__header.microsoft-header {
+  position: absolute;
+  z-index: 60;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+/* This is a Figma-authored transparent copy frame, not a new surface. The
+   shared explainer still owns its semantic anatomy and reveal lifecycle; this
+   module only supplies the exact frame geometry and typography. */
+.mbqc__explainer.kiosk-explainer {
+  --kiosk-explainer-active-transform: translateY(0);
+  --kiosk-explainer-body-color: #2a446f;
+  --kiosk-explainer-body-size: 60px;
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-content-gap: 80px;
+  --kiosk-explainer-enter-opacity-duration: 600ms;
+  --kiosk-explainer-enter-opacity-easing: var(--ease-out);
+  --kiosk-explainer-enter-transform-duration: 780ms;
+  --kiosk-explainer-enter-transform-easing: var(--ease-out);
+  --kiosk-explainer-exit-opacity-duration: 260ms;
+  --kiosk-explainer-exit-opacity-easing: cubic-bezier(0.3, 0, 1, 1);
+  --kiosk-explainer-exit-transform-duration: 260ms;
+  --kiosk-explainer-exit-transform-easing: cubic-bezier(0.3, 0, 1, 1);
+  --kiosk-explainer-exit-visibility-delay: 260ms;
+  --kiosk-explainer-ink: #2a446f;
+  --kiosk-explainer-padding: 60px;
+  /* The panel's own appearance travels the same distance the copy swap does, so
+     the module opens and restarts on the one upward move rather than easing in
+     on a 24px drift that reads as a fade. */
+  --kiosk-explainer-rest-transform: translateY(200px);
+  --kiosk-explainer-title-size: 96px;
+
+  position: absolute;
+  z-index: 10;
+  top: 536px;
+  left: 50%;
+  box-sizing: border-box;
+  width: 1512px;
+  height: auto;
+  margin: 0;
+  transform: translateX(-50%) var(--kiosk-explainer-rest-transform);
+}
+
+.mbqc__explainer.kiosk-explainer.is-showing {
+  transform: translateX(-50%) var(--kiosk-explainer-active-transform);
+}
+
+/* The layer a build boundary hands the incoming copy to. It is only ever shown
+   from hidden at a boundary, where mbqc-copy-in already owns the entrance, so
+   the panel's own is switched off here: run together they stacked 96px of
+   panel travel under 108px of copy travel and multiplied their two opacity
+   ramps, which is what made the text pop into place at the end of the move
+   rather than arrive. */
+.mbqc__explainer--transition.kiosk-explainer {
+  --kiosk-explainer-enter-opacity-duration: 0s;
+  --kiosk-explainer-enter-transform-duration: 0s;
+  --kiosk-explainer-rest-transform: translateY(0);
+
+  z-index: 11;
+}
+
+.mbqc__explainer .kiosk-explainer__copy {
+  width: 100%;
+}
+
+.mbqc__explainer .kiosk-explainer__title,
+.mbqc__explainer .kiosk-explainer__body {
+  flex: 0 0 auto;
+  color: #2a446f;
+  line-height: 1.330078;
+  text-align: center;
+}
+
+.mbqc__explainer .kiosk-explainer__title {
+  width: 1392px;
+  font-family: var(--font-text);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: pre-line;
+}
+
+.mbqc__explainer .kiosk-explainer__body {
+  width: 1392px;
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: normal;
+}
+
+.mbqc__explainer[data-copy-step='opening'].kiosk-explainer {
+  width: 1588px;
+}
+
+.mbqc__explainer[data-copy-step='opening'] .kiosk-explainer__title {
+  width: 1468px;
+  white-space: nowrap;
+}
+
+.mbqc__explainer[data-copy-step='opening'] .kiosk-explainer__body {
+  width: 1378px;
+}
+
+/* Both layers are promoted for the whole transition phase rather than only
+   while their keyframes run. The phase and the copy-change flag are set
+   together at the boundary, so the layer gets built during the hold above --
+   somewhere quiet -- instead of in the first frames of the entrance, which is
+   the frame the eye is actually on. The flags clear at settle, so neither
+   layer is left promoted while the module sits on a reading.
+
+   A build clip runs for several seconds; the text it carries should not. Each
+   boundary uses the same choreography — the outgoing copy accelerates up and
+   away, the incoming copy slides up into place from below it — and the copy
+   that arrives is the destination frame's own, so it simply stays put on
+   settle. The opening build swaps the whole block; the two later builds hold
+   the shared title still and move only the paragraph under it.
+
+   The entrance travels 220px over 780ms. It used to move 30px over 280ms with
+   a scale under it, which at this stage size is not a slide at all: on a
+   2160x3840 board that is under one percent of the height, so the eye reads a
+   dissolve with a twitch in it rather than copy arriving from below. 220px is
+   a little over two lines of the body copy, which is far enough that the eye
+   follows the block up rather than just noticing it has changed. */
+.mbqc[data-phase='transition'][data-copy-change='copy'] .mbqc__explainer--current .kiosk-explainer__copy {
+  animation: mbqc-copy-out 300ms cubic-bezier(0.3, 0, 1, 1) var(--mbqc-copy-hold) both;
+  will-change: transform, opacity;
+}
+
+.mbqc[data-phase='transition'][data-copy-change='copy'] .mbqc__explainer--transition .kiosk-explainer__copy {
+  animation:
+    mbqc-copy-in 780ms var(--ease-out) var(--mbqc-copy-in-delay) both,
+    mbqc-copy-in-fade 420ms linear var(--mbqc-copy-in-delay) both;
+  will-change: transform, opacity;
+}
+
+.mbqc[data-phase='transition'][data-copy-change='body'] .mbqc__explainer--transition .kiosk-explainer__title {
+  visibility: hidden;
+}
+
+.mbqc[data-phase='transition'][data-copy-change='body'] .mbqc__explainer--current .kiosk-explainer__body {
+  animation: mbqc-copy-out 300ms cubic-bezier(0.3, 0, 1, 1) var(--mbqc-copy-hold) both;
+  will-change: transform, opacity;
+}
+
+.mbqc[data-phase='transition'][data-copy-change='body'] .mbqc__explainer--transition .kiosk-explainer__body {
+  animation:
+    mbqc-copy-in 780ms var(--ease-out) var(--mbqc-copy-in-delay) both,
+    mbqc-copy-in-fade 420ms linear var(--mbqc-copy-in-delay) both;
+  will-change: transform, opacity;
+}
+
+/* Advancing between two readings of the same loop plays no build clip, so there
+   is no transition layer to hand the copy over to: the current panel runs the
+   entrance in place. Where the heading carries over, only the paragraph moves;
+   where it turns over, the whole block comes in. */
+.mbqc[data-copy-advance='body'] .mbqc__explainer--current .kiosk-explainer__body,
+.mbqc[data-copy-advance='copy'] .mbqc__explainer--current .kiosk-explainer__copy {
+  animation:
+    mbqc-copy-in 780ms var(--ease-out) both,
+    mbqc-copy-in-fade 420ms linear both;
+}
+
+@keyframes mbqc-copy-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -150px, 0);
+  }
+}
+
+/* One segment, deliberately. A timing function in CSS is applied between each
+   pair of keyframes, not across the animation, so the 55% stop this used to
+   carry was easing twice: the block covered 220px down to 54px and decelerated
+   to a dead stop at 429ms, held there for about 80ms, then re-accelerated from
+   0 to 0.74px/ms for the last 54px. Two movements with a stop between them,
+   which is what "not one consistent move" was -- and it was frame-rate
+   independent, so no amount of making the frames cheaper could have fixed it.
+ *
+ * --ease-out is cubic-bezier(0.16, 1, 0.3, 1), which already spends most of
+ * its distance early and settles long. The 55% stop was hand-authoring the
+ * shape the curve gives for free, and breaking it in the process.
+ *
+ * Travel only. The keyframes also used to carry a scale -- 0.955 up through
+ * 1.012 and back to 1 -- which reversed direction at that same stop and, being
+ * a scaling layer of live text, was re-rastered rather than blitted. */
+@keyframes mbqc-copy-in {
+  from {
+    transform: translate3d(0, 220px, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Carried separately so the copy is legible for most of the distance it covers
+   rather than arriving already faded in and then drifting. Two animations on
+   one element is what lets the fade lead the travel without putting a second
+   stop in the travel to hang it on. */
+@keyframes mbqc-copy-in-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Figma keeps this artwork-anchored annotation separate from both the shared
+   explainer and the footage. It arrives with the protected-information device
+   state and marks the two encoded regions with the authored connector SVG. */
+.mbqc__protected-callout {
+  position: absolute;
+  z-index: 8;
+  top: 1423px;
+  left: 470.5px;
+  width: 647px;
+  height: 442px;
+  color: #2a446f;
+  opacity: 0;
+  transition: opacity 220ms cubic-bezier(0.3, 0, 1, 1);
+  pointer-events: none;
+}
+
+.mbqc__protected-title,
+.mbqc__protected-body {
+  position: absolute;
+  display: block;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  text-align: center;
+}
+
+.mbqc__protected-title {
+  top: 0;
+  left: 0;
+  width: 647px;
+  font-size: 67.133px;
+  letter-spacing: -1.343px;
+  line-height: 76.924px;
+  white-space: nowrap;
+}
+
+.mbqc__protected-body {
+  top: 91.259px;
+  left: 99px;
+  width: 449px;
+  font-size: 41.958px;
+  letter-spacing: -0.839px;
+  line-height: 50.35px;
+}
+
+.mbqc__protected-connector {
+  position: absolute;
+  top: 218px;
+  left: 147.9px;
+  display: block;
+  width: 784px;
+  height: 555px;
+}
+
+/* The board draws this annotation from the information-cloud build through the
+   two frames that talk about the encoding, and drops it again on the closing
+   bridge frame, whose copy has moved on to the next module. */
+.mbqc[data-phase='transition'][data-transition='information-cloud'] .mbqc__protected-callout,
+.mbqc[data-step='protected-information']:not([data-phase='loading']):not([data-phase='preparing']) .mbqc__protected-callout {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 260ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+.mbqc__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A transparent action target makes the reading surface tappable. Header and
+   shared band controls remain above it; the shared tooltip supplies guidance. */
+.mbqc__advance {
+  position: absolute;
+  z-index: 12;
+  inset: 340px 0 0;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mbqc__advance:disabled { pointer-events: none; }
+.mbqc__advance[hidden] { display: none; }
+.mbqc__advance:focus-visible { outline: 4px solid #2a446f; outline-offset: -16px; }
+
+.mbqc__continue.kiosk-tooltip {
+  position: absolute;
+  z-index: 15;
+  top: 2640px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.mbqc__continue .kiosk-tooltip__text { color: #2a446f; }
+
+/* The document combines two paragraphs here. Reserve the area above the
+   artwork-anchored label at y=1423, including the incoming copy's travel. */
+.mbqc__explainer[data-copy-step='protected-information'].kiosk-explainer {
+  top: 410px;
+  width: 1800px;
+  --kiosk-explainer-content-gap: 64px;
+}
+.mbqc__explainer[data-copy-step='protected-information'] .kiosk-explainer__title {
+  width: 1680px;
+  font-size: 88px;
+}
+.mbqc__explainer[data-copy-step='protected-information'] .kiosk-explainer__body {
+  width: 1680px;
+  font-size: 56px;
+  line-height: 1.3;
+  white-space: pre-line;
+}
+
+/* Keep the longer block within its reserved area throughout the entrance. */
+.mbqc[data-phase='transition'] .mbqc__explainer--transition[data-copy-step='protected-information'] .kiosk-explainer__copy {
+  /* Replaces the shorthand outright rather than renaming it: the entrance is
+     two animations now, and swapping only the first name would leave the fade
+     running against a keyframe set that already carries its own opacity. */
+  animation: mbqc-protected-copy-in 780ms var(--ease-out) var(--mbqc-copy-in-delay) both;
+  will-change: transform, opacity;
+}
+@keyframes mbqc-protected-copy-in {
+  from { opacity: 0; transform: translateY(64px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mbqc__connector-flow {
+    display: none;
+  }
+
+  .mbqc__video[data-mbqc-fade],
+  .mbqc__video,
+  .mbqc__explainer,
+  .mbqc__explainer .kiosk-explainer__body,
+  .mbqc__measurement-callout,
+  .mbqc__connector-shadow,
+  .mbqc__protected-callout {
+    animation: none;
+    /* Override the phase selectors for both ink and adaptive glow. */
+    transition: none !important;
+  }
+}

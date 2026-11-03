@@ -1,0 +1,952 @@
+/*
+ * Nanoscale — audited against the current Figma Feedback frames (58:4672 and siblings).
+ *
+ * The stage is a camera, not a stack of centred slides. JavaScript writes only
+ * transform and opacity on the registered scene stack; all informational UI
+ * remains in fixed 2160 x 3840 design coordinates.
+ */
+
+.nz {
+  --nz-blue: #0078d4;
+  --nz-navy: #2a446f;
+  --nz-comparison-media-fill: transparent;
+  --nz-comparison-surface-fill: rgb(255 255 255 / 0.6);
+  --nz-comparison-stroke: rgb(0 120 212 / 0.2);
+  --nz-comparison-shadow: 0 20px 60px rgb(122 165 199 / 0.2);
+  --nz-comparison-backdrop-filter: none;
+  --nz-comparison-caption-color: var(--nz-navy);
+  --nz-caption-fill: transparent;
+  --nz-dimension-color: var(--nz-blue);
+  --nz-dimension-label-color: var(--nz-blue);
+  --nz-scrubber-scrim-fill: transparent;
+  --nz-scrubber-scrim-filter: none;
+  --nz-scrubber-axis-color: var(--nz-blue);
+  --nz-scrubber-number-color: var(--nz-blue);
+  --nz-scrubber-marker-color: var(--nz-blue);
+  --nz-scrubber-x: 499px;
+  /* Kept in step with NANOSCALE_SCRUBBER.y, which overrides this inline. */
+  --nz-scrubber-y: 2702px;
+  --nz-scrubber-width: 1109px;
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  background: #fff;
+  color: var(--nz-navy);
+  font-family: var(--font-text);
+  isolation: isolate;
+  touch-action: none;
+  user-select: none;
+}
+
+.nz__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Registered camera scenes ---------- */
+
+.nz__stack {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Rubber-band for a drag pushed past either end of the journey. The offset is
+     written by the gesture and the camera never sees it, so the artwork can
+     give a little where the timeline cannot. */
+  transform: translate3d(var(--nz-overscroll-x, 0px), var(--nz-overscroll-y, 0px), 0);
+  transition: transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* While a finger is down the artwork tracks it directly; the transition is only
+   wanted for the release, when clearing the offset becomes the spring back. */
+.nz.is-zooming .nz__stack {
+  transition: none;
+}
+
+/* Each handoff owns one nested, bounded camera. Completed cameras keep a 2D
+   endpoint matrix while only the active outer camera is promoted, so neither
+   integer stops nor later deep zooms re-raster the retained child stack. */
+.nz__stack-camera {
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  contain: layout paint style;
+  transform-origin: 0 0;
+}
+
+.nz__scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2160px;
+  height: 3840px;
+  margin: 0;
+  contain: paint;
+  overflow: hidden;
+  /* The root owns the one opaque backing. Registered prior scenes remain
+     visible through transparent regions of every later overlay. */
+  background: transparent;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.nz__scene-camera {
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  transform-origin: 0 0;
+}
+
+.nz__scene-art {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: var(--nz-scene-fit, cover);
+  object-position: var(--nz-scene-position, center center);
+}
+
+/* One alpha ramp per authored axis, intersected, so a plate can dissolve into
+   the scene retained beneath it instead of ending on a hard rectangle. */
+.nz__scene-art[data-nz-art-mask] {
+  -webkit-mask-image: var(--nz-art-mask);
+  mask-image: var(--nz-art-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Hardware placed on an SEM photograph arrives as its own beat, after the
+   photograph it sits on has settled. */
+.nz__scene-art[data-nz-art-reveal] {
+  transition: opacity 560ms ease var(--nz-art-reveal-delay, 0ms);
+}
+
+/* ---------- Measurement ---------- */
+
+.nz__dimension {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  pointer-events: none;
+}
+
+.nz__dimension-span,
+.nz__dimension-extension {
+  fill: none;
+  stroke: var(--nz-dimension-color);
+  stroke-width: var(--nz-dimension-stroke, 4px);
+}
+
+.nz__dimension-extension {
+  stroke-dasharray: var(--nz-extension-dash, 5 9);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.nz__dimension-arrow {
+  fill: var(--nz-dimension-color);
+  opacity: 0;
+  transition: opacity 180ms ease 180ms;
+}
+
+.nz__dimension-span {
+  stroke-dasharray: var(--nz-span-length, 1000);
+  stroke-dashoffset: var(--nz-span-length, 1000);
+  transition: stroke-dashoffset 560ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nz.is-measurement .nz__dimension-span {
+  stroke-dashoffset: 0;
+}
+
+.nz.is-measurement .nz__dimension-extension,
+.nz.is-measurement .nz__dimension-arrow {
+  opacity: 1;
+}
+
+.nz__dimension-label {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  /* The span is broken around this label, so it needs no backing plate. */
+  background: none;
+  color: var(--nz-dimension-label-color);
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.33;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 220ms ease 180ms;
+  white-space: nowrap;
+}
+
+.nz.is-measurement .nz__dimension-label {
+  opacity: 1;
+}
+
+/* ---------- Shared kiosk header ---------- */
+
+.nz__header.microsoft-header {
+  position: absolute;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Solid, like the header on every other module. It was 70% white so the
+     zoom journey showed through behind it, but the artwork passing under the
+     brand bar reads as the header fading rather than as depth. */
+  background: var(--color-panel);
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.14),
+    0 0 2px rgb(0 0 0 / 0.12);
+}
+
+.nz__header .microsoft-brand {
+  gap: 0;
+}
+
+.nz__header .microsoft-brand__divider {
+  background: #737373;
+  margin-right: 39px;
+}
+
+.nz__header .microsoft-brand__quantum {
+  letter-spacing: 0;
+}
+
+.nz__header .microsoft-header__actions {
+  gap: 60px;
+}
+
+.nz__header .microsoft-header__action.microsoft-header__action {
+  min-width: 0;
+  min-height: 66px;
+  height: 66px;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.nz__header .microsoft-header__action:first-child {
+  width: 180px;
+}
+
+.nz__header .microsoft-header__action:last-child {
+  width: 130px;
+}
+
+.nz__header .microsoft-header__action-icon img {
+  width: 36px;
+  height: 36px;
+}
+
+/* ---------- Authored copy and comparison ---------- */
+
+.nz__intro.kiosk-explainer,
+.nz__identity.kiosk-explainer {
+  --kiosk-explainer-active-transform: translateY(0);
+  --kiosk-explainer-body-color: var(--nz-navy);
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-content-gap: 0px;
+  --kiosk-explainer-ink: var(--nz-navy);
+  --kiosk-explainer-padding: 0px;
+  --kiosk-explainer-rest-transform: translateY(6px);
+  position: absolute;
+  margin: 0;
+  align-items: stretch;
+}
+
+.nz__intro.kiosk-explainer {
+  --kiosk-explainer-body-size: var(--nz-intro-body-size, 60px);
+  --kiosk-explainer-body-white-space: normal;
+  --kiosk-explainer-content-gap: 80px;
+  --kiosk-explainer-padding: 60px;
+  --kiosk-explainer-title-size: var(--nz-intro-title-size, 96px);
+  z-index: 8;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.nz__intro .kiosk-explainer__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  gap: 80px;
+  margin: 0;
+}
+
+.nz__intro .kiosk-explainer__title,
+.nz__intro .kiosk-explainer__body {
+  display: block;
+  flex: 0 0 auto;
+  padding: 0;
+  color: var(--nz-navy);
+  font-family: var(--font-display);
+  text-align: center;
+}
+
+.nz__intro .kiosk-explainer__title {
+  width: var(--nz-intro-title-width, 993.7835px);
+  height: var(--nz-intro-title-height, 128.0452px);
+  font-size: var(--nz-intro-title-size, 96px);
+  font-weight: var(--nz-intro-title-weight, 600);
+  letter-spacing: var(--nz-intro-title-tracking, -0.02em);
+  line-height: var(--nz-intro-title-leading, 127.6875px);
+}
+
+.nz__intro .kiosk-explainer__body {
+  width: var(--nz-intro-body-width, 880px);
+  height: var(--nz-intro-body-height, 321.0685px);
+  font-size: var(--nz-intro-body-size, 60px);
+  font-weight: var(--nz-intro-body-weight, 600);
+  letter-spacing: var(--nz-intro-body-tracking, -0.02em);
+  line-height: var(--nz-intro-body-leading, 80.2671px);
+  white-space: normal;
+}
+
+.nz__identity.kiosk-explainer {
+  --kiosk-explainer-body-size: var(--nz-identity-body-size, 40px);
+  --kiosk-explainer-title-size: var(--nz-identity-title-size, 60px);
+  z-index: 7;
+  text-align: left;
+}
+
+.nz__identity .kiosk-explainer__copy {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.nz__identity .kiosk-explainer__title,
+.nz__identity .kiosk-explainer__subtitle,
+.nz__identity .kiosk-explainer__body {
+  position: absolute;
+  display: block;
+  padding: 0;
+  color: var(--nz-navy);
+  text-align: left;
+  white-space: normal;
+}
+
+.nz__identity .kiosk-explainer__title {
+  top: var(--nz-identity-title-y, 60px);
+  left: var(--nz-identity-title-x, 60px);
+  width: var(--nz-identity-title-width, 500px);
+  height: var(--nz-identity-title-height, 80.2671px);
+  font-family: var(--font-display);
+  font-size: var(--nz-identity-title-size, 60px);
+  font-weight: var(--nz-identity-title-weight, 600);
+  letter-spacing: var(--nz-identity-title-tracking, -0.02em);
+  line-height: var(--nz-identity-title-leading, 80.2671px);
+}
+
+/* The qualifier under the heading. Sits at the box the layout gives it, which
+   is the title's box end — the two read as one heading in two sizes. */
+.nz__identity .kiosk-explainer__subtitle {
+  top: var(--nz-identity-subtitle-y, 140px);
+  left: var(--nz-identity-subtitle-x, 60px);
+  width: var(--nz-identity-subtitle-width, 500px);
+  height: var(--nz-identity-subtitle-height, 96px);
+  font-family: var(--font-display);
+  font-size: var(--nz-identity-subtitle-size, 36px);
+  font-weight: var(--nz-identity-subtitle-weight, 600);
+  letter-spacing: var(--nz-identity-subtitle-tracking, -0.02em);
+  line-height: var(--nz-identity-subtitle-leading, 48px);
+}
+
+.nz__identity .kiosk-explainer__body {
+  top: var(--nz-identity-body-y, 200.2671px);
+  left: var(--nz-identity-body-x, 60px);
+  width: var(--nz-identity-body-width, 500px);
+  height: var(--nz-identity-body-height, 193.0233px);
+  font-family: var(--font-text);
+  font-size: var(--nz-identity-body-size, 40px);
+  font-weight: var(--nz-identity-body-weight, 400);
+  letter-spacing: var(--nz-identity-body-tracking, -0.01em);
+  line-height: var(--nz-identity-body-leading, 48px);
+}
+
+.nz__comparison {
+  position: absolute;
+  z-index: 7;
+  display: grid;
+  grid-template-rows: 662px var(--nz-comparison-caption-height, 162px);
+  gap: 4px;
+  margin: 0;
+  overflow: visible;
+  border-radius: 12px 12px 0 0;
+  background: var(--nz-comparison-surface-fill);
+  box-shadow: var(--nz-comparison-shadow);
+  -webkit-backdrop-filter: var(--nz-comparison-backdrop-filter);
+  backdrop-filter: var(--nz-comparison-backdrop-filter);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms ease;
+}
+
+.nz.is-measurement .nz__comparison {
+  opacity: 1;
+}
+
+.nz__comparison-media-frame,
+.nz__comparison-footer {
+  overflow: hidden;
+  outline: 2px solid var(--nz-comparison-stroke);
+}
+
+/* The card, its picture and its caption share one silhouette: rounded at the
+   top, square where the caption meets the bottom edge. Rounding only the
+   picture left the square white surface showing through at its corners. */
+.nz__comparison-media-frame {
+  position: relative;
+  border-radius: 12px 12px 0 0;
+  background: var(--nz-comparison-media-fill);
+}
+
+.nz__comparison-media-image {
+  pointer-events: none;
+  user-select: none;
+}
+
+.nz__comparison-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 30px;
+  border-radius: 0;
+  background: var(--nz-caption-fill);
+  color: var(--nz-comparison-caption-color);
+  font-family: var(--font-display);
+  font-size: var(--nz-comparison-caption-size, 40px);
+  font-weight: var(--nz-comparison-caption-weight, 600);
+  line-height: var(--nz-comparison-caption-leading, 53.5114px);
+  text-align: center;
+}
+
+.nz__comparison-footer strong {
+  font-weight: inherit;
+}
+
+.nz__instruction.kiosk-tooltip {
+  position: absolute;
+  z-index: 9;
+  min-height: 0;
+  padding: var(--nz-instruction-padding-y, 22px) var(--nz-instruction-padding-x, 32px);
+  background: #f2f4f5;
+  /* Light tooltip: use a dark drop shadow so it reads on the white splash. */
+  box-shadow: 0 4px 20px rgb(31 55 80 / 0.22);
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  visibility: hidden;
+  transition:
+    opacity 120ms cubic-bezier(0.3, 0, 1, 1),
+    transform 120ms cubic-bezier(0.3, 0, 1, 1),
+    visibility 0s linear 120ms;
+}
+
+.nz__instruction .kiosk-tooltip__text {
+  width: 100%;
+  color: #7c8282;
+  font-family: var(--font-text);
+  font-size: var(--nz-instruction-size, 36px);
+  font-weight: var(--nz-instruction-weight, 600);
+  letter-spacing: var(--nz-instruction-tracking, 0);
+  line-height: var(--nz-instruction-leading, 47.7781px);
+}
+
+.nz.is-splash .nz__instruction.kiosk-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  visibility: visible;
+  transition:
+    opacity 180ms cubic-bezier(0.2, 0, 0, 1),
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    visibility 0s linear 0s;
+}
+
+/* The direction is the one thing a visitor has to guess, so it is drawn as well
+   as written. Sits after the words inside the pill's centred flex row. */
+.nz__instruction-arrow {
+  width: 30px;
+  height: 37px;
+  margin-left: 0.5em;
+  flex: 0 0 auto;
+  animation: nz-swipe-arrow-nudge 2200ms cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Ambient until it has been missed three times over. Then the pill leans on the
+   shoulder: it shifts off its resting offset, the arrow doubles its travel and
+   loses the pauses between beats. */
+.nz.is-misdirected .nz__instruction.kiosk-tooltip {
+  /* The colour shift carries the escalation on its own where motion is refused,
+     so the third miss is answered there too. Brand blue against the grey the
+     pill rests at, matching the arrow it is asking to be read with. */
+  background: #eaf4fc;
+  box-shadow: 0 4px 20px rgb(0 120 212 / 0.28);
+  animation: nz-instruction-insist 720ms cubic-bezier(0.36, 0.07, 0.19, 0.97) 2;
+}
+
+.nz.is-misdirected .nz__instruction .kiosk-tooltip__text {
+  color: #0078d4;
+}
+
+.nz.is-misdirected .nz__instruction-arrow {
+  animation-name: nz-swipe-arrow-insist;
+  animation-duration: 900ms;
+}
+
+@keyframes nz-swipe-arrow-nudge {
+  0%,
+  22%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes nz-swipe-arrow-insist {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-28px);
+  }
+}
+
+/* Keeps the pill's own translateX(-50%) centring — a bare translateY here would
+   drop it back to the left edge for the length of the shake. */
+@keyframes nz-instruction-insist {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  25% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+
+  75% {
+    transform: translateX(-50%) translateY(6px);
+  }
+}
+
+/* ---------- Figma-authored scrollytelling finale ---------- */
+
+.nz__finale {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  color: var(--nz-navy);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.nz__finale-track {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 2160px;
+  height: 3840px;
+  contain: layout paint style;
+}
+
+.nz__finale-section {
+  position: absolute;
+  left: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+}
+
+.nz__finale-section--scale {
+  top: 0;
+  background: transparent;
+}
+
+/* The top-edge connector that carries the visitor into the built-to-scale
+   screen. */
+.nz__finale-guide {
+  position: absolute;
+  top: 0;
+  left: 1070px;
+  width: 20px;
+  height: 470px;
+  overflow: visible;
+  fill: #408bf5;
+}
+
+.nz__finale-guide line {
+  fill: none;
+  stroke: #408bf5;
+  stroke-width: 6px;
+  stroke-linecap: round;
+  stroke-dasharray: 1 18;
+  vector-effect: non-scaling-stroke;
+}
+
+.nz__finale-copy {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px;
+  color: var(--nz-navy);
+  text-align: center;
+}
+
+.nz__finale-copy--scale {
+  top: 500px;
+  left: 520px;
+  width: 1120px;
+  height: 908px;
+}
+
+.nz__finale-copy h2,
+.nz__finale-copy p {
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.nz__finale-copy h2 {
+  width: 100%;
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 128px;
+  white-space: nowrap;
+}
+
+.nz__finale-paragraphs {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  width: 960px;
+  margin-top: 60px;
+}
+
+.nz__finale-copy p {
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 80px;
+}
+
+.nz__finale-figure {
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  margin: 0;
+}
+
+.nz__finale-field,
+.nz__finale-field-ghost,
+.nz__finale-marker {
+  position: absolute;
+  display: block;
+  user-select: none;
+}
+
+.nz__finale-field,
+.nz__finale-field-ghost {
+  top: 2058px;
+  left: 1305px;
+  width: 673px;
+  height: 323px;
+  object-fit: cover;
+}
+
+/* The crisp field is revealed left to right as the count climbs, uncovering the
+   pixelated ground beneath it. Clipping rather than fading: the board's boundary
+   between built and unbuilt is a hard edge. */
+.nz__finale-field {
+  clip-path: inset(0 calc((1 - var(--nz-field-fill, 0)) * 100%) 0 0);
+}
+
+/* Scaled up from 84x40, so each source pixel lands as one 8px block — the size
+   the board's censor uses. Held back so the filled part reads as the solid one. */
+.nz__finale-field-ghost {
+  opacity: 0.55;
+  image-rendering: pixelated;
+}
+
+.nz__finale-marker {
+  top: 2176px;
+  left: 600px;
+  width: 20px;
+  height: 20px;
+}
+
+/* The number's right edge and the word's left edge are both pinned, so the
+   count grows leftwards into its own space instead of shunting the word along
+   as it gains digits. */
+.nz__finale-count {
+  margin: 0;
+  color: #225b62;
+  font-family: var(--font-display);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 128px;
+  white-space: nowrap;
+}
+
+.nz__finale-count-value,
+.nz__finale-count-unit {
+  position: absolute;
+  top: 1500px;
+  height: 128px;
+}
+
+.nz__finale-count-value {
+  right: 1077px;
+  font-variant-numeric: tabular-nums;
+}
+
+.nz__finale-count-unit {
+  left: 1143px;
+}
+
+.nz__finale-scale-label {
+  position: absolute;
+  top: 1836px;
+  color: var(--nz-navy);
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 53px;
+  white-space: nowrap;
+}
+
+.nz__finale-scale-label--machine {
+  left: 366px;
+}
+
+.nz__finale-scale-label--other {
+  left: 1425px;
+}
+
+/* Fades out at both ends rather than butting into the copy above and the
+   nothing below. */
+.nz__finale-divider {
+  position: absolute;
+  top: 1920px;
+  left: 1080px;
+  width: 1px;
+  height: 625px;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.2),
+    #333333 50%,
+    rgb(0 0 0 / 0.2)
+  );
+}
+
+/* The cue to carry on past the last numbered specimen. Same pill as the
+   finale's own prompt, because it is the same kind of instruction one screen
+   earlier, and it sits above the timeline rather than over the artwork so it
+   never lands on the thing it is asking to be scrolled past. */
+.nz__scroll-cue.kiosk-tooltip {
+  /* Barely breathes. The shared pulse dips to 0.72, which on a cue that sits
+     over live artwork read as the prompt going away and coming back; this
+     keeps the movement as a flicker of life rather than a fade. */
+  --kiosk-tooltip-breathe-floor: 0.92;
+
+  position: absolute;
+  z-index: 9;
+  top: 2660px;
+  left: 1080px;
+  box-sizing: border-box;
+  width: max-content;
+  padding: 20px 40px;
+  /* A step greyer than the splash instruction and the finale prompt. This one
+     asks for something while the artwork is still on screen behind it, where
+     the near-white pill those two use had too little to sit against. */
+  background: #e6e9ea;
+  box-shadow: 0 4px 20px rgb(31 55 80 / 0.22);
+  color: #7c8282;
+  /* Opacity is written inline by the render pass, the way every other fading
+     part of this module is driven — it has to follow the timeline's curve as
+     the visitor scrolls, which a class alone cannot express. */
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  visibility: hidden;
+  transition:
+    transform 240ms ease,
+    visibility 0s linear 240ms;
+}
+
+.nz__scroll-cue .kiosk-tooltip__text {
+  color: #7c8282;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 48px;
+  white-space: nowrap;
+}
+
+/* Rides the timeline's fade: scrolling on is the thing it asked for, so it
+   leaves with the timeline rather than being dismissed separately. */
+.nz.is-scroll-cue .nz__scroll-cue.kiosk-tooltip {
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0s;
+}
+
+/* ---------- Five-stop scrubber ---------- */
+
+.nz__scrubber {
+  position: absolute;
+  z-index: 7;
+  top: var(--nz-scrubber-y);
+  left: var(--nz-scrubber-x);
+  width: var(--nz-scrubber-width);
+  height: 155px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+.nz.has-science-ui .nz__scrubber {
+  opacity: var(--nz-scrubber-opacity, 1);
+}
+
+/* Its own ground on the photographic stops, where the artwork behind the track
+   swings from near-black gaps to bright wire traces. Painted before the
+   positioned track, ticks, number and marker, so it sits under all of them. */
+.nz__scrubber::before {
+  content: '';
+  position: absolute;
+  inset: -46px -120px;
+  /* 16px, the radius the Figma Button component uses for every CTA in the app.
+     Half the plate's height read as a stadium pill, which made the scrim look
+     like a control the visitor could press rather than a ground behind one. */
+  border-radius: 16px;
+  /* Both the tint and the blur radius are written per frame from the zoom
+     position, so neither needs a transition of its own. The element itself is
+     never faded: element opacity would dilute the backdrop filter along with
+     the tint, and the plate would read flat instead of frosted. */
+  background: var(--nz-scrubber-scrim-fill);
+  -webkit-backdrop-filter: var(--nz-scrubber-scrim-filter);
+  backdrop-filter: var(--nz-scrubber-scrim-filter);
+}
+
+.nz__scrubber-axis {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--nz-scrubber-axis-color);
+}
+
+.nz__tick {
+  position: absolute;
+  top: 65px;
+  width: 4px;
+  height: 30px;
+  background: var(--nz-scrubber-axis-color);
+  transform: translateX(-2px);
+}
+
+.nz__scrubber-number {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--nz-scrubber-number-color);
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  transform: translateX(calc(var(--nz-marker-x, 0px) - 50%));
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nz__scrubber-marker {
+  position: absolute;
+  top: 120px;
+  left: 0;
+  width: 35px;
+  height: 35px;
+  background: var(--nz-scrubber-marker-color);
+  clip-path: polygon(50% 0, 93.3% 75%, 6.7% 75%);
+  transform: translateX(calc(var(--nz-marker-x, 0px) - 50%));
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nz:focus-visible {
+  outline: 8px solid var(--nz-blue);
+  outline-offset: -8px;
+}
+
+.nz.is-zooming .nz__scrubber-marker,
+.nz.is-zooming .nz__scrubber-number {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nz__scene-art[data-nz-art-reveal],
+  .nz__dimension-span,
+  .nz__dimension-extension,
+  .nz__dimension-arrow,
+  .nz__dimension-label,
+  .nz__identity,
+  .nz__comparison,
+  .nz__intro,
+  .nz__instruction,
+  .nz__finale-track,
+  .nz__finale-guide,
+  .nz__finale-copy h2,
+  .nz__finale-copy p,
+  .nz__finale-figure,
+  .nz__scrubber,
+  .nz__scrubber-marker,
+  .nz__scrubber-number {
+    transition-duration: 1ms;
+    transition-delay: 0ms;
+  }
+
+  /* The direction still has to be legible without motion, so the arrow stays
+     and only its travel goes. The stretch keeps its transition — the spring
+     back is the part that says the drag was refused, and snapping the artwork
+     home instantly would read as a jump. */
+  .nz__instruction-arrow,
+  .nz.is-misdirected .nz__instruction-arrow,
+  .nz.is-misdirected .nz__instruction.kiosk-tooltip {
+    animation: none;
+  }
+}

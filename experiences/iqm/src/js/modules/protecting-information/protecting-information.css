@@ -1,0 +1,1013 @@
+.pqi,
+.pqi * {
+  box-sizing: border-box;
+}
+
+.pqi {
+  --pqi-ink: #f7f8ff;
+  --pqi-text-shadow: 0 3px 18px rgba(20, 43, 74, 0.34);
+  --pqi-orange: #ff5c39;
+  --pqi-blue: #168fd0;
+  --pqi-green: #aee7a7;
+  --pqi-temperature: 0;
+  --pqi-background-cooling: 0;
+  --pqi-rim: 0;
+  position: absolute;
+  inset: 0;
+  width: 2160px;
+  height: 3840px;
+  overflow: hidden;
+  background: transparent;
+  color: var(--pqi-ink);
+  font-family: var(--font-text);
+  isolation: isolate;
+  touch-action: none;
+}
+
+.pqi button {
+  border: 0;
+  color: inherit;
+  font: inherit;
+}
+
+.pqi__header .microsoft-header__action:focus-visible {
+  outline: 5px solid #0d75b6;
+  outline-offset: 6px;
+}
+
+.pqi__header {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(22px);
+}
+
+.pqi__experience {
+  position: absolute;
+  inset: 120px 0 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 75% 36% at 95% 43%, rgba(180, 145, 229, 0.45), transparent 100%),
+    linear-gradient(180deg, #eeebf8 0%, #e1daf4 25%, #cec6ed 48%, #e8eefb 74%, #fcfcff 100%);
+  isolation: isolate;
+}
+
+.pqi__experience::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  /* Temperature crossfades lavender into the reference's cool blue. Keep the
+     top pale for the copy and fade back to the light floor beneath the dials. */
+  background: linear-gradient(
+    180deg,
+    #f2f3fd 0%,
+    #e3e8fb 18%,
+    #b3c2f4 30%,
+    #6a85f6 46%,
+    #93a6ec 56%,
+    #e8eefb 74%,
+    #fcfcff 100%
+  );
+  opacity: var(--pqi-background-cooling);
+  transition: opacity 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pqi__content {
+  position: absolute;
+  z-index: 11;
+  top: 415px;
+  left: 50%;
+  display: flex;
+  width: 1600px;
+  flex-direction: column;
+  align-items: center;
+  gap: 60px;
+  color: #25314f;
+  text-align: center;
+  text-shadow: none;
+  transform: translateX(-50%);
+}
+
+.pqi__content h2 {
+  max-width: 1600px;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: 96px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
+.pqi__content p {
+  width: 1020px;
+  max-width: 100%;
+  margin: 0;
+  color: inherit;
+  font-size: 60px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.22;
+}
+
+.pqi[data-complete="true"] .pqi__content p {
+  width: 1080px;
+}
+
+/* The shell is the whole device block — the three.js scene, its glow and the
+   video stage all sit inside it, so this offset moves the treatment as one.
+   Lifted by a quarter of the shell's own height to sit the die higher in frame;
+   the lift is separate from the 700px it was authored at so the original
+   position is still legible and the amount is one number to tune. */
+.pqi__scene-shell {
+  --pqi-scene-lift: 424px;
+  /* 5% of the shell width. Half of the 10% that was too strong, and close to
+     the 86px that would centre the device exactly — it lands 20px left of
+     screen centre. 214px is the hard ceiling: past that the device's own left
+     edge leaves the screen. */
+  --pqi-scene-shift: 107px;
+
+  position: absolute;
+  z-index: 4;
+  top: calc(700px - var(--pqi-scene-lift));
+  left: calc(13px - var(--pqi-scene-shift));
+  width: 2135px;
+  height: 1695px;
+  /* Both the kiosk scene and video overlay need room for the magnetic crests. */
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
+}
+
+.pqi__scene,
+.pqi__canvas,
+.pqi__scene-glow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pqi__canvas {
+  display: block;
+}
+
+.pqi__scene {
+  /* The kiosk camera sends crests farther down than the video composition.
+     Cover the full stage so no canvas edge can cut through a visible crest. */
+  --pqi-scene-overscan: 1900px;
+  --pqi-scene-overscan-x: 120px;
+
+  z-index: 1;
+  right: auto;
+  bottom: auto;
+  left: calc(-1 * var(--pqi-scene-overscan-x));
+  top: calc(-1 * var(--pqi-scene-overscan));
+  width: calc(100% + (var(--pqi-scene-overscan-x) * 2));
+  height: calc(100% + (var(--pqi-scene-overscan) * 2));
+  background: transparent;
+}
+
+.pqi__scene-glow {
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 46% 34% at 50% 61%,
+    rgba(71, 205, 246, 0.3) 0%,
+    rgba(70, 163, 238, 0.12) 38%,
+    rgba(70, 163, 238, 0) 74%
+  );
+  opacity: calc(0.12 + (var(--pqi-rim) * 0.18));
+  pointer-events: none;
+  transition: opacity 750ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The whole module arrives at once, behind the covering frame of the intro
+   reveal, rather than each part appearing as it becomes ready. */
+.pqi__experience {
+  opacity: 0;
+  transition: opacity 560ms ease;
+}
+
+.pqi.is-revealed .pqi__experience {
+  opacity: 1;
+}
+
+/* Centred on the stage. It used to live inside the scene shell and centre on
+   that, which was the same thing until the shell was shifted left and lifted —
+   after which it sat off-centre by exactly those amounts. */
+.pqi__loading {
+  position: absolute;
+  z-index: 20;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 34px;
+  border: 1px solid rgba(42, 68, 111, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 50px rgba(42, 68, 111, 0.14);
+  color: #2a446f;
+  font-size: 28px;
+  font-weight: 600;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+  transition: opacity 320ms ease;
+}
+
+.pqi__loading-spinner {
+  width: 34px;
+  height: 34px;
+  border: 4px solid rgba(42, 68, 111, 0.17);
+  border-top-color: #2a446f;
+  border-radius: 50%;
+  animation: pqi-spin 850ms linear infinite;
+}
+
+.pqi.is-scene-ready .pqi__loading {
+  opacity: 0;
+}
+
+.pqi__loupe-link {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  overflow: visible;
+  pointer-events: none;
+  transition: opacity 360ms ease;
+}
+
+.pqi__loupe-link path {
+  fill: rgba(92, 231, 201, 0.13);
+  stroke: rgba(65, 211, 182, 0.78);
+  stroke-width: 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.pqi__loupe-link circle {
+  fill: rgba(100, 239, 209, 0.12);
+  stroke: rgba(65, 211, 182, 0.94);
+  stroke-width: 5;
+  vector-effect: non-scaling-stroke;
+}
+
+.pqi__loupe-link .pqi__loupe-locator-core {
+  fill: rgba(255, 82, 105, 0.98);
+  stroke: rgba(255, 240, 238, 0.96);
+  stroke-width: 3;
+}
+
+/* Geometry comes from LOUPE_LAYOUT, which the module writes into these
+   properties at mount. The pointer's tangents are derived from the same
+   numbers, so the circle and its leader lines cannot drift apart. The
+   fallbacks are only for the element existing before the module runs. */
+.pqi__loupe {
+  position: absolute;
+  z-index: 6;
+  top: var(--pqi-loupe-top, 674px);
+  right: var(--pqi-loupe-right, 74px);
+  width: var(--pqi-loupe-size, 660px);
+  height: var(--pqi-loupe-size, 660px);
+  border: 8px solid rgba(89, 232, 203, 0.98);
+  border-radius: 50%;
+  background: #637896;
+  box-shadow:
+    inset 0 0 0 7px rgba(255, 255, 255, 0.94),
+    0 30px 74px rgba(34, 69, 114, 0.26),
+    0 0 34px rgba(77, 226, 203, 0.2);
+  opacity: 0;
+  overflow: hidden;
+  transform: translate(72px, 30px) scale(0.88);
+  transform-origin: 42% 72%;
+  transition:
+    opacity 420ms ease,
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pqi__loupe canvas,
+.pqi__loupe video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* The clip covers the drawn loupe once it has a frame to show. Held at zero
+   until then so a slow decode shows the drawing rather than the dish behind
+   it. */
+.pqi__loupe video {
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.pqi[data-loupe-video='ready'] .pqi__loupe video {
+  opacity: 1;
+}
+
+.pqi.is-magnetic-visible .pqi__loupe {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+.pqi.is-magnetic-visible .pqi__loupe-link {
+  opacity: 1;
+}
+
+.pqi__controls {
+  position: absolute;
+  z-index: 14;
+  top: 2423px;
+  left: 50%;
+  display: grid;
+  width: 1700px;
+  background: transparent;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 90px;
+  transform: translateX(-50%);
+}
+
+.pqi__control {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+}
+
+.pqi__control-label {
+  margin-bottom: 46px;
+  color: #090a0b;
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  text-align: center;
+  text-shadow: none;
+}
+
+.pqi__dial {
+  --pqi-dial-angle: 0deg;
+  position: relative;
+  width: 420px;
+  height: 420px;
+  flex: 0 0 420px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.pqi__dial:active,
+.pqi__dial.is-dragging {
+  cursor: grabbing;
+}
+
+.pqi__dial:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.94),
+    0 0 0 12px #0d75b6;
+}
+
+.pqi__dial-scale,
+.pqi__dial-target,
+.pqi__dial-ticks,
+.pqi__dial-body,
+.pqi__dial-rim,
+.pqi__dial-needle,
+.pqi__dial-face,
+.pqi__dial-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.pqi__dial-scale {
+  z-index: 2;
+  width: 400px;
+  height: 400px;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+}
+
+.pqi__dial-scale::before,
+.pqi__dial-scale::after,
+.pqi__dial-body::before,
+.pqi__dial-body::after,
+.pqi__dial-face::before,
+.pqi__dial-face::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.pqi__dial-scale::before {
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 0 73%, rgba(33, 45, 57, 0.1) 73.5% 75%, transparent 75.5%);
+  filter: blur(0.4px);
+}
+
+.pqi__dial-scale::after {
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from -1.5deg,
+    rgba(31, 45, 58, 0.6) 0 3deg,
+    transparent 3deg 30deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 86%, #000 86.5% 92%, transparent 92.5%);
+  mask: radial-gradient(circle, transparent 0 86%, #000 86.5% 92%, transparent 92.5%);
+}
+
+.pqi__dial-target,
+.pqi__dial-ticks {
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.pqi__dial-target {
+  z-index: 1;
+  width: 400px;
+  height: 400px;
+  filter:
+    drop-shadow(0 4px 7px rgba(46, 133, 63, 0.3))
+    drop-shadow(0 0 8px rgba(101, 220, 121, 0.24));
+}
+
+.pqi__dial-target img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Temperature's target is one sector driven by the same angles as its tuning
+   logic. The bitmap ended at 354deg; patching it with a farthest-corner radial
+   mask left only a thin outer line instead of filling the gap to 100%. */
+.pqi__dial[data-pqi-dial="temperature"] .pqi__dial-target img {
+  display: none;
+}
+
+.pqi__dial[data-pqi-dial="temperature"] .pqi__dial-target::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  border-radius: 50%;
+  /* Match the bitmap's green and faint radial rim. The dial body covers the
+     sector's centre; the circle clips its outside at exactly the scale radius.
+     No round end cap: it would extend the target past the 360-degree stop. */
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent 0deg var(--pqi-target-start),
+      rgb(132 219 106 / 0.53) var(--pqi-target-start) var(--pqi-target-end),
+      transparent var(--pqi-target-end) 360deg
+    ),
+    radial-gradient(
+      circle closest-side,
+      rgb(0 0 0 / 0.06) 70%,
+      rgb(255 255 255 / 0.06) 100%
+    );
+}
+
+.pqi__dial-ticks {
+  z-index: 2;
+  background: repeating-conic-gradient(
+    from -1deg,
+    rgba(42, 56, 71, 0.46) 0 1.8deg,
+    transparent 1.8deg 12deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 0 88%, #000 88.5% 91.5%, transparent 92%);
+  mask: radial-gradient(circle, transparent 0 88%, #000 88.5% 91.5%, transparent 92%);
+}
+
+.pqi__dial-body {
+  z-index: 3;
+  width: 286px;
+  height: 286px;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%);
+  transition: filter 220ms ease-out, transform 170ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pqi__dial-body::before {
+  z-index: 0;
+  inset: -9px;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(245, 247, 248, 0.74) 0 38%, rgba(75, 87, 98, 0.82) 58%, #202b34 84%, #7c8891 100%);
+  box-shadow:
+    0 30px 33px rgba(27, 38, 49, 0.23),
+    0 12px 11px rgba(27, 38, 49, 0.16);
+  transform: translateY(17px) scaleY(0.95);
+}
+
+.pqi__dial-body::after {
+  z-index: 1;
+  inset: -2px;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(58deg, rgba(244, 247, 248, 0.45) 0 1.5px, transparent 1.5px 5px),
+    repeating-linear-gradient(122deg, rgba(20, 29, 37, 0.42) 0 1.5px, transparent 1.5px 5px),
+    linear-gradient(180deg, #bac1c6 0%, #5c6872 56%, #26313a 100%);
+  background-blend-mode: screen, multiply, normal;
+  box-shadow: inset 0 -8px 12px rgba(17, 25, 33, 0.42);
+  transform: translateY(10px);
+}
+
+.pqi__dial-rim {
+  z-index: 2;
+  width: 286px;
+  height: 286px;
+  background:
+    radial-gradient(circle at 36% 24%, rgba(255, 255, 255, 0.8), transparent 29%),
+    radial-gradient(circle at 50% 50%, transparent 0 70%, rgba(27, 37, 46, 0.12) 71%, rgba(16, 24, 31, 0.62) 91%, rgba(242, 245, 246, 0.9) 100%),
+    repeating-linear-gradient(58deg, rgba(245, 248, 249, 0.72) 0 1.5px, transparent 1.5px 5px),
+    repeating-linear-gradient(122deg, rgba(27, 37, 46, 0.58) 0 1.5px, transparent 1.5px 5px),
+    linear-gradient(138deg, #dfe3e5 0%, #6f7a83 48%, #c9ced1 72%, #5f6a73 100%);
+  background-blend-mode: screen, normal, screen, multiply, normal;
+  box-shadow:
+    inset 0 4px 3px rgba(255, 255, 255, 0.78),
+    inset 0 -7px 11px rgba(25, 35, 44, 0.38),
+    0 0 0 1px rgba(34, 46, 57, 0.46);
+  transform: translate(-50%, -50%);
+}
+
+.pqi__dial-needle {
+  z-index: 6;
+  width: 246px;
+  height: 246px;
+  transform: translate(-50%, -50%) rotate(var(--pqi-dial-angle));
+  transition: transform 80ms linear;
+}
+
+.pqi__dial-indicator {
+  top: 14px;
+  width: 9px;
+  height: 34px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #aeb5ba 0 13%, #26323c 31% 67%, #f4f5f5 84% 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 2px 3px rgba(12, 20, 27, 0.7),
+    0 0 0 1px rgba(36, 47, 57, 0.22);
+  transform: translate(-50%, -50%);
+}
+
+.pqi__dial-face {
+  z-index: 5;
+  display: grid;
+  width: 246px;
+  height: 246px;
+  overflow: hidden;
+  place-items: center;
+  background:
+    radial-gradient(circle at 35% 22%, rgba(255, 255, 255, 0.96) 0 4%, transparent 27%),
+    radial-gradient(circle at 50% 48%, transparent 0 55%, rgba(48, 61, 71, 0.14) 100%),
+    linear-gradient(138deg, #eef0f1 0%, #c1c7cb 35%, #f2f3f3 63%, #a7b0b6 100%);
+  box-shadow:
+    inset 0 3px 3px rgba(255, 255, 255, 0.9),
+    inset 0 -8px 13px rgba(35, 47, 57, 0.22),
+    0 0 0 2px rgba(44, 57, 67, 0.52),
+    0 0 0 5px rgba(233, 236, 237, 0.48);
+  transform: translate(-50%, -50%);
+}
+
+.pqi__dial-face::before {
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 35% 22%, rgba(255, 255, 255, 0.72) 0 4%, transparent 27%),
+    radial-gradient(circle at 50% 48%, transparent 0 55%, rgba(35, 91, 49, 0.18) 100%),
+    linear-gradient(138deg, #c6edc8 0%, #83c990 35%, #b2e4b6 63%, #64ac76 100%);
+  /* Crossfade a separate fill: gradient backgrounds cannot transition. */
+  opacity: 0;
+  transition: opacity 360ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pqi__dial-face::after {
+  z-index: 1;
+  inset: 3px;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse at 31% 19%, rgba(255, 255, 255, 0.7) 0 7%, transparent 29%),
+    linear-gradient(142deg, rgba(255, 255, 255, 0.34), transparent 31% 68%, rgba(31, 45, 57, 0.13));
+  mix-blend-mode: screen;
+}
+
+.pqi__dial-icon {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 88px;
+  height: 92px;
+  object-fit: contain;
+  opacity: 0.42;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(25%)
+    sepia(11%)
+    saturate(405%)
+    hue-rotate(166deg)
+    brightness(83%)
+    contrast(86%)
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.72));
+  transition: opacity 360ms ease-out, filter 360ms ease-out;
+}
+
+.pqi__dial[data-pqi-dial="temperature"] .pqi__dial-icon {
+  width: 82px;
+}
+
+.pqi__dial[data-pqi-dial="voltage"] .pqi__dial-icon {
+  width: 88px;
+}
+
+.pqi__dial[data-pqi-dial="magnetic"] .pqi__dial-icon {
+  width: 76px;
+  height: 82px;
+}
+
+.pqi__control.is-active .pqi__dial-body {
+  filter: drop-shadow(0 0 9px rgba(13, 117, 182, 0.17));
+}
+
+.pqi__control.is-active .pqi__dial-icon {
+  opacity: 0.56;
+}
+
+.pqi__dial.is-dragging .pqi__dial-body {
+  transform: translate(-50%, calc(-50% + 2px)) scale(0.992);
+}
+
+.pqi__dial[data-range-status="above"] .pqi__dial-indicator {
+  background: linear-gradient(90deg, #92311f, #ff8d70 45%, #b43d28 100%);
+}
+
+.pqi__dial[data-range-status="above"] .pqi__dial-icon {
+  opacity: 0.58;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(40%)
+    sepia(17%)
+    saturate(1198%)
+    hue-rotate(316deg)
+    brightness(92%)
+    contrast(87%);
+}
+
+.pqi__dial.is-tuned .pqi__dial-indicator {
+  background: linear-gradient(90deg, #357a4b, #a8e2ae 45%, #4e9d62 100%);
+}
+
+.pqi__dial.is-tuned .pqi__dial-face::before {
+  opacity: 1;
+}
+
+.pqi__dial.is-tuned .pqi__dial-icon {
+  opacity: 0.9;
+  filter:
+    brightness(0)
+    saturate(100%)
+    invert(43%)
+    sepia(17%)
+    saturate(1118%)
+    hue-rotate(90deg)
+    brightness(93%)
+    contrast(87%);
+}
+
+.pqi__dial.is-tuned .pqi__dial-body {
+  filter:
+    drop-shadow(0 0 10px rgba(78, 169, 106, 0.2))
+    drop-shadow(0 15px 12px rgba(33, 43, 55, 0.1));
+}
+
+.pqi__dial.is-tuned .pqi__dial-target {
+  filter: drop-shadow(0 0 8px rgba(78, 169, 106, 0.34));
+}
+
+@media (hover: hover) {
+  .pqi__dial:hover .pqi__dial-body {
+    filter:
+      drop-shadow(0 14px 13px rgba(33, 43, 55, 0.16))
+      drop-shadow(0 2px 2px rgba(255, 255, 255, 0.42));
+    transform: translate(-50%, calc(-50% - 3px));
+  }
+}
+
+.pqi__control-state {
+  margin-top: 24px;
+  color: #6f747c;
+  font-size: 26px;
+  font-weight: 600;
+  opacity: 1;
+  text-align: center;
+  text-shadow: none;
+  transition: color 220ms ease;
+}
+
+.pqi__control.is-tuned .pqi__control-state {
+  color: #39784e;
+}
+
+.pqi__control[data-range-status="above"] .pqi__control-state {
+  color: #b93f2b;
+  opacity: 1;
+}
+
+/* Placement only. Everything this used to declare for itself — the pill, the
+   type, the halo and the blue wipe across both — is .kiosk-tooltip's now, and
+   re-declaring any of it here would only pull this cue back out of step with
+   every other one. Note in particular that `background` must not reappear: the
+   wipe lives in background-image, and the shorthand would drop it. */
+.pqi__guidance {
+  position: absolute;
+  z-index: 15;
+  top: 976px;
+  left: 50%;
+  border: 2px solid #d9d9d6;
+  color: #f4f3f5;
+  backdrop-filter: blur(60px);
+  transform: translateX(-50%);
+  transition:
+    opacity 360ms ease,
+    transform 460ms var(--ease-out);
+}
+
+.pqi.has-interacted .pqi__guidance {
+  opacity: 1;
+  transform: translateX(-50%);
+}
+
+/* This cue fades out rather than being marked hidden, so the component's own
+   `:not([hidden])` guard does not catch it and the wipe would go on animating —
+   and repainting text every frame — over a live WebGL scene, invisibly. */
+.pqi[data-complete="true"] .pqi__guidance {
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  animation: none;
+  pointer-events: none;
+}
+
+.pqi__progress {
+  position: absolute;
+  z-index: 14;
+  top: 3132px;
+  left: 50%;
+  margin: 0;
+  color: var(--pqi-blue);
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  text-align: center;
+  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.42);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.pqi__sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@keyframes pqi-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pqi *,
+  .pqi *::before,
+  .pqi *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 180ms !important;
+  }
+
+  .pqi__loading-spinner {
+    animation: none;
+  }
+
+  .pqi__dial-needle {
+    transition-duration: 1ms !important;
+  }
+
+  .pqi__dial.is-dragging .pqi__dial-body {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Video layer treatment ---------------------------------------------------
+   The delivered clips were authored inside one square 4096 composition, so the
+   stage below is that composition mapped onto the kiosk. Each layer positions
+   itself inside it from its own crop rectangle, which is what keeps the passes
+   registered with one another without any per-clip offsets.
+
+   The default box is the full design width, nudged vertically so the die lands
+   in the middle of the scene shell. Both numbers are custom properties because
+   this is art direction, not geometry anyone can derive — expect to tune them
+   against the real screen. */
+.pqi {
+  --pqi-video-size: 2160px;
+  --pqi-video-top: 364px;
+}
+
+.pqi__video-stage {
+  position: absolute;
+  left: calc((2160px - var(--pqi-video-size)) / 2);
+  top: var(--pqi-video-top);
+  width: var(--pqi-video-size);
+  height: var(--pqi-video-size);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Above the scene canvas, which the video variant raises to 5. The reveal and
+   the outro pass over everything, particles included. */
+.pqi__video-stage--over-scene {
+  z-index: 7;
+}
+
+.pqi__video-layer {
+  /* Placement comes from the manifest crop; only presentation belongs here. */
+  transition: opacity 320ms ease;
+  will-change: opacity;
+}
+
+/* An additive pass contributes light, so it must not be dimmed by a stacking
+   context that isolates it. Left in the default group the plus-lighter blend
+   would compose against the layer stage rather than the device beneath it.
+   Keyed on the blend rather than on a named pass, because the board marks
+   several layers "(Add/Screen Mode)" and they all need this. */
+.pqi__video-layer--additive {
+  isolation: auto;
+}
+
+/* The Add-on FX master still carries alpha at its right frame boundary.
+   Ease out only its final 4% so the glow fades instead of ending at a line. */
+.pqi__video-layer--add-on-fx {
+  mask-image: linear-gradient(
+    to right,
+    #000 96%,
+    rgb(0 0 0 / 0.844) 97%,
+    rgb(0 0 0 / 0.5) 98%,
+    rgb(0 0 0 / 0.156) 99%,
+    transparent 100%
+  );
+}
+
+/* The video replaces the three.js *device*, not the three.js scene. The board
+   keeps the particle passes and the magnetic arcs in three.js and composites
+   them over the video, so the canvas stays on and moves above the stage; the
+   scene hides its own device meshes in overlay mode.
+
+   Reframed onto the video composition box so both treatments share one
+   coordinate space. Without this the canvas would be the shell's 2135x1695 and
+   the video a 2160 square at a different offset, and matching the particles to
+   the device would mean compensating for that difference in the camera as well
+   as for the camera angle. */
+.pqi[data-pqi-visual='video'] .pqi__scene {
+  --pqi-scene-overscan: 930px;
+
+  /* Reuse the scene's symmetric overscan around the authored video square.
+     The resize handler subtracts horizontal overscan from the camera's reference
+     width, so widening the canvas reveals more without magnifying the device. */
+  z-index: 5;
+  right: auto;
+  bottom: auto;
+  left: calc(((2160px - var(--pqi-video-size)) / 2) - var(--pqi-scene-overscan-x));
+  top: calc(var(--pqi-video-top) - var(--pqi-scene-overscan));
+  width: calc(var(--pqi-video-size) + (var(--pqi-scene-overscan-x) * 2));
+  height: calc(var(--pqi-video-size) + (var(--pqi-scene-overscan) * 2));
+}
+
+/* The video carries its own glow, so this one would double it. */
+.pqi[data-pqi-visual='video'] .pqi__scene-glow {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Alignment panel. Debug only — mounts on ?debug=camera and is attached to the
+   document rather than the kiosk stage, so it is in real screen pixels and not
+   scaled with the 2160x3840 design. */
+.pqi-camera-debug {
+  position: fixed;
+  z-index: 9999;
+  top: 16px;
+  right: 16px;
+  width: 320px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(14, 18, 28, 0.92);
+  color: #eef3fb;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.pqi-camera-debug header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pqi-camera-debug button {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+
+.pqi-camera-debug__row {
+  display: grid;
+  align-items: center;
+  margin-bottom: 6px;
+  grid-template-columns: 96px 1fr 54px;
+  gap: 8px;
+}
+
+.pqi-camera-debug__label {
+  color: rgba(238, 243, 251, 0.72);
+}
+
+.pqi-camera-debug__value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pqi-camera-debug__toggle {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 8px;
+  cursor: pointer;
+}
+
+.pqi-camera-debug__toggle input {
+  accent-color: #47cdf6;
+}
+
+.pqi-camera-debug input[type='range'] {
+  width: 100%;
+  accent-color: #47cdf6;
+}
+
+.pqi-camera-debug footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pqi-camera-debug pre {
+  max-height: 190px;
+  margin: 10px 0 0;
+  padding: 8px;
+  overflow: auto;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.42);
+  color: #a8e7ff;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.pqi-camera-debug--collapsed [data-role='body'],
+.pqi-camera-debug--collapsed footer,
+.pqi-camera-debug--collapsed pre {
+  display: none;
+}

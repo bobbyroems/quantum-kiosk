@@ -1,0 +1,50 @@
+newmtl FiveCentSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Five_Cent_Color.bmp
+bump Five_Cent_Bump.bmp -bm 1
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 18.00
+newmtl HundredCentSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Hundred_Cent_Color.bmp
+bump Hundred_Cent_Bump.bmp -bm 1
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 18.00
+newmtl OneCentSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd One_Cent_Color.bmp
+bump One_Cent_Bump.bmp -bm 1
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 18.00
+newmtl TenCentSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Ten_Cent_Color.bmp
+bump Ten_Cent_Bump.bmp -bm 1
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 18.00
+newmtl TwentyFiveCentSG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Five_Cent_Color.bmp
+bump Five_Cent_Bump.bmp -bm 1
+Ni 1.00
+Ks 1.00 1.00 1.00
+Ns 18.00

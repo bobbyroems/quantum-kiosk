@@ -1,0 +1,440 @@
+{
+  "version": 1,
+  "coordinateSpace": {
+    "width": 2160,
+    "height": 3840
+  },
+  "frameBackground": "#f2f4f5",
+  "omittedGridNodes": [
+    "31:1229",
+    "31:1513",
+    "31:1791",
+    "31:2072"
+  ],
+  "layers": [
+    {
+      "stop": 2,
+      "role": "background",
+      "file": "majorana-2-background.webp",
+      "figmaNode": "31:1393",
+      "imageRef": "8d8c256a77b33ef2add1bb29b464af6d14ecbf72",
+      "intrinsicSize": {
+        "width": 3840,
+        "height": 2160
+      },
+      "artBox": {
+        "x": -17654.390639185905,
+        "y": -14904,
+        "width": 37046.77734375,
+        "height": 16279.8408203125
+      },
+      "imageScaleMode": "STRETCH",
+      "sourcePaintTransform": {
+        "m00": 1.0000172853469849,
+        "m01": 0,
+        "m02": -0.000008679558050062042,
+        "m10": 0,
+        "m11": 0.7812394499778748,
+        "m12": 0
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 1,
+      "dimensionCoverScale": 0.23587454216436798,
+      "encodedSize": {
+        "width": 3840,
+        "height": 2160,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 487228,
+        "sha256": "921501f7a72cb5d6e98cd6cdb4073734bb7960d5b33bebbd71d8380359fff0a7"
+      }
+    },
+    {
+      "stop": 2,
+      "role": "focal",
+      "file": "majorana-2-focal.webp",
+      "figmaNode": "31:1394",
+      "imageRef": "81e4a1718756ed60bcaab951aaa41daf09424df7",
+      "intrinsicSize": {
+        "width": 4096,
+        "height": 2304
+      },
+      "artBox": {
+        "x": -265.8125,
+        "y": 1104.982421875,
+        "width": 2268.317138671875,
+        "height": 1276.011962890625
+      },
+      "imageScaleMode": "FILL",
+      "sourcePaintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 1,
+      "dimensionCoverScale": 3.0093761748918264,
+      "encodedSize": {
+        "width": 4096,
+        "height": 2304,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 2137724,
+        "sha256": "366a581b27ee85e182c7619e801d717c7275186febda8922372c300991ec3512"
+      }
+    },
+    {
+      "stop": 3,
+      "role": "background",
+      "file": "qpu-chip-background.webp",
+      "figmaNode": "31:1512",
+      "imageRef": "6497a86f499dc6f8842f49fa319a1f07aefe7391",
+      "intrinsicSize": {
+        "width": 4096,
+        "height": 2304
+      },
+      "artBox": {
+        "x": -7183,
+        "y": -3428,
+        "width": 18346,
+        "height": 10320
+      },
+      "imageScaleMode": "FILL",
+      "sourcePaintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 0.6000000238418579,
+      "dimensionCoverScale": 0.37209302325581395,
+      "encodedSize": {
+        "width": 4096,
+        "height": 2304,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 353242,
+        "sha256": "f479a4e2b3ffc908a037ce9ed1e0fb74ff34fb09e55ef60f9ba113b52eb39955"
+      }
+    },
+    {
+      "stop": 3,
+      "role": "focal",
+      "file": "qpu-chip-focal.webp",
+      "figmaNode": "31:1676",
+      "imageRef": "08db4af22ab1472352d26b965412e9845cde1804",
+      "intrinsicSize": {
+        "width": 476,
+        "height": 519
+      },
+      "artBox": {
+        "x": -196,
+        "y": 553,
+        "width": 2133,
+        "height": 2326
+      },
+      "imageScaleMode": "STRETCH",
+      "sourcePaintTransform": {
+        "m00": 1.0004299879074097,
+        "m01": 0,
+        "m02": -0.00007814514538040385,
+        "m10": 0,
+        "m11": 1.0005645751953125,
+        "m12": -0.0004212484054733068
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 1,
+      "dimensionCoverScale": 1.650902837489252,
+      "encodedSize": {
+        "width": 476,
+        "height": 519,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 247038,
+        "sha256": "1770c1c068aafdbf844b3fc167dba2635e0585901842d63bfd918852a7d4eb17"
+      }
+    },
+    {
+      "stop": 4,
+      "role": "background",
+      "file": "qubit-array-background.webp",
+      "figmaNode": "31:1790",
+      "imageRef": "af980fe93624655e6f16382776cc4aa22efe06c4",
+      "intrinsicSize": {
+        "width": 4096,
+        "height": 2917
+      },
+      "artBox": {
+        "x": -5467,
+        "y": -2390,
+        "width": 12376,
+        "height": 8814
+      },
+      "imageScaleMode": "FILL",
+      "sourcePaintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 1,
+      "dimensionCoverScale": 0.43567052416609936,
+      "encodedSize": {
+        "width": 4096,
+        "height": 2917,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 2005172,
+        "sha256": "06066c2e92aad2d1ad49c1ba3b72bde401b842b780de60086606282754e8825d"
+      }
+    },
+    {
+      "stop": 4,
+      "role": "focal",
+      "file": "qubit-array-focal.webp",
+      "figmaNode": "31:1954",
+      "imageRef": "3d8dd21edfac5228e3cd7fe5a503f4027c3b0fd2",
+      "intrinsicSize": {
+        "width": 428,
+        "height": 232
+      },
+      "artBox": {
+        "x": 35,
+        "y": 1374,
+        "width": 1294,
+        "height": 702
+      },
+      "imageScaleMode": "STRETCH",
+      "sourcePaintTransform": {
+        "m00": 1.0005847215652466,
+        "m01": 0,
+        "m02": -0.00007539478247053921,
+        "m10": 0,
+        "m11": 1.0014113187789917,
+        "m12": -0.0012987545924261212
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 1,
+      "dimensionCoverScale": 5.47008547008547,
+      "encodedSize": {
+        "width": 428,
+        "height": 232,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 82562,
+        "sha256": "ab62cd3b63fef53905667e974affaccb67496f52c929573dfccde6943f1f3869"
+      }
+    },
+    {
+      "stop": 5,
+      "role": "background",
+      "file": "nanowire-background.webp",
+      "figmaNode": "31:2071",
+      "imageRef": "8703923e48b6d3931d854ff19d9e8171642bf036",
+      "intrinsicSize": {
+        "width": 4096,
+        "height": 2917
+      },
+      "artBox": {
+        "x": -3015,
+        "y": -613.5106718838215,
+        "width": 6710,
+        "height": 4526.02294921875
+      },
+      "imageScaleMode": "STRETCH",
+      "sourcePaintTransform": {
+        "m00": 0.9999622702598572,
+        "m01": 0,
+        "m02": 0.000018944147086585872,
+        "m10": 0,
+        "m11": 0.9471118450164795,
+        "m12": 0.03984784334897995
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": {
+        "contrast": 0,
+        "exposure": 0,
+        "highlights": 0,
+        "shadows": -0.07999999821186066,
+        "temperature": 0,
+        "tint": 0,
+        "vibrance": 0
+      },
+      "paintFilter": null,
+      "paintFilterBaked": true,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": "rgb*(1+shadows*(1-luminance)^2)"
+      },
+      "opacity": 1,
+      "dimensionCoverScale": 0.8484269839291985,
+      "encodedSize": {
+        "width": 4096,
+        "height": 2917,
+        "channels": 3,
+        "hasAlpha": false,
+        "bytes": 5778288,
+        "sha256": "b38bcec93668519c809d0503ed808fc1a0e1ae0d29eac9cf1f9bb97c00297289"
+      }
+    },
+    {
+      "stop": 5,
+      "role": "focal",
+      "file": "nanowire-focal.webp",
+      "figmaNode": "31:2235",
+      "imageRef": "ffe2478d8848a00ee4c233c6ebfb8eb3df97971b",
+      "intrinsicSize": {
+        "width": 1920,
+        "height": 1080
+      },
+      "artBox": {
+        "x": -890.352783203125,
+        "y": 722.7542114257812,
+        "width": 3497.015380859375,
+        "height": 1967.0712890625
+      },
+      "imageScaleMode": "FILL",
+      "sourcePaintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransform": {
+        "m00": 1,
+        "m01": 0,
+        "m02": 0,
+        "m10": 0,
+        "m11": 1,
+        "m12": 0
+      },
+      "paintTransformBaked": true,
+      "sourcePaintFilter": null,
+      "paintFilter": null,
+      "paintFilterBaked": false,
+      "bakeRecipe": {
+        "sampling": "premultiplied-alpha-bilinear",
+        "shadows": null
+      },
+      "opacity": 0.8999999761581421,
+      "dimensionCoverScale": 1.9521407390527936,
+      "encodedSize": {
+        "width": 1920,
+        "height": 1080,
+        "channels": 4,
+        "hasAlpha": true,
+        "bytes": 366384,
+        "sha256": "5e5f78174b32c878e0ac5640fad905dc5eaaa0a96bc2dcd327f4b26290e35048"
+      }
+    }
+  ]
+}

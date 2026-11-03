@@ -1,0 +1,659 @@
+/* ========================================
+   COMPUTE TAB
+   ======================================== */
+.compute-view {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+}
+
+.compute-view.is-dragging {
+  cursor: grabbing;
+}
+
+.compute-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.compute-canvas canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.compute-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.compute-hex-layout {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(24 / 1080 * 100vw);
+  padding: 0 calc(40 / 1080 * 100vw);
+  max-width: calc(780 / 1080 * 100vw);
+  margin: 0 auto;
+  transform: translateY(calc(320 / 1080 * 100vw));
+}
+
+.compute-hex-view {
+  transform: translateY(calc(20 / 1080 * 100vw));
+}
+
+.compute-hex-copy {
+  align-self: center;
+  max-width: calc(360 / 1080 * 100vw);
+  color: var(--blue-black);
+  font-family: var(--font-content);
+}
+
+.compute-hex-title {
+  font-size: calc(30 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: calc(16 / 1080 * 100vw);
+}
+
+.compute-hex-subtitle {
+  font-size: calc(20 / 1080 * 100vw);
+  line-height: 1.4;
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+}
+
+.compute-hex-asset {
+  flex: 0 0 auto;
+}
+
+.compute-hex-asset img {
+  width: calc(380 / 1080 * 100vw);
+  max-width: 32vw;
+  height: auto;
+  display: block;
+}
+
+.compute-flow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  --flow-bar-offset: 0%;
+  --flow-bar-height: calc(227.144 / 1080 * 100vw);
+  --flow-arrow-scale: 1.04;
+}
+
+.compute-flow-content {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.compute-flow-info {
+  position: absolute;
+  font-family: var(--font-content);
+  color: var(--blue-black);
+  line-height: 1.35;
+}
+
+.compute-flow-info h2 {
+  margin: 0 0 calc(20 / 1080 * 100vw) 0;
+  font-size: calc(36 / 1080 * 100vw);
+  font-weight: var(--font-weight-semibold);
+}
+
+.compute-flow-info p {
+  margin: 0;
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+}
+
+.compute-flow-info--top {
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(130 / 1080 * 100vw);
+  width: calc(750 / 1080 * 100vw);
+  text-align: center;
+}
+
+.compute-flow-info--bottom {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(290 / 1080 * 100vw);
+  top: auto;
+  width: calc(700 / 1080 * 100vw);
+  text-align: left;
+  opacity: 0;
+}
+
+.compute-flow-diagram {
+  position: absolute;
+  left: 0;
+  top: calc(43% + var(--flow-bar-offset));
+  width: 100%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.compute-flow-divider {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(630 / 1080 * 100vw);
+  height: 2px;
+  background: #000000;
+}
+
+.compute-flow-divider--top {
+  top: calc(-280 / 1080 * 100vw);
+}
+
+.compute-flow-divider--bottom {
+  opacity: 0;
+}
+
+.compute-flow-divider-vertical {
+  position: absolute;
+  left: 50%;
+  width: 2px;
+  height: calc(50 / 1080 * 100vw);
+  background: #000000;
+  transform: translateX(-50%);
+}
+
+.compute-flow-divider-vertical--up {
+  bottom: 2px;
+  left: 50%;
+}
+
+.compute-flow-divider-vertical--down {
+  top: 2px;
+}
+
+.compute-flow-steps {
+  position: absolute;
+  top: calc(-260 / 1080 * 100vw);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(950 / 1080 * 100vw);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  font-family: var(--font-content);
+  color: var(--blue-black);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.compute-flow-steps .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  opacity: 0;
+}
+
+.compute-flow-steps .step-title {
+  font-size: calc(26 / 1080 * 100vw);
+  font-weight: 600;
+  margin-bottom: calc(8 / 1080 * 100vw);
+}
+
+.compute-flow-steps .step-desc {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.compute-flow-arrow {
+  position: relative;
+  width: calc(1030.129 / 1080 * 100vw);
+  height: var(--flow-bar-height);
+  pointer-events: none;
+  transform: scale(var(--flow-arrow-scale));
+  transform-origin: left center;
+  margin-top: calc(-100 / 1080 * 100vw);
+}
+
+.compute-flow-arrow-shape {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.compute-flow-arrow-grid {
+  position: absolute;
+  left: calc(60 / 1080 * 100vw);
+  top: calc(50 / 1080 * 100vw);
+  width: calc(280 / 1080 * 100vw);
+  height: calc(130 / 1080 * 100vw);
+}
+
+.compute-flow-arrow-binary {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(50 / 1080 * 100vw);
+  width: calc(240 / 1080 * 100vw);
+  font-family: "Unica One", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  letter-spacing: 0.1em;
+  color: var(--pure-white);
+  overflow: hidden;
+}
+
+.compute-flow-arrow-binary p {
+  margin: 0;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.compute-flow-arrow-lines {
+  position: absolute;
+  left: calc(650 / 1080 * 100vw);
+  top: calc(63 / 1080 * 100vw);
+  width: calc(220 / 1080 * 100vw);
+  height: calc(103 / 1080 * 100vw);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.compute-flow-arrow-line {
+  position: relative;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.compute-flow-arrow-h {
+  position: absolute;
+  top: 50%;
+  width: calc(22.5 / 1080 * 100vw);
+  height: calc(22.5 / 1080 * 100vw);
+  transform: translate(-50%, -50%) translateY(-0.06em);
+  background: #fffafa;
+  border-radius: calc(4.8 / 1080 * 100vw);
+  color: #59c8b6;
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compute-flow-arrow-line--one .compute-flow-arrow-h {
+  left: 38%;
+}
+
+.compute-flow-arrow-line--two .compute-flow-arrow-h {
+  left: 50%;
+}
+
+.compute-flow-arrow-line--three .compute-flow-arrow-h {
+  left: 62%;
+}
+
+.compute-flow-arrow-line--four .compute-flow-arrow-h {
+  left: 72%;
+}
+
+.compute-flow-stats {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(800 / 1080 * 100vw);
+  display: flex;
+  justify-content: center;
+  gap: calc(32 / 1080 * 100vw);
+  align-items: flex-start;
+}
+
+.compute-flow-code-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(12 / 1080 * 100vw);
+}
+
+.compute-flow-code-card {
+  width: calc(256 / 1080 * 100vw);
+  background: #e6e6e6;
+  border: 1px solid white;
+  border-radius: calc(16 / 1080 * 100vw);
+  padding: calc(24 / 1080 * 100vw) calc(20 / 1080 * 100vw);
+  font-family: var(--font-content);
+  color: var(--blue-black);
+  box-shadow: 0 calc(4 / 1080 * 100vw) calc(12 / 1080 * 100vw) rgba(0, 0, 0, 0.08);
+  opacity: 0;
+}
+
+.compute-flow-code-title {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: calc(16 / 1080 * 100vw);
+}
+
+.compute-flow-code-grid-wrapper {
+  position: relative;
+  border: calc(2.5 / 1080 * 100vw) solid #5a5f6b;
+  border-radius: calc(8 / 1080 * 100vw);
+  padding: calc(14 / 1080 * 100vw);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(12 / 1080 * 100vw);
+}
+
+.compute-flow-code-grid {
+  display: grid;
+  gap: calc(8 / 1080 * 100vw);
+  position: relative;
+}
+
+.compute-flow-code-grid--green {
+  grid-template-columns: repeat(6, calc(19 / 1080 * 100vw));
+}
+
+.compute-flow-code-grid--blue {
+  grid-template-columns: repeat(8, calc(15 / 1080 * 100vw));
+}
+
+.compute-flow-code-divider {
+  width: 100%;
+  height: 1px;
+  background: #5a5f6b;
+  margin: calc(2 / 1080 * 100vw) 0;
+}
+
+.compute-flow-code-label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: calc(8 / 1080 * 100vw);
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  color: var(--blue-black);
+  white-space: nowrap;
+  opacity: 0;
+  z-index: 10;
+}
+
+.compute-flow-code-label--logical {
+  top: calc(115 / 1080 * 100vw);
+  left: calc(-215 / 1080 * 100vw);
+}
+
+.compute-flow-code-label--physical {
+  top: calc(243 / 1080 * 100vw);
+  left: calc(-230 / 1080 * 100vw);
+}
+
+.compute-flow-code-line {
+  width: calc(68 / 1080 * 100vw);
+  height: 1px;
+  background: var(--blue-black);
+}
+
+.compute-flow-dot {
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+}
+
+.compute-flow-dot--green {
+  width: calc(19 / 1080 * 100vw);
+  height: calc(19 / 1080 * 100vw);
+  background: #52b471;
+}
+
+.compute-flow-dot--blue {
+  width: calc(15 / 1080 * 100vw);
+  height: calc(15 / 1080 * 100vw);
+  background: #0078d4;
+}
+
+.compute-flow-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: calc(18 / 1080 * 100vw);
+  margin-top: calc(48 / 1080 * 100vw);
+}
+
+.compute-flow-metric {
+  opacity: 0;
+}
+
+.compute-flow-metric-label {
+  display: block;
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: calc(25 / 1080 * 100vw);
+  font-weight: 400;
+  color: var(--blue-black);
+  margin-bottom: calc(8 / 1080 * 100vw);
+}
+
+.compute-flow-metric-bar {
+  width: calc(225 / 1080 * 100vw);
+  height: calc(30.452 / 1080 * 100vw);
+  background: #d9d9d9;
+  border-radius: calc(6 / 1080 * 100vw);
+  overflow: hidden;
+  position: relative;
+}
+
+.compute-flow-metric-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--metric-width, 0%);
+  display: block;
+}
+
+.compute-flow-metric-fill--blue {
+  background: #0078d4;
+}
+
+.compute-flow-metric-fill--green {
+  background: #52b471;
+}
+
+.compute-flow-metric-fill--purple {
+  background: #784ab5;
+}
+
+.compute-flow-balls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.compute-highlight {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.compute-highlight__ring-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.compute-highlight__ring-wrap.clickable {
+  cursor: pointer;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.001);
+}
+
+.compute-highlight__ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 18px rgba(0, 120, 212, 0.45), inset 0 0 12px rgba(0, 120, 212, 0.35);
+  position: relative;
+  transform-origin: center;
+}
+
+.compute-highlight__ring::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 1px solid rgba(0, 120, 212, 0.35);
+  animation: compute-ring-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes compute-ring-pulse {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.06);
+  }
+}
+
+/* Dimension labels for magnification callout (3D CSS rendered) */
+.dimension-labels {
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.dimension-label {
+  color: var(--blue-black);
+  white-space: nowrap;
+}
+
+.dimension-label--title {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: 25px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.dimension-label--value {
+  font-size: 36px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.dimension-description {
+  pointer-events: none;
+}
+
+.dimension-description--anchor-title {
+  transform: translateY(calc(50% - var(--dimension-title-offset, 0px)));
+  transform-origin: top left;
+}
+
+.dimension-description--anchor-title-right {
+  transform: translateY(calc(50% - var(--dimension-title-offset, 0px)));
+  transform-origin: top right;
+  text-align: left;
+}
+
+.dimension-description__title {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--blue-black);
+  letter-spacing: 0.02em;
+  margin-bottom: 20px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.dimension-description__title--all-to-all {
+  font-size: 44px;
+  font-weight: 600;
+}
+
+.dimension-description--neutral .dimension-description__title {
+  font-size: 32px;
+}
+
+.dimension-description--neutral .dimension-description__text {
+  font-size: 22px;
+}
+
+.dimension-description__text {
+  font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif;
+  font-size: 25px;
+  font-weight: 400;
+  color: var(--blue-black);
+  line-height: 1.4;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.dimension-description--delayed {
+  animation: fadeInDelayed 0.4s ease-out 1.5s both;
+}
+
+@keyframes fadeInDelayed {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Drag hint animation for stage 3 */
+.compute-drag-hint {
+  position: absolute;
+  top: 46%;
+  left: 58%;
+  transform: translate(-50%, -50%) rotate(-90deg) scaleX(-1);
+  width: 40%;
+  height: 40%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+  z-index: 50;
+}
+
+.compute-drag-hint.visible {
+  opacity: 1;
+}
+
+/* Drag zone for stage 3 ball swiping */
+.compute-drag-zone {
+  position: absolute;
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  /* Debug: uncomment to see zone */
+  /* background: rgba(255, 0, 0, 0.15); */
+  /* border: 2px dashed rgba(255, 0, 0, 0.5); */
+}
+
+.compute-drag-zone:active {
+  cursor: grabbing;
+}

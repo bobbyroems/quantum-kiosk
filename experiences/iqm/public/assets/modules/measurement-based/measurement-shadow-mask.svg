@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="532" height="382" viewBox="662 1460 532 382">
+  <!-- Combine a defined inner halo with a faint outer falloff in one mask.
+       The shared backdrop tint keeps both layers adaptive. Dots get only a
+       smaller, half-strength inner halo so they remain precise. -->
+  <defs>
+    <path id="leader" d="M928 1516V1616H718V1786M928 1616H1138V1786"/>
+    <filter id="inner-glow" x="662" y="1460" width="532" height="382" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+    <filter id="outer-glow" x="662" y="1460" width="532" height="382" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <g filter="url(#outer-glow)" opacity="0.28">
+    <use href="#leader" fill="none" stroke="white" stroke-width="19" stroke-linejoin="round"/>
+  </g>
+  <g filter="url(#inner-glow)" opacity="0.8">
+    <use href="#leader" fill="none" stroke="white" stroke-width="11" stroke-linejoin="round"/>
+    <g fill="white" opacity="0.5">
+      <circle cx="928" cy="1516" r="16"/>
+      <circle cx="718" cy="1786" r="15.5"/>
+      <circle cx="1138" cy="1786" r="15.5"/>
+    </g>
+  </g>
+</svg>
