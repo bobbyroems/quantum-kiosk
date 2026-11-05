@@ -1,6 +1,6 @@
 'use strict'
 
-const { app, BrowserWindow, ipcMain, Menu, powerSaveBlocker, protocol, screen, session } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, Menu, powerSaveBlocker, protocol, screen, session } = require('electron')
 const fs = require('node:fs')
 const fsp = require('node:fs/promises')
 const path = require('node:path')
@@ -11,12 +11,12 @@ const { loadExperienceRegistry, resolveExperiencePath } = require('./experience-
 const { createRuntimeEnvelope } = require('./runtime-config.cjs')
 const { getRuntimeAdapter } = require('./runtime-adapters.cjs')
 const { RETURN_CONTROL_CSS } = require('./return-control-styles.cjs')
-const { acquireWorkspaceLock } = require('../scripts/experience-import/workspace-lock.cjs')
 
 protocol.registerSchemesAsPrivileged([{ scheme: APP_PROTOCOL_SCHEME, privileges: APP_PROTOCOL_PRIVILEGES }])
 
 const windowed = process.argv.includes('--windowed')
-const projectRoot = path.resolve(__dirname, '..')
+// Stream media from ordinary files, not ASAR file handles.
+const projectRoot = app.isPackaged ? path.join(process.resourcesPath, 'app-content') : path.resolve(__dirname, '..')
 let experiences = null
 let documents = null
 let roots = null
@@ -50,6 +50,14 @@ function releaseWorkspace() {
   const release = releaseWorkspaceLock
   releaseWorkspaceLock = null
   release()
+}
+
+function startupFailed(error) {
+  console.error(`[main] Startup failed: ${error.message}`)
+  if (app.isPackaged) dialog.showErrorBox('Quantum Kiosk could not start', error.message)
+  quitting = true
+  releaseWorkspace()
+  app.quit()
 }
 
 const windowUsable = () => mainWindow && !mainWindow.isDestroyed()
@@ -128,7 +136,9 @@ function createWindow() {
         const entry = await fsp.stat(path.join(roots[document], 'index.html'))
         if (!entry.isFile()) throw new Error('Missing entry document')
       } catch {
-        throw new Error(`${experiences.find(entry => entry.id === document).label} build unavailable. Build that experience from the project root, then try again.`)
+        const action = app.isPackaged ? 'Replace the executable with a freshly packaged copy, then try again.' :
+          'Build that experience from the project root, then try again.'
+        throw new Error(`${experiences.find(entry => entry.id === document).label} build unavailable. ${action}`)
       }
     },
     async loadDocument(document) {
@@ -199,16 +209,16 @@ if (!app.requestSingleInstanceLock()) {
     mainWindow.focus()
   })
   try {
-    releaseWorkspaceLock = acquireWorkspaceLock(projectRoot, 'launcher')
+    if (!app.isPackaged) {
+      const { acquireWorkspaceLock } = require('../scripts/experience-import/workspace-lock.cjs')
+      releaseWorkspaceLock = acquireWorkspaceLock(projectRoot, 'launcher')
+    }
     experiences = loadExperienceRegistry(projectRoot)
     documents = Object.freeze(['launcher', ...experiences.map(entry => entry.id)])
     roots = Object.freeze({ launcher: path.join(projectRoot, 'launcher'),
       ...Object.fromEntries(experiences.map(entry => [entry.id, resolveExperiencePath(projectRoot, entry, 'dist')])) })
   } catch (error) {
-    console.error(`[main] Startup failed: ${error.message}`)
-    quitting = true
-    releaseWorkspace()
-    app.quit()
+    startupFailed(error)
   }
   if (!quitting) app.whenReady().then(() => {
     if (quitting) return
@@ -227,12 +237,7 @@ if (!app.requestSingleInstanceLock()) {
     screen.on('display-metrics-changed', scheduleDisplayRefresh)
     createWindow()
     app.on('activate', () => { if (!quitting && !windowUsable()) createWindow() })
-  }).catch(error => {
-    console.error(`[main] Startup failed: ${error.message}`)
-    quitting = true
-    releaseWorkspace()
-    app.quit()
-  })
+  }).catch(startupFailed)
 }
 
 app.on('before-quit', () => {

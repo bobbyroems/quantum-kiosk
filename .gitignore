@@ -3,4 +3,5 @@ experiences/*/node_modules/
 experiences/*/dist/
 .runtime/
 .experience-imports/
+release/
 *.log

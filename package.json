@@ -11,14 +11,17 @@
     "start": "electron .",
     "dev": "electron . --windowed",
     "build": "node scripts\\build.cjs",
+    "package:win": "npm run build && node scripts\\package-win.cjs",
     "test": "node scripts\\test-shell.cjs",
     "test:experiences": "node scripts\\check-experiences.cjs",
     "experience:import": "node scripts\\experience-import.cjs",
     "smoke": "electron scripts\\electron-smoke.cjs --windowed",
-    "smoke:production": "electron scripts\\electron-smoke.cjs --production"
+    "smoke:production": "electron scripts\\electron-smoke.cjs --production",
+    "smoke:packaged": "node scripts\\smoke-packaged.cjs"
   },
   "devDependencies": {
-    "electron": "39.2.7"
+    "electron": "39.2.7",
+    "electron-builder": "26.18.0"
   },
   "allowScripts": {
     "electron@39.2.7": true

@@ -17,7 +17,7 @@ const registryFixture = Object.freeze([
 ])
 
 async function harness({ argv = [], env = {}, lock = true, registry = registryFixture,
-  workspaceFailure = null, registryFailure = null, startupFailure = null } = {}) {
+  workspaceFailure = null, registryFailure = null, startupFailure = null, packaged = false } = {}) {
   const windows = []
   const paths = []
   const writes = []
@@ -26,9 +26,11 @@ async function harness({ argv = [], env = {}, lock = true, registry = registryFi
   const registrations = []
   const blockers = []
   const workspaceLocks = []
+  const dialogs = []
   let released = 0
   let hostedRoots
   const app = new EventEmitter()
+  app.isPackaged = packaged
   app.commandLine = { appendSwitch() {} }
   app.getVersion = () => '1.0.0'
   app.requestSingleInstanceLock = () => lock
@@ -80,14 +82,15 @@ async function harness({ argv = [], env = {}, lock = true, registry = registryFi
     setBounds(value) { this.bounds = value }
     setAlwaysOnTop(value) { this.top = value }
   }
-  const electron = { app, BrowserWindow: Window, ipcMain: { handle: (channel, callback) => handlers.set(channel, callback) },
+  const electron = { app, BrowserWindow: Window, dialog: { showErrorBox: (...args) => dialogs.push(args) },
+    ipcMain: { handle: (channel, callback) => handlers.set(channel, callback) },
     Menu: { setApplicationMenu() {} }, screen, session: { defaultSession: appSession },
     protocol: { registerSchemesAsPrivileged: value => registrations.push(value), handle() { if (startupFailure) throw startupFailure } },
     powerSaveBlocker: { start: type => { blockers.push(type); return 1 }, isStarted: () => true, stop: id => blockers.push(id) } }
   const context = {
     module: { exports: {} },
     __dirname: path.join(__dirname, '..', 'electron'),
-    process: { argv, env, platform: 'win32' },
+    process: { argv, env, platform: 'win32', resourcesPath: path.join(__dirname, 'packaged-resources') },
     console: { error() {}, warn() {} },
     setTimeout: (callback, delay) => { const timer = { callback, delay }; timers.add(timer); return timer },
     clearTimeout: timer => timers.delete(timer),
@@ -131,7 +134,7 @@ async function harness({ argv = [], env = {}, lock = true, registry = registryFi
     return handlers.get(channel)({ sender: contents, senderFrame: contents.mainFrame }, ...args)
   }
   return { app, appSession, blockers, handlers, ipc, paths, registrations, runTimers, screen, timers, windows, writes,
-    workspaceLocks, getReleased: () => released, hostedRoots }
+    workspaceLocks, getReleased: () => released, hostedRoots, dialogs }
 }
 
 test('main starts one sandboxed window and full-document switching never constructs inactive windows', async () => {
@@ -346,6 +349,33 @@ test('workspace lifecycle lock is acquired only after Electron lock and released
   shell.app.quit()
   shell.app.emit('will-quit')
   assert.equal(shell.getReleased(), 1)
+})
+test('packaged shell serves external bundled content without writing workspace locks or requiring import tooling', async () => {
+  const shell = await harness({ packaged: true, workspaceFailure: new Error('Read-only application directory') })
+  assert.equal(shell.windows.length, 1)
+  assert.deepEqual(shell.workspaceLocks, [])
+  assert.deepEqual(shell.writes, [])
+  const root = path.join(__dirname, 'packaged-resources', 'app-content')
+  assert.equal(shell.hostedRoots.launcher, path.join(root, 'launcher'))
+  assert.equal(shell.hostedRoots.iqm, path.join(root, 'experiences', 'iqm', 'dist'))
+  await shell.ipc('quantum:launch-experience', 'iqm')
+  assert.equal(shell.windows[0].webContents.urls.at(-1), 'quantum-app://iqm/index.html')
+  assert.equal(shell.windows[0].options.frame, false)
+  const runtime = JSON.parse(decodeURIComponent(shell.windows[0].options.webPreferences.additionalArguments[0].split('=')[1]))
+  assert.equal(runtime.isKiosk, true)
+  shell.app.quit()
+  assert.equal(shell.getReleased(), 0)
+})
+test('packaged startup failures show an operator-visible error instead of silently exiting', async () => {
+  for (const options of [{ registryFailure: new Error('Missing bundled registry') },
+    { startupFailure: new Error('Protocol registration failed') }]) {
+    const shell = await harness({ packaged: true, ...options })
+    assert.equal(shell.app.quitCount, 1)
+    assert.equal(shell.dialogs.length, 1)
+    assert.match(shell.dialogs[0][0], /could not start/)
+    assert.equal(shell.dialogs[0][1], (options.registryFailure || options.startupFailure).message)
+    assert.equal(shell.getReleased(), 0)
+  }
 })
 test('active import blocks startup and registry or asynchronous startup failures release acquired workspace locks', async () => {
   const blocked = await harness({ workspaceFailure: new Error('Import is active') })

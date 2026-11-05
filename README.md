@@ -28,6 +28,33 @@ This command shows the cursor in the welcome screen, MAGNE, and IQM. MAGNE's lau
 
 Exit using **Ctrl+Shift+Q while the shell window has focus**. Windowed mode also allows ordinary window closing. Normal kiosk mode is borderless/fullscreen and guards accidental close, Escape, and F11; it is not Windows account lockdown or OS provisioning.
 
+## Stand-alone Windows kiosk executable
+
+The production target matches the IQM project: a **55-inch Elo 4K PCAP touchscreen**, mounted **portrait (2160 x 3840)**, on **Windows 11 Enterprise or Pro, x64**. Set the display's resolution and portrait orientation in Windows first; the application follows the display's actual bounds and DPI scaling rather than changing OS display settings. Elo/touch display selection and the overrides below work in the executable too.
+
+On the Windows build machine, restore the dependencies described above, then run:
+
+```powershell
+npm.cmd run package:win
+npm.cmd run smoke:packaged
+```
+
+Packaging rebuilds both registered experiences and creates **`release\Quantum-Kiosk-0.1.0-x64-portable.exe`** (the version follows the root manifest). Copy that single executable to the kiosk's local disk and double-click it. **The kiosk does not need Node.js, npm, Git, a source checkout, internet access, or administrator rights.** It starts manually in fullscreen kiosk mode; it does not install itself, create shortcuts, enable sign-in startup, or change Windows policies.
+
+The portable EXE embeds its large media payload without recompression to keep build and extraction times predictable; expect a large executable. It extracts its bundled Electron runtime and content into a temporary directory on each launch. Allow disk space for both the EXE and its extracted media; startup can take longer than running an installed app. Keep the executable on the kiosk rather than running it from removable media. Runtime preferences/cache use Electron's normal per-user data directories, not the executable's directory. Closing the app does not erase those preferences. To update, quit with **Ctrl+Shift+Q**, replace the EXE, and relaunch.
+
+For a safe operator preview:
+
+```powershell
+& '.\release\Quantum-Kiosk-0.1.0-x64-portable.exe' --windowed
+```
+
+The payload contains the shared Electron shell, welcome assets, registry, every registered experience's built `dist`, and its runtime configuration. It excludes editable renderer source, build tools, dependency trees, import baselines, and development state. Media lives outside ASAR in the extracted resources so the existing streamed-file protocol and video byte ranges work unchanged. A post-pack check rejects missing/truncated content, including OBJ models that packaging defaults can otherwise omit. Packaged startup never writes source-workspace locks or loads importer tooling. The pinned electron-builder 26.18.0 edits Windows executable metadata without the older cross-platform signing-tool archive's administrator/symlink requirement; Windows protections need not be changed to build an unsigned EXE.
+
+`smoke:packaged` launches the actual portable EXE in a temporary windowed session, from outside the source root, using isolated user data. It checks the 2160 x 3840 welcome layout, both experience launches and return controls, offline fonts, IQM configuration, bundled video HEAD/range reads, and clean windowed shutdown. It enables a temporary localhost debugging endpoint only for this test and writes evidence under `.runtime\packaged-smoke`. To check a renamed/copied build, use `npm.cmd run smoke:packaged -- 'C:\Kiosk\Quantum-Kiosk.exe'`. This does not replace a physical touchscreen/production fullscreen acceptance test, including focused **Ctrl+Shift+Q**.
+
+Builds are unsigned unless you configure electron-builder's normal Authenticode signing credentials on the build machine. Windows may show a SmartScreen warning for unsigned downloads; use your organization's approved signing/distribution process rather than disabling Windows protections. Electron fullscreen alone does not prevent OS shortcuts, task switching, or access to the desktop: unattended public installations still need separately managed Windows account lockdown/Shell Launcher policies.
+
 An environment-specific registry workaround was needed during development. On machines with the same restriction, append this approved feed to each dependency-restore command:
 
 ```text
